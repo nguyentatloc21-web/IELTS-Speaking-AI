@@ -1,53 +1,43 @@
 import streamlit as st
 import google.generativeai as genai
 
-# ================= 1. CẤU HÌNH =================
-if "GOOGLE_API_KEY" in st.secrets:
-    GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
-else:
-    st.error("⚠️ Chưa nhập API Key. Hãy vào Settings -> Secrets để nhập.")
+# ================= 1. CẤU HÌNH (DÙNG BẢN CŨ CHO AN TOÀN) =================
+try:
+    if "GOOGLE_API_KEY" in st.secrets:
+        GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
+    else:
+        st.error("⚠️ Chưa nhận được API Key.")
+        st.stop()
+        
+    genai.configure(api_key=GOOGLE_API_KEY, transport="rest")
+    
+    # --- DÙNG GEMINI PRO (BẢN 1.0) ---
+    # Con này tuy cũ hơn Flash nhưng siêu ổn định, không bao giờ lỗi 404
+    model = genai.GenerativeModel("gemini-pro")
+    
+except Exception as e:
+    st.error(f"Lỗi khởi tạo: {e}")
     st.stop()
 
-genai.configure(api_key=GOOGLE_API_KEY, transport="rest")
-
-# --- SỬA LỖI 404: THỬ CÁC TÊN GỌI KHÁC NHAU ---
-# Máy chủ đôi khi hiểu tên này, đôi khi hiểu tên kia. Ta thử cả 2.
-try:
-    # Thử tên ngắn gọn trước (Thường dùng cho bản mới)
-    model = genai.GenerativeModel("gemini-1.5-flash")
-except:
-    try:
-        # Nếu lỗi, thử thêm tiền tố models/
-        model = genai.GenerativeModel("models/gemini-1.5-flash")
-    except:
-        # Đường cùng: Dùng bản Pro cũ (Chắc chắn chạy nhưng hạn mức ít hơn chút)
-        model = genai.GenerativeModel("gemini-pro")
-
-# ================= 2. GIAO DIỆN (UI) =================
-st.set_page_config(page_title="IELTS Assessment", page_icon="🎙️")
+# ================= 2. GIAO DIỆN =================
+st.set_page_config(page_title="IELTS Speaking", page_icon="🎙️")
 
 st.markdown("""
     <style>
         .stApp {background-color: #f4f6f9;}
         .instruction-box {
             background-color: white; padding: 20px; border-radius: 10px;
-            border-left: 5px solid #1e3a8a; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-left: 5px solid #1e3a8a; margin-bottom: 20px;
         }
-        h1 {color: #1e3a8a;}
     </style>
 """, unsafe_allow_html=True)
 
 st.title("IELTS Speaking Assessment")
-st.markdown("**Class:** PLA1601 | **Instructor:** Mr. Tat Loc")
+st.caption("Model: Gemini Pro (Stable)")
 
 st.markdown("""
 <div class="instruction-box">
-    <strong>👋 Hướng dẫn (Instructions):</strong>
-    <ol>
-        <li>Chọn Topic bên dưới.</li>
-        <li>Bấm <b>Record</b> và trả lời (20-40s).</li>
-        <li>Chụp màn hình kết quả nộp bài.</li>
-    </ol>
+    <strong>Hướng dẫn:</strong> Chọn chủ đề, bấm Record và trả lời trong 30s.
 </div>
 """, unsafe_allow_html=True)
 
@@ -61,47 +51,32 @@ questions = [
     "Part 1: Is there any new hobby you want to try in the future?",
     "Part 1: How do you relax after a stressful day?"
 ]
-selected_q = st.selectbox("📌 Select a Topic:", questions)
+selected_q = st.selectbox("Topic:", questions)
 
-st.write("🎙️ **Your Answer:**")
-audio_value = st.audio_input("Record")
+audio_value = st.audio_input("Record Answer")
 
 if audio_value:
-    with st.spinner("AI is analyzing..."):
+    with st.spinner("Analyzing..."):
         try:
             audio_bytes = audio_value.read()
             if len(audio_bytes) < 500:
-                st.error("⚠️ File quá ngắn. Vui lòng thử lại.")
+                st.warning("Ghi âm quá ngắn.")
                 st.stop()
                 
             gemini_audio_input = {"mime_type": "audio/wav", "data": audio_bytes}
             
             prompt = f"""
-            Role: IELTS Examiner. Assess speaking for: "{selected_q}".
-            
-            INSTRUCTIONS:
-            1. Determine Band Score.
-            2. Provide feedback strictly in VIETNAMESE.
-            3. LEVEL-ADAPTIVE:
-               - If Band < 5.0: Suggest simple improvements (Band 6.0). NO idioms.
-               - If Band 6.0+: Suggest advanced vocabulary (Band 7.5+).
-            
-            OUTPUT FORMAT (Vietnamese):
-            **1. Đánh giá (Estimated Band):** [Score]
-            **2. Nhận xét:** [Pros/Cons]
-            **3. Sửa lỗi & Nâng cấp:** [Correction -> Better Phrase]
-            **4. Tổng kết:** [Conclusion]
+            Role: IELTS Examiner. Assess: "{selected_q}".
+            Feedback in VIETNAMESE.
+            Output: Band Score, Pros/Cons, Fixes, Conclusion.
             """
 
             response = model.generate_content([prompt, gemini_audio_input], stream=False)
             
-            st.divider()
-            st.success("✅ Assessment Completed!")
+            st.success("✅ Done!")
             with st.container(border=True):
                 st.markdown(response.text)
-            st.info("💡 Tip: Chụp màn hình kết quả này để nộp bài.")
             
         except Exception as e:
-            st.error("⚠️ LỖI KẾT NỐI (Vui lòng thử lại sau 30s):")
-            # Chỉ hiện mã lỗi ngắn gọn để không làm rối mắt
-            st.code(str(e)[0:100] + "...")
+            st.error("Lỗi:")
+            st.code(e)
