@@ -1,82 +1,67 @@
 import streamlit as st
 import google.generativeai as genai
+import importlib.metadata
 
-# ================= 1. CẤU HÌNH (DÙNG BẢN CŨ CHO AN TOÀN) =================
+# ================= CẤU HÌNH =================
+st.set_page_config(page_title="System Check", page_icon="🛠️")
+st.title("🛠️ Công cụ Kiểm tra Hệ thống")
+
+# 1. Kiểm tra API Key
 try:
+    # Ưu tiên lấy từ Secrets
     if "GOOGLE_API_KEY" in st.secrets:
-        GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
+        api_key = st.secrets["GOOGLE_API_KEY"]
+        source = "Secrets (Bảo mật)"
     else:
-        st.error("⚠️ Chưa nhận được API Key.")
-        st.stop()
-        
-    genai.configure(api_key=GOOGLE_API_KEY, transport="rest")
+        # Nếu không có Secrets thì thử dùng key dán trực tiếp (chỉ để test)
+        # Bạn có thể dán tạm key vào dòng dưới nếu cần test nhanh:
+        api_key = "DÁN_KEY_CỦA_BẠN_VÀO_ĐÂY_NẾU_KHÔNG_DÙNG_SECRETS" 
+        source = "Dán trực tiếp (Hard-code)"
     
-    # --- DÙNG GEMINI PRO (BẢN 1.0) ---
-    # Con này tuy cũ hơn Flash nhưng siêu ổn định, không bao giờ lỗi 404
-    model = genai.GenerativeModel("gemini-pro")
+    st.success(f"✅ Đã tìm thấy API Key từ: {source}")
+    genai.configure(api_key=api_key)
     
 except Exception as e:
-    st.error(f"Lỗi khởi tạo: {e}")
+    st.error(f"❌ Lỗi API Key: {e}")
     st.stop()
 
-# ================= 2. GIAO DIỆN =================
-st.set_page_config(page_title="IELTS Speaking", page_icon="🎙️")
+# 2. Kiểm tra Phiên bản Thư viện
+try:
+    version = importlib.metadata.version("google-generativeai")
+    st.info(f"📦 Phiên bản thư viện 'google-generativeai' đang chạy: **{version}**")
+    
+    # Cảnh báo nếu phiên bản quá cũ
+    if version < "0.7.0":
+        st.error("⚠️ Phiên bản QUÁ CŨ! Cần cập nhật requirements.txt thành: google-generativeai>=0.7.0")
+    else:
+        st.success("✅ Phiên bản thư viện: ỔN")
+except:
+    st.warning("⚠️ Không kiểm tra được phiên bản thư viện.")
 
-st.markdown("""
-    <style>
-        .stApp {background-color: #f4f6f9;}
-        .instruction-box {
-            background-color: white; padding: 20px; border-radius: 10px;
-            border-left: 5px solid #1e3a8a; margin-bottom: 20px;
-        }
-    </style>
-""", unsafe_allow_html=True)
+# 3. Quét danh sách Model khả dụng (QUAN TRỌNG NHẤT)
+st.divider()
+st.write("🔄 Đang hỏi Google xem Key này dùng được Model nào...")
 
-st.title("IELTS Speaking Assessment")
-st.caption("Model: Gemini Pro (Stable)")
-
-st.markdown("""
-<div class="instruction-box">
-    <strong>Hướng dẫn:</strong> Chọn chủ đề, bấm Record và trả lời trong 30s.
-</div>
-""", unsafe_allow_html=True)
-
-questions = [
-    "Part 1: What is your daily routine like?",
-    "Part 1: Are you a morning person or a night person?",
-    "Part 1: Do you often eat breakfast at home or outside?",
-    "Part 1: Do you have a healthy lifestyle?",
-    "Part 1: What do you usually do in your free time?",
-    "Part 1: Do you prefer spending time alone or with friends?",
-    "Part 1: Is there any new hobby you want to try in the future?",
-    "Part 1: How do you relax after a stressful day?"
-]
-selected_q = st.selectbox("Topic:", questions)
-
-audio_value = st.audio_input("Record Answer")
-
-if audio_value:
-    with st.spinner("Analyzing..."):
-        try:
-            audio_bytes = audio_value.read()
-            if len(audio_bytes) < 500:
-                st.warning("Ghi âm quá ngắn.")
-                st.stop()
-                
-            gemini_audio_input = {"mime_type": "audio/wav", "data": audio_bytes}
+if st.button("Bấm để Quét Model (Scan Models)"):
+    try:
+        available_models = []
+        for m in genai.list_models():
+            # Chỉ lấy những model có khả năng tạo nội dung (generateContent)
+            if 'generateContent' in m.supported_generation_methods:
+                available_models.append(m.name)
+        
+        if available_models:
+            st.success(f"🎉 Tìm thấy {len(available_models)} model hoạt động được:")
+            st.code("\n".join(available_models))
+            st.caption("👉 Hãy copy một cái tên trong danh sách trên (ví dụ: models/gemini-1.5-flash) để dùng.")
+        else:
+            st.error("❌ Kết nối thành công nhưng KHÔNG tìm thấy model nào. Có thể Key này bị hạn chế quyền hoặc sai vùng.")
             
-            prompt = f"""
-            Role: IELTS Examiner. Assess: "{selected_q}".
-            Feedback in VIETNAMESE.
-            Output: Band Score, Pros/Cons, Fixes, Conclusion.
-            """
-
-            response = model.generate_content([prompt, gemini_audio_input], stream=False)
-            
-            st.success("✅ Done!")
-            with st.container(border=True):
-                st.markdown(response.text)
-            
-        except Exception as e:
-            st.error("Lỗi:")
-            st.code(e)
+    except Exception as e:
+        st.error("❌ Lỗi KẾT NỐI nghiêm trọng:")
+        st.code(e)
+        st.markdown("""
+        **Gợi ý nguyên nhân:**
+        1. API Key bị sai hoặc đã bị xóa/hủy.
+        2. File `requirements.txt` chưa được máy chủ cập nhật (Hãy Reboot App & Clear Cache).
+        """)
