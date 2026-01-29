@@ -3,7 +3,8 @@ import google.generativeai as genai
 
 # ================= 1. CẤU HÌNH KỸ THUẬT (GIỮ NGUYÊN ĐỂ KHÔNG LỖI) =================
 # ⚠️ DÁN KEY CỦA BẠN VÀO ĐÂY
-GOOGLE_API_KEY = "AIzaSyDIMjMbKU3lXMsJ6Exb9q3D1h3cDhkqFzg"
+# Lấy key từ hệ thống bảo mật (Secrets)
+GOOGLE_API_KEY = st.secrets["AIzaSyDIMjMbKU3lXMsJ6Exb9q3D1h3cDhkqFzg"]
 
 # Cấu hình kết nối
 genai.configure(api_key=GOOGLE_API_KEY, transport="rest")
