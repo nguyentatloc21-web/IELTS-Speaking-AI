@@ -13,6 +13,19 @@ CLASS_CONFIG = {
     "ELITE1912": {"level": "6.5 - 7.0", "desc": "Lớp Elite"}
 }
 
+# Danh sách Chủ đề Listening (Cho học viên chọn)
+LISTENING_TOPICS = [
+    "Công nghệ & AI (Technology)",
+    "Sức khỏe & Tinh thần (Health & Mental)",
+    "Kinh doanh & Khởi nghiệp (Business)",
+    "Văn hóa & Du lịch (Culture & Travel)",
+    "Tâm lý học (Psychology)",
+    "Vụ án & Trinh thám (True Crime)",
+    "Môi trường (Environment)",
+    "Giáo dục (Education)",
+    "Thể thao (Sports)"
+]
+
 # --- DỮ LIỆU SPEAKING ---
 SPEAKING_CONTENT = {
     "Lesson 1: Work & Study": [
@@ -34,7 +47,7 @@ SPEAKING_CONTENT = {
     ]
 }
 
-# --- DỮ LIỆU READING (FULL PASSAGE) ---
+# --- DỮ LIỆU READING (FULL PASSAGE & EXPLANATION) ---
 READING_CONTENT = {
     "Lesson 2: Marine Chronometer": {
         "status": "Active",
@@ -56,37 +69,23 @@ Harrison had a principal contestant for the tempting prize at that time, an Engl
 
 Most chronometer forerunners of that particular generation were English, but that doesn’t mean every achievement was made by them. One wonderful figure in the history is the Lancastrian Thomas Earnshaw, who created the ultimate form of chronometer escapement—the spring detent escapement—and made the final decision on format and productions system for the marine chronometer, which turns it into a genuine modem commercial product, as well as a safe and pragmatic way of navigation at sea over the next century and half.
         """,
-        # Phần 1: Điền từ (Comprehension)
+        # Phần câu hỏi & Giải thích chi tiết
         "questions_fill": [
-            {"id": "q1", "q": "1. Sailors were able to use the position of the Sun to calculate [.........].", "a": "local time", "exp": "Dẫn chứng đoạn 4: 'A comparison with the local time (easily identified by checking the position of the Sun)...'"},
-            {"id": "q2", "q": "2. An invention that could win the competition would lose no more than [.........] every day.", "a": "2.8 seconds", "exp": "Dẫn chứng đoạn 5: '...needed to be within 2.8 seconds a day...'"},
-            {"id": "q3", "q": "3. John and James Harrison’s clock worked accurately without [.........].", "a": "lubrication", "exp": "Dẫn chứng đoạn 6: '...revolutionary because it required no lubrication.'"},
-            {"id": "q4", "q": "4. Harrison’s main competitor’s invention was known as [.........].", "a": "sextant", "exp": "Dẫn chứng đoạn 7: '...John Hadley, who developed sextant.'"},
-            {"id": "q5", "q": "5. Hadley’s instrument can use [.........] to make a calculation of location of ships or planes.", "a": "angles", "exp": "Dẫn chứng đoạn 7: 'The sextant is the tool that people adopt to measure angles...'"},
-            {"id": "q6", "q": "6. The modern version of Harrison’s invention is called [.........].", "a": "marine chronometer", "exp": "Dẫn chứng đoạn 8: '...turns it into a genuine modem commercial product... marine chronometer...'"}
-        ],
-        # Phần 2: Nối từ (Vocabulary Matching)
-        "vocab_match": [
-            {"word": "Longitude", "def": "Kinh độ (Distance east or west of the prime meridian)", "key": "A"},
-            {"word": "Accuracy", "def": "Sự chính xác (The fact of being exact or correct)", "key": "B"},
-            {"word": "Lubrication", "def": "Sự bôi trơn (Making a machine work smoothly with oil)", "key": "C"},
-            {"word": "Revolutionary", "def": "Mang tính cách mạng (Completely new and having a great effect)", "key": "D"},
-            {"word": "Pragmatic", "def": "Thực tế/Thực dụng (Solving problems in a sensible way)", "key": "E"}
-        ],
-        # Phần 3: Chọn từ vào câu (Vocabulary in Context)
-        "vocab_context": [
-            {"q": "The GPS on my phone gives me accurate ______ of my location.", "options": ["coordinates", "shaking", "contestant"], "a": "coordinates"},
-            {"q": "This machine requires regular ______ to work smoothly.", "options": ["lubrication", "longitude", "destination"], "a": "lubrication"},
-            {"q": "We need a ______ solution, not just a theoretical one.", "options": ["pragmatic", "violent", "lunar"], "a": "pragmatic"}
+            {"id": "q1", "q": "1. Sailors were able to use the position of the Sun to calculate [.........].", "a": "local time", "exp": "Vị trí thông tin đoạn 4: 'A comparison with the local time (easily identified by checking the position of the Sun)...' -> Giờ địa phương được xác định nhờ mặt trời."},
+            {"id": "q2", "q": "2. An invention that could win the competition would lose no more than [.........] every day.", "a": "2.8 seconds", "exp": "Vị trí thông tin đoạn 5: '...needed to be within 2.8 seconds a day...' -> Sai số cho phép là 2.8 giây/ngày."},
+            {"id": "q3", "q": "3. John and James Harrison’s clock worked accurately without [.........].", "a": "lubrication", "exp": "Vị trí thông tin đoạn 6: '...revolutionary because it required no lubrication.' -> Không cần bôi trơn."},
+            {"id": "q4", "q": "4. Harrison’s main competitor’s invention was known as [.........].", "a": "sextant", "exp": "Vị trí thông tin đoạn 7: '...John Hadley, who developed sextant.' -> Đối thủ chính phát triển kính lục phân."},
+            {"id": "q5", "q": "5. Hadley’s instrument can use [.........] to make a calculation of location of ships or planes.", "a": "angles", "exp": "Vị trí thông tin đoạn 7: 'The sextant is the tool that people adopt to measure angles...' -> Dùng để đo góc."},
+            {"id": "q6", "q": "6. The modern version of Harrison’s invention is called [.........].", "a": "marine chronometer", "exp": "Vị trí thông tin đoạn 8: '...turns it into a genuine modem commercial product... marine chronometer...' -> Đồng hồ hàng hải."}
         ]
     }
 }
 
-# Tự động tạo Menu
-SPEAKING_MENU = list(SPEAKING_CONTENT.keys()) + [f"Lesson {i}: (Sắp ra mắt)" for i in range(3, 11)]
-READING_MENU = ["Lesson 1: (Sắp ra mắt)"] + list(READING_CONTENT.keys()) + [f"Lesson {i}: (Sắp ra mắt)" for i in range(3, 11)]
+# Tạo Menu (Lesson 1-10)
+SPEAKING_MENU = list(SPEAKING_CONTENT.keys()) + [f"Lesson {i}" for i in range(3, 11)]
+READING_MENU = [f"Lesson {i}" if i != 2 else "Lesson 2: Marine Chronometer" for i in range(1, 11)]
 
-# ================= 2. SYSTEM CONFIG =================
+# ================= 2. CẤU HÌNH HỆ THỐNG =================
 st.set_page_config(page_title="Mr. Tat Loc IELTS Portal", page_icon="🎓", layout="wide")
 
 st.markdown("""
@@ -96,6 +95,7 @@ st.markdown("""
     h2 {color: #004080; font-size: 18px; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 20px;}
     .stButton button {background-color: #004080; color: white; border-radius: 4px;}
     .stAlert {background-color: #f0f8ff; border: 1px solid #d6e9c6; color: #3c763d;}
+    .explanation-box {background-color: #f9f9f9; padding: 10px; border-left: 3px solid #004080; margin-top: 5px; font-size: 0.9rem;}
     </style>
 """, unsafe_allow_html=True)
 
@@ -114,10 +114,8 @@ def call_gemini(prompt):
         resp = requests.post(url, headers=headers, data=json.dumps(data))
         if resp.status_code == 200:
             return resp.json()['candidates'][0]['content']['parts'][0]['text']
-        else:
-            return "Hệ thống đang bận, vui lòng thử lại sau."
-    except:
-        return "Lỗi kết nối mạng."
+        else: return "Hệ thống đang bận, vui lòng thử lại."
+    except: return "Lỗi kết nối mạng."
 
 def login():
     st.markdown("<div style='text-align: center; margin-top: 50px;'><h1>MR. TAT LOC IELTS CLASS</h1></div>", unsafe_allow_html=True)
@@ -130,45 +128,41 @@ def login():
                 if name and class_code != "-- Chọn lớp --":
                     st.session_state['user'] = {"name": name, "class": class_code, "level": CLASS_CONFIG[class_code]}
                     st.rerun()
-                else:
-                    st.warning("Vui lòng điền đủ thông tin.")
+                else: st.warning("Vui lòng điền đủ thông tin.")
 
 def logout():
     st.session_state['user'] = None
     st.rerun()
 
-# ================= 4. UI CHÍNH =================
+# ================= 4. GIAO DIỆN CHÍNH =================
 if 'user' not in st.session_state or st.session_state['user'] is None:
     login()
 else:
     user = st.session_state['user']
     
-    # --- SIDEBAR ---
     with st.sidebar:
         st.write(f"👤 **{user['name']}**")
         st.caption(f"Lớp: {user['class']} | Level: {user['level']['level']}")
         st.divider()
         menu = st.radio("CHỌN KỸ NĂNG:", ["🗣️ Speaking", "📖 Reading", "🎧 Listening"])
         st.divider()
-        if st.button("Đăng xuất"):
-            logout()
+        if st.button("Đăng xuất"): logout()
 
-    # --- 1. SPEAKING MODULE ---
+    # --- 1. SPEAKING ---
     if menu == "🗣️ Speaking":
         st.title("Luyện Tập Speaking")
-        st.info("💡 Hướng dẫn: Chọn bài học, chọn câu hỏi và ghi âm. AI sẽ chấm điểm theo trình độ lớp học.")
-        
         col1, col2 = st.columns([1, 2])
         with col1:
-            lesson_choice = st.selectbox("Danh sách bài học:", SPEAKING_MENU)
+            lesson_choice = st.selectbox("Chọn bài học:", SPEAKING_MENU)
         
+        # Nếu bài học có dữ liệu
         if lesson_choice in SPEAKING_CONTENT:
             with col2:
                 q_list = SPEAKING_CONTENT[lesson_choice]
-                question = st.selectbox("Chọn câu hỏi:", q_list)
+                question = st.selectbox("Câu hỏi:", q_list)
             
-            st.markdown(f"**Topic:** {question}")
-            audio = st.audio_input("Nhấn để ghi âm", key=f"rec_{question}")
+            st.info(f"🎙️ **Topic:** {question}")
+            audio = st.audio_input("Ghi âm câu trả lời:", key=f"rec_{question}")
             
             if audio:
                 with st.spinner("AI đang chấm điểm..."):
@@ -187,112 +181,111 @@ else:
                     try:
                         resp = requests.post(url, headers={'Content-Type': 'application/json'}, data=json.dumps(payload))
                         if resp.status_code == 200:
-                            st.success("Đã có kết quả!")
                             st.markdown(resp.json()['candidates'][0]['content']['parts'][0]['text'])
-                        else: st.error("Lỗi kết nối.")
                     except: st.error("Lỗi hệ thống.")
         else:
-            st.warning("🚧 Bài học này đang được biên soạn. Vui lòng quay lại sau.")
+            st.info("Bài học này chưa cập nhật.")
 
-    # --- 2. READING MODULE ---
+    # --- 2. READING ---
     elif menu == "📖 Reading":
-        st.title("Luyện Từ Vựng Reading")
-        lesson_choice = st.selectbox("Danh sách bài đọc:", READING_MENU)
+        st.title("Luyện Reading & Từ Vựng")
+        lesson_choice = st.selectbox("Chọn bài đọc:", READING_MENU)
         
-        if lesson_choice in READING_CONTENT:
-            data = READING_CONTENT[lesson_choice]
+        if "Marine Chronometer" in lesson_choice: # Chỉ Lesson 2 có nội dung
+            data = READING_CONTENT["Lesson 2: Marine Chronometer"]
             
-            # Tự động hiển thị văn bản (Expanded)
-            with st.expander("📄 ĐỌC VĂN BẢN (Nhấn để thu gọn/mở rộng)", expanded=True):
-                st.markdown(data['text'])
-                
-            tab1, tab2, tab3 = st.tabs(["📝 Điền từ", "🔗 Nối từ", "🧩 Chọn từ"])
+            tab1, tab2 = st.tabs(["📝 Bài Đọc & Điền Từ", "🤖 Luyện Từ Vựng (AI)"])
             
-            # Tab 1: Comprehension
+            # Tab 1: Bài đọc chính + Chấm điểm
             with tab1:
-                st.subheader("Questions 1-6: Fill in the blanks (No more than TWO words)")
+                with st.expander("📄 HIỂN THỊ BÀI ĐỌC (FULL TEXT)", expanded=True):
+                    st.markdown(data['text'])
+                
+                st.subheader("Questions 1-6: Fill in the blanks")
                 with st.form("read_fill"):
-                    score = 0
+                    user_answers = {}
                     for q in data['questions_fill']:
-                        user_ans = st.text_input(q['q'])
-                        if user_ans.strip().lower() == q['a'].lower():
-                            score += 1
-                    if st.form_submit_button("Nộp bài"):
-                        st.info(f"Kết quả: {score}/{len(data['questions_fill'])}")
-                        if score < len(data['questions_fill']): st.caption("Gợi ý: Hãy đọc kỹ lại đoạn văn để tìm từ chính xác.")
+                        user_answers[q['id']] = st.text_input(q['q'])
+                    
+                    submitted = st.form_submit_button("Nộp bài & Xem Giải Thích")
+                    
+                    if submitted:
+                        score = 0
+                        for q in data['questions_fill']:
+                            u_ans = user_answers[q['id']].strip().lower()
+                            c_ans = q['a'].lower()
+                            
+                            # Hiển thị kết quả từng câu
+                            if u_ans == c_ans:
+                                st.success(f"✅ **Đúng:** {q['a']}")
+                                score += 1
+                            else:
+                                st.error(f"❌ **Sai:** Bạn điền '{user_answers[q['id']]}' -> Đáp án: '{q['a']}'")
+                            
+                            # HIỂN THỊ GIẢI THÍCH (CHO CẢ ĐÚNG VÀ SAI)
+                            st.markdown(f"<div class='explanation-box'>💡 <b>Giải thích:</b> {q['exp']}</div>", unsafe_allow_html=True)
+                        
+                        st.divider()
+                        st.info(f"📊 **Tổng điểm: {score}/{len(data['questions_fill'])}**")
 
-            # Tab 2: Matching
+            # Tab 2: AI Generate bài tập
             with tab2:
-                st.subheader("Match word with definition")
-                col_def, col_form = st.columns(2)
-                with col_def:
-                    for item in data['vocab_match']:
-                        st.write(f"**{item['key']}:** {item['def']}")
-                with col_form:
-                    with st.form("read_match"):
-                        m_score = 0
-                        for item in data['vocab_match']:
-                            ans = st.selectbox(f"Từ '{item['word']}' nghĩa là:", ["...", "A", "B", "C", "D", "E"], key=item['word'])
-                            if ans == item['key']: m_score += 1
-                        if st.form_submit_button("Kiểm tra"):
-                            if m_score == len(data['vocab_match']): st.success("Xuất sắc!")
-                            else: st.warning(f"Bạn đúng {m_score} câu.")
+                st.info("Bấm nút bên dưới để AI tạo ra các bài tập từ vựng mới dựa trên bài đọc này.")
+                
+                col_gen1, col_gen2 = st.columns(2)
+                with col_gen1:
+                    if st.button("✨ Tạo bài tập Trắc nghiệm (Multiple Choice)"):
+                        with st.spinner("AI đang soạn đề..."):
+                            prompt = f"Create 5 multiple choice vocabulary questions based on this text: \n{data['text']}\n Format: Question, 4 Options, Answer Key. Output in Vietnamese."
+                            st.markdown(call_gemini(prompt))
+                
+                with col_gen2:
+                    if st.button("🧩 Tạo bài tập Nối từ (Matching)"):
+                        with st.spinner("AI đang soạn đề..."):
+                            prompt = f"Create a matching exercise (5 words) with definitions based on this text: \n{data['text']}\n Output in Vietnamese."
+                            st.markdown(call_gemini(prompt))
 
-            # Tab 3: Context
-            with tab3:
-                st.subheader("Choose the correct word")
-                with st.form("read_context"):
-                    c_score = 0
-                    for i, item in enumerate(data['vocab_context']):
-                        st.write(f"**Câu {i+1}:** {item['q']}")
-                        ans = st.radio(f"Đáp án:", item['options'], key=f"ctx_{i}", label_visibility="collapsed")
-                        if ans == item['a']: c_score += 1
-                    if st.form_submit_button("Hoàn thành"):
-                        st.success(f"Kết quả: {c_score}/{len(data['vocab_context'])}")
         else:
-            st.warning("🚧 Bài học này đang được thầy Lộc biên soạn. Vui lòng chọn Lesson 2.")
+            st.info("Bài học này chưa cập nhật.")
 
-    # --- 3. LISTENING MODULE ---
+    # --- 3. LISTENING ---
     elif menu == "🎧 Listening":
         st.title("Luyện Nghe Chủ Động")
-        st.info("💡 Hướng dẫn: Nhập chủ đề bạn thích -> AI gợi ý kênh -> Bạn tìm video và Script -> AI dịch và giải thích từ vựng.")
+        st.info("Chọn chủ đề bạn thích, hệ thống sẽ đề xuất kênh phù hợp.")
         
         col1, col2 = st.columns(2)
         with col1:
-            topic = st.text_input("Nhập chủ đề (VD: Technology, Football, Cooking...):")
+            topic = st.selectbox("Chọn chủ đề:", LISTENING_TOPICS)
         with col2:
             duration = st.selectbox("Thời lượng:", ["Ngắn (3-5 phút)", "Trung bình (10-15 phút)", "Dài (> 30 phút)"])
             
-        if st.button("🔍 Tìm Kênh/Podcast phù hợp"):
-            if topic:
-                with st.spinner("AI đang tìm kiếm nguồn nghe hay nhất..."):
-                    prompt = f"""
-                    Role: IELTS Teacher. Student Level: {user['level']['level']}.
-                    Task: Suggest 3 Youtube Channels or Podcasts for topic "{topic}" with duration "{duration}".
-                    Output Language: Vietnamese.
-                    Format:
-                    1. **[Tên Kênh]** - [Nền tảng]
-                       - Tại sao phù hợp: [Giải thích]
-                       - Từ khóa tìm kiếm: [Keyword]
-                    """
-                    st.markdown(call_gemini(prompt))
-            else:
-                st.warning("Vui lòng nhập chủ đề.")
+        if st.button("🔍 Tìm nguồn nghe"):
+            with st.spinner("AI đang tìm kiếm..."):
+                prompt = f"""
+                Role: IELTS Teacher. Student Level: {user['level']['level']}.
+                Task: Suggest 3 Youtube Channels or Podcasts for topic "{topic}" with duration "{duration}".
+                Output Language: Vietnamese.
+                Format:
+                1. **[Tên Kênh]**
+                   - Tại sao phù hợp: [Giải thích]
+                   - Từ khóa tìm kiếm: [Keyword]
+                """
+                st.markdown(call_gemini(prompt))
 
         st.divider()
         st.subheader("Phân tích Script & Dịch Song Ngữ")
         script_input = st.text_area("Dán Script (lời thoại) video bạn tìm được vào đây:", height=200)
         
-        if st.button("Dịch & Highlight Từ Vựng"):
+        if st.button("Dịch & Giải thích Từ Vựng"):
             if script_input:
                 with st.spinner("AI đang phân tích..."):
                     prompt = f"""
                     Role: IELTS Teacher. Level: {user['level']['level']}.
                     Task:
-                    1. Translate the script below to Vietnamese (Format: Sentence by sentence).
-                    2. **Highlight Vocabulary**: Pick 5-7 words suitable for band {user['level']['level']}. Explain meanings in context.
+                    1. Translate to Vietnamese (Sentence by sentence).
+                    2. Highlight 5-7 useful words for band {user['level']['level']}.
                     Script: {script_input[:3000]}
                     """
                     st.markdown(call_gemini(prompt))
             else:
-                st.warning("Hãy dán script vào trước nhé.")
+                st.warning("Vui lòng dán script vào trước.")
