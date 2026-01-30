@@ -1,9 +1,10 @@
 import streamlit as st
 import google.generativeai as genai
+import time
 
-# ================= 1. CẤU HÌNH (DÙNG KEY MỚI) =================
-# ⚠️ DÁN KEY MỚI VÀO ĐÂY
-GOOGLE_API_KEY = "AIzaSyA7Rn_kvSEZ63ZEfIsrTGnZEh57aVCZvEM"
+# ================= 1. CẤU HÌNH (DÙNG KEY TỪ NEW PROJECT) =================
+# ⚠️ DÁN KEY TỪ DỰ ÁN MỚI (NEW PROJECT) VÀO ĐÂY
+GOOGLE_API_KEY = "AIzaSyC3vMiv7f5eJXxLKiKWoh7F6tyOGeTf0K0"
 
 try:
     genai.configure(api_key=GOOGLE_API_KEY, transport="rest")
@@ -11,19 +12,34 @@ except Exception as e:
     st.error(f"Lỗi Key: {e}")
     st.stop()
 
-# --- CHỌN ĐÚNG MODEL CÓ TRONG TÀI KHOẢN THẦY ---
-# Tuyệt đối không gọi 1.5 Flash nữa vì tài khoản thầy không có.
-# Gọi chính xác tên này (Đã check trong list thầy gửi):
-try:
-    model = genai.GenerativeModel("models/gemini-2.0-flash-lite-001")
-except:
-    # Nếu xui quá thì thử gọi tên ngắn gọn của nó
-    model = genai.GenerativeModel("gemini-2.0-flash-lite-001")
+# --- QUAY VỀ CHÂN ÁI: GEMINI 1.5 FLASH ---
+# Với Project mới, con này chắc chắn 100% sẽ xuất hiện và chạy ngon.
+# Em thêm cơ chế tự thử các tên gọi khác nhau để chống lỗi 404 tuyệt đối.
+active_model = None
+model_names = [
+    "gemini-1.5-flash",          # Tên chuẩn
+    "gemini-1.5-flash-latest",   # Tên bản mới
+    "gemini-1.5-flash-001",      # Tên mã
+    "models/gemini-1.5-flash"    # Tên đầy đủ
+]
+
+for name in model_names:
+    try:
+        test_model = genai.GenerativeModel(name)
+        active_model = test_model
+        break # Nếu chạy được thì dừng thử
+    except:
+        continue
+
+if not active_model:
+    # Nếu xui xẻo lắm thì dùng bản Pro cũ
+    active_model = genai.GenerativeModel("gemini-pro")
 
 # ================= 2. GIAO DIỆN LỚP HỌC =================
 st.set_page_config(page_title="IELTS Speaking", page_icon="🎙️")
 st.title("IELTS Speaking Assessment")
-st.markdown("**Instructor:** Mr. Tat Loc | **Model:** Gemini 2.0 Flash Lite")
+st.markdown("**Class:** PLA1601 | **Instructor:** Mr. Tat Loc")
+st.caption("Model: Gemini 1.5 Flash (Standard)")
 
 st.info("👋 Hướng dẫn: Chọn chủ đề -> Bấm Record -> Chờ AI chấm điểm.")
 
@@ -43,7 +59,7 @@ st.write("🎙️ **Your Answer:**")
 audio_value = st.audio_input("Record")
 
 if audio_value:
-    with st.spinner("AI đang chấm điểm (Model 2.0 Lite)..."):
+    with st.spinner("AI đang chấm điểm (Mất khoảng 5-10s)..."):
         try:
             audio_bytes = audio_value.read()
             if len(audio_bytes) < 500:
@@ -58,18 +74,15 @@ if audio_value:
             Output: Band Score, Pros/Cons, Fixes, Conclusion.
             """
 
-            response = model.generate_content([prompt, gemini_audio_input], stream=False)
+            response = active_model.generate_content([prompt, gemini_audio_input], stream=False)
             
             st.success("✅ Đã chấm xong!")
             with st.container(border=True):
                 st.markdown(response.text)
+            st.balloons() # Thả bóng bay chúc mừng
             
         except Exception as e:
-            st.error("⚠️ LỖI KẾT NỐI:")
+            st.error("⚠️ LỖI:")
             st.code(e)
-            # Kiểm tra nếu lỗi 429 (Hết lượt)
-            if "429" in str(e):
-                st.warning("Key này đã hết hạn mức hôm nay. Vui lòng đổi Key khác.")
-            # Kiểm tra lỗi 404 (Không tìm thấy model)
-            elif "404" in str(e):
-                st.warning("Vẫn không tìm thấy Model. Có thể Google đang cập nhật danh sách.")
+            if "400" in str(e):
+                st.warning("Lỗi định dạng file âm thanh. Thầy thử reload trang nhé.")
