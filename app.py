@@ -2,16 +2,20 @@ import streamlit as st
 import requests
 import base64
 import json
-import time
 
-# ================= CẤU HÌNH =================
-# ⚠️ DÙNG LẠI ĐÚNG CÁI KEY VỪA QUÉT RA DANH SÁCH KIA
-API_KEY = "AIzaSyC3vMiv7f5eJXxLKiKWoh7F6tyOGeTf0K0" 
+# ================= CẤU HÌNH (LẤY TỪ KÉT SẮT) =================
+# Không dán Key trực tiếp vào đây nữa!
+# Code này sẽ tự mò vào mục Secrets trên web để lấy Key.
+try:
+    API_KEY = st.secrets["GOOGLE_API_KEY"]
+except:
+    st.error("⚠️ Chưa cấu hình Secrets. Thầy hãy vào Settings -> Secrets trên Streamlit để dán Key vào nhé.")
+    st.stop()
 
 # ================= GIAO DIỆN =================
 st.set_page_config(page_title="IELTS Speaking", page_icon="🎙️")
 st.title("IELTS Speaking Assessment")
-st.caption("Model: Gemini 2.0 Flash (Premium Tester Access)")
+st.caption("Model: Gemini 2.0 Flash (Secure Mode)")
 
 questions = [
     "Part 1: What is your daily routine like?",
@@ -28,7 +32,7 @@ st.write("🎙️ **Your Answer:**")
 audio_value = st.audio_input("Record")
 
 if audio_value:
-    with st.spinner("AI đang chấm điểm (Gemini 2.0 Flash)..."):
+    with st.spinner("AI đang chấm điểm..."):
         try:
             # 1. Xử lý file
             audio_bytes = audio_value.read()
@@ -38,8 +42,7 @@ if audio_value:
             
             audio_b64 = base64.b64encode(audio_bytes).decode('utf-8')
 
-            # 2. GỌI ĐÚNG TÊN MODEL TRONG DANH SÁCH CỦA THẦY
-            # Em chọn con này vì nó ổn định nhất trong đám Tester
+            # 2. Gửi đến Gemini 2.0 Flash (Model xịn nhất trong list của thầy)
             url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
             
             headers = {'Content-Type': 'application/json'}
@@ -75,10 +78,6 @@ if audio_value:
             else:
                 st.error(f"⚠️ Lỗi Google ({response.status_code}):")
                 st.code(response.text)
-                
-                # Nếu con 2.0 Flash này cũng bị khóa (429), ta sẽ thử con 2.5
-                if response.status_code == 429:
-                    st.warning("👉 Gợi ý: Nếu lỗi 429, thầy thử đổi dòng `url` trong code thành `models/gemini-2.5-flash` xem sao.")
 
         except Exception as e:
             st.error("⚠️ Lỗi hệ thống:")
