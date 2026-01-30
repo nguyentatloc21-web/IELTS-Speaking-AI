@@ -2,22 +2,19 @@ import streamlit as st
 import requests
 import base64
 import json
-import time
 
-# ================= CẤU HÌNH (LẤY TỪ KÉT SẮT) =================
-# Code tự động lấy Key trong Secrets để không bị Google khóa
+# ================= CẤU HÌNH (LẤY TỪ SECRETS) =================
 try:
+    # Lấy Key từ "Két sắt" để Google không bao giờ khóa nữa
     API_KEY = st.secrets["GOOGLE_API_KEY"]
 except:
-    # Nếu thầy chưa cài Secrets, nó sẽ hiện lỗi hướng dẫn
-    st.error("⚠️ QUAN TRỌNG: Thầy chưa cất Key vào Két sắt (Secrets)!")
-    st.info("👉 Cách sửa: Vào web Streamlit -> Settings -> Secrets -> Dán Key vào đó theo mẫu: GOOGLE_API_KEY = '...'")
+    st.error("⚠️ Chưa cấu hình Secrets. Thầy hãy vào Settings -> Secrets trên Streamlit để dán Key vào nhé.")
     st.stop()
 
 # ================= GIAO DIỆN =================
 st.set_page_config(page_title="IELTS Speaking", page_icon="🎙️")
 st.title("IELTS Speaking Assessment")
-st.caption("Model: Gemini Exp 1206 (Experimental Channel)")
+st.caption("System: Clean Account | Model: Gemini 1.5 Flash")
 
 questions = [
     "Part 1: What is your daily routine like?",
@@ -34,7 +31,7 @@ st.write("🎙️ **Your Answer:**")
 audio_value = st.audio_input("Record")
 
 if audio_value:
-    with st.spinner("AI đang chấm điểm (Thử nghiệm Exp 1206)..."):
+    with st.spinner("AI đang chấm điểm (Tài khoản mới)..."):
         try:
             # 1. Xử lý file
             audio_bytes = audio_value.read()
@@ -44,9 +41,8 @@ if audio_value:
             
             audio_b64 = base64.b64encode(audio_bytes).decode('utf-8')
 
-            # 2. GỌI CON MODEL "CỬA SAU": GEMINI EXP 1206
-            # Con này thường được thả Free để test
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-exp-1206:generateContent?key={API_KEY}"
+            # 2. GỌI GEMINI 1.5 FLASH (Chuẩn nhất cho Gmail mới)
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={API_KEY}"
             
             headers = {'Content-Type': 'application/json'}
             
@@ -81,11 +77,6 @@ if audio_value:
             else:
                 st.error(f"⚠️ Lỗi Google ({response.status_code}):")
                 st.code(response.text)
-                
-                # Nếu con này cũng chết thì bó tay với tài khoản này
-                if "429" in str(response.status_code):
-                    st.error("⛔ KẾT LUẬN: Tài khoản Google này đã bị khóa 'Hard Limit' (Cấm toàn bộ model).")
-                    st.warning("👉 GIẢI PHÁP CUỐI CÙNG: Thầy bắt buộc phải tạo một GMAIL MỚI TINH (chưa từng dính dáng đến Google Cloud/Gemini) để lấy Key mới.")
 
         except Exception as e:
             st.error("⚠️ Lỗi hệ thống:")
