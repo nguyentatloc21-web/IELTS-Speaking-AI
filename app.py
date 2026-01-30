@@ -4,105 +4,113 @@ import base64
 import json
 
 # ================= CẤU HÌNH HỆ THỐNG =================
-# Giới hạn số lần nộp bài trong 1 phiên làm việc để tiết kiệm tài nguyên
-MAX_SUBMISSIONS = 3 
+# Giới hạn số lượt trả lời CHO MỖI CÂU HỎI
+MAX_ATTEMPTS_PER_QUESTION = 3
 
-st.set_page_config(page_title="Lớp IELTS Thầy Lộc", page_icon="📚", layout="centered")
+st.set_page_config(page_title="Lớp IELTS Thầy Lộc", page_icon="🎓", layout="centered")
 
-# CSS tùy chỉnh để giao diện sạch và chuyên nghiệp hơn
+# CSS giao diện sạch, tối giản
 st.markdown("""
     <style>
     .main {
-        background-color: #f9f9f9;
+        background-color: #fdfdfd;
     }
     h1 {
-        color: #2c3e50;
+        color: #1a5276;
         font-family: 'Helvetica Neue', sans-serif;
-        font-size: 2.2rem;
+        font-size: 2rem;
     }
-    .stButton button {
-        background-color: #2980b9;
-        color: white;
-        border-radius: 5px;
+    .stSelectbox label {
+        color: #34495e;
+        font-weight: bold;
     }
     .stAlert {
-        background-color: #ecf0f1;
-        color: #2c3e50;
-        border: 1px solid #bdc3c7;
+        border: 1px solid #d5dbdb;
     }
     </style>
 """, unsafe_allow_html=True)
-
-# Khởi tạo bộ đếm số lần nộp bài
-if 'submission_count' not in st.session_state:
-    st.session_state['submission_count'] = 0
 
 # Lấy Key từ Secrets
 try:
     API_KEY = st.secrets["GOOGLE_API_KEY"]
 except:
-    st.error("⚠️ Hệ thống đang bảo trì (Chưa cấu hình API Key). Vui lòng liên hệ Thầy Lộc.")
+    st.error("⚠️ Hệ thống chưa nhận diện được Key. Vui lòng liên hệ Thầy Lộc.")
     st.stop()
 
-# ================= GIAO DIỆN CHÍNH =================
-st.title("Nộp Bài Tập Nói - Lớp Thầy Lộc")
-st.markdown("---")
-st.write("Chào bạn! Đây là trợ lý AI của Thầy Lộc. Bạn hãy chọn chủ đề bên dưới và nộp bài ghi âm nhé.")
-st.write(f"⚡ **Lượt nộp còn lại:** {MAX_SUBMISSIONS - st.session_state['submission_count']}/{MAX_SUBMISSIONS}")
+# ================= QUẢN LÝ TRẠNG THÁI (SESSION STATE) =================
+# Tạo một từ điển để lưu số lần nộp của TỪNG câu hỏi
+if 'attempts_history' not in st.session_state:
+    st.session_state['attempts_history'] = {}
 
-# Danh sách câu hỏi (Thầy có thể sửa lại tiếng Việt cho thân thiện hơn)
+# ================= DANH SÁCH CÂU HỎI =================
 questions = [
-    "Topic 1: Kể về thói quen hàng ngày của bạn (Daily Routine)",
-    "Topic 2: Bạn là người dậy sớm hay thức khuya? (Morning/Night Person)",
-    "Topic 3: Bạn thường ăn sáng ở nhà hay bên ngoài?",
-    "Topic 4: Bạn có lối sống lành mạnh không?",
-    "Topic 5: Sở thích lúc rảnh rỗi của bạn là gì?",
-    "Topic 6: Một kỹ năng mới bạn muốn học trong tương lai?",
-    "Topic 7: Cách bạn thư giãn sau một ngày căng thẳng?"
+    "1. What is your daily routine like?",
+    "2. Are you a morning person or a night person?",
+    "3. Do you often eat breakfast at home or outside?",
+    "4. Do you have a healthy lifestyle?",
+    "5. What do you usually do in your free time?",
+    "6. Do you prefer spending time alone or with friends?",
+    "7. Is there any new hobby you want to try in the future?",
+    "8. How do you relax after a stressful day?"
 ]
-selected_topic = st.selectbox("📌 Chọn chủ đề bài tập:", questions)
 
+# ================= GIAO DIỆN CHÍNH =================
+st.title("Luyện Tập Speaking - Lớp Thầy Lộc")
+st.caption("Trợ lý AI hỗ trợ chấm bài và feedback chi tiết")
+st.markdown("---")
+
+# 1. Chọn câu hỏi
+selected_q = st.selectbox("📌 Chọn câu hỏi bạn muốn luyện tập:", questions)
+
+# 2. Kiểm tra số lượt còn lại của câu hỏi này
+current_usage = st.session_state['attempts_history'].get(selected_q, 0)
+remaining_attempts = MAX_ATTEMPTS_PER_QUESTION - current_usage
+
+# Hiển thị thông báo lượt
+if remaining_attempts > 0:
+    st.info(f"⚡ Bạn còn **{remaining_attempts}** lượt trả lời cho câu hỏi này.")
+else:
+    st.warning(f"⛔ Bạn đã dùng hết {MAX_ATTEMPTS_PER_QUESTION} lượt cho câu hỏi này. Hãy chuyển sang câu khác nhé!")
+
+# 3. Khu vực ghi âm
 st.write("🎙️ **Ghi âm câu trả lời của bạn:**")
-audio_value = st.audio_input("Nhấn để ghi âm")
+audio_value = st.audio_input("Nhấn để bắt đầu nói")
 
 # ================= XỬ LÝ LOGIC =================
 if audio_value:
-    # 1. Kiểm tra giới hạn lượt nộp
-    if st.session_state['submission_count'] >= MAX_SUBMISSIONS:
-        st.warning("⛔ Bạn đã hết lượt nộp bài hôm nay. Hãy quay lại sau hoặc liên hệ Thầy Lộc nhé!")
+    # Chặn nếu hết lượt
+    if remaining_attempts <= 0:
+        st.error("Rất tiếc, để đảm bảo tài nguyên lớp học, bạn vui lòng chọn câu hỏi khác hoặc quay lại sau nhé.")
         st.stop()
 
-    with st.spinner("Trợ lý đang nghe và chấm bài..."):
+    with st.spinner("Trợ lý Thầy Lộc đang nghe và nhận xét..."):
         try:
-            # 2. Xử lý file âm thanh
+            # Xử lý file
             audio_bytes = audio_value.read()
-            if len(audio_bytes) < 1000: # Tăng giới hạn tối thiểu lên chút để lọc tạp âm
-                st.error("⚠️ File ghi âm quá ngắn hoặc không có tiếng. Bạn vui lòng nói lại nhé.")
+            if len(audio_bytes) < 800: # Lọc file quá ngắn (< 1 giây)
+                st.warning("⚠️ Âm thanh quá ngắn. Bạn vui lòng nói dài hơn một chút nhé.")
                 st.stop()
             
             audio_b64 = base64.b64encode(audio_bytes).decode('utf-8')
 
-            # 3. Gửi đến Gemini 2.0 Flash
+            # Gọi API Gemini 2.0 Flash
             url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
             headers = {'Content-Type': 'application/json'}
             
-            # === PROMPT (LINH HỒN CỦA TRỢ LÝ) ===
-            # Đây là phần chỉ đạo AI chấm điểm theo ý thầy
+            # Prompt tối ưu hóa cho feedback
             prompt_text = f"""
-            Vai trò: Bạn là Trợ lý AI thân thiện của lớp IELTS Thầy Lộc.
-            Nhiệm vụ: Nghe và nhận xét bài nói của học viên về chủ đề: '{selected_topic}'.
+            Vai trò: Bạn là Trợ lý giảng dạy thân thiện của Thầy Lộc (Lớp IELTS Speaking).
+            Nhiệm vụ: Đánh giá câu trả lời của học viên cho câu hỏi: "{selected_q}".
             
-            Yêu cầu quan trọng về Feedback:
-            1. Tự động phát hiện trình độ:
-               - Nếu học viên nói yếu/ngập ngừng: Dùng từ vựng đơn giản, động viên là chính, chỉ sửa lỗi ngữ pháp cơ bản.
-               - Nếu học viên nói tốt: Góp ý khắt khe hơn, gợi ý từ vựng nâng cao (Idioms/Collocations).
-            2. Tuyệt đối không dùng văn phong quá học thuật hay "như máy". Hãy nói chuyện tự nhiên như một người hướng dẫn tận tâm.
-            3. Trả về kết quả bằng Tiếng Việt theo cấu trúc sau (Dùng Markdown):
-               - 🎯 **Band điểm ước lượng:** (Đưa ra khoảng, ví dụ 5.0 - 5.5)
-               - 🌟 **Điểm sáng:** (Khen ngợi 1-2 điểm tốt nhất)
-               - 🛠️ **Góp ý cải thiện:** (Chỉ ra 2 lỗi quan trọng nhất cần sửa ngay, đừng liệt kê quá nhiều gây nản)
-               - 💡 **Thử nói lại thế này nhé:** (Viết lại 1 câu của học viên theo cách hay hơn/tự nhiên hơn)
-               - 💬 **Lời nhắn từ Trợ lý:** (Một câu động viên ngắn gọn).
+            YÊU CẦU FEEDBACK (Quan trọng):
+            1. **Nhận diện trình độ:** - Nếu nói yếu/ngập ngừng: Dùng giọng điệu khích lệ, chỉ sửa lỗi ngữ pháp cơ bản để bạn không nản.
+               - Nếu nói trôi chảy: Góp ý kỹ hơn về từ vựng (collocations) và độ tự nhiên để nâng band.
+            2. **Định dạng trả về (Tiếng Việt, dùng Markdown):**
+               - 🎯 **Band điểm ước lượng:** (Khoảng điểm, ví dụ 5.0 - 5.5)
+               - ✨ **Điểm cộng:** (Khen 1-2 điểm tốt nhất về phát âm hoặc ý tưởng)
+               - 🔧 **Cần cải thiện:** (Chỉ ra tối đa 2 lỗi quan trọng nhất kèm cách sửa. Đừng liệt kê quá nhiều)
+               - 💡 **Gợi ý nâng cấp:** (Viết lại một câu của bạn cho hay hơn/"tây" hơn)
+               - 💬 **Lời nhắn:** (Một câu động viên ngắn gọn từ trợ lý).
             """
 
             payload = {
@@ -119,24 +127,21 @@ if audio_value:
                 }]
             }
 
-            # 4. Gửi request
             response = requests.post(url, headers=headers, data=json.dumps(payload))
             
             if response.status_code == 200:
                 result = response.json()
                 text_response = result['candidates'][0]['content']['parts'][0]['text']
                 
-                # Tăng biến đếm số lần nộp thành công
-                st.session_state['submission_count'] += 1
+                # CẬP NHẬT SỐ LƯỢT DÙNG (Trừ đi 1 lượt của câu hỏi này)
+                st.session_state['attempts_history'][selected_q] = current_usage + 1
                 
                 # Hiển thị kết quả
-                st.success("✅ Đã chấm xong! Dưới đây là nhận xét chi tiết:")
+                st.success("✅ Đã có kết quả!")
                 with st.container(border=True):
                     st.markdown(text_response)
             else:
-                st.error("⚠️ Có lỗi kết nối. Bạn vui lòng thử lại sau.")
-                # (Chỉ hiện mã lỗi cho thầy xem nếu cần debug, ẩn với học viên)
-                # st.write(response.text) 
+                st.error("⚠️ Kết nối thất bại. Bạn thử lại nhé.")
 
         except Exception as e:
-            st.error("⚠️ Hệ thống đang bận. Bạn hãy thử lại nhé.")
+            st.error("⚠️ Hệ thống đang bận, vui lòng thử lại sau.")
