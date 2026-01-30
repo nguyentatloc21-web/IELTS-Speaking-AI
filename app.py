@@ -1,67 +1,50 @@
 import streamlit as st
 import google.generativeai as genai
 
-# ================= 1. CẤU HÌNH =================
-# Lấy Key an toàn
-if "GOOGLE_API_KEY" in st.secrets:
-    GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
-else:
-    # Dự phòng cho thầy test nhanh nếu lười chỉnh secrets
-    GOOGLE_API_KEY = "DÁN_KEY_CỦA_THẦY_VÀO_ĐÂY" 
+# ================= 1. CẤU HÌNH (QUAN TRỌNG: DÙNG KEY MỚI) =================
+# ⚠️ Thay Key mới vào đây (Key cũ đã bị khóa hôm nay)
+GOOGLE_API_KEY = "AIzaSyA7Rn_kvSEZ63ZEfIsrTGnZEh57aVCZvEM"
 
-genai.configure(api_key=GOOGLE_API_KEY, transport="rest")
-
-# --- CHIẾN THUẬT: THỬ LẦN LƯỢT CÁC MODEL CÓ TRONG LIST CỦA THẦY ---
-# Danh sách này lấy từ ảnh thầy gửi (những con này chắc chắn Key thầy dùng được)
-model_candidates = [
-    "models/gemini-flash-latest",       # Ưu tiên 1: Bản Flash mới nhất
-    "models/gemini-2.0-flash-exp",      # Ưu tiên 2: Bản 2.0 (Ngon nhưng experimental)
-    "models/gemini-exp-1206",           # Ưu tiên 3: Bản thử nghiệm tháng 12
-    "models/gemini-pro"                 # Đường cùng: Bản cũ siêu bền
-]
-
-active_model = None
-last_error = None
-
-# Vòng lặp thử từng con một
-for m_name in model_candidates:
-    try:
-        test_model = genai.GenerativeModel(m_name)
-        # Thử kết nối giả vờ một cái xem sống hay chết
-        test_model.count_tokens("Hello")
-        active_model = test_model
-        print(f"✅ Đã kết nối thành công với: {m_name}")
-        break # Nếu ngon rồi thì dừng thử, dùng luôn
-    except Exception as e:
-        print(f"❌ {m_name} bị lỗi, đang thử con tiếp theo...")
-        last_error = e
-
-# Nếu thử hết cả danh sách mà vẫn chết
-if not active_model:
-    st.error("⚠️ LỖI NGHIÊM TRỌNG: Không model nào hoạt động.")
-    st.write("Chi tiết lỗi cuối cùng (Gửi ảnh này cho Admin):")
-    st.code(last_error)
+try:
+    genai.configure(api_key=GOOGLE_API_KEY, transport="rest")
+except Exception as e:
+    st.error(f"Lỗi Key: {e}")
     st.stop()
 
-# ================= 2. GIAO DIỆN HỌC VIÊN =================
-st.set_page_config(page_title="IELTS Speaking", page_icon="🎙️")
+# --- CHỌN MODEL "LITE" (MIỄN PHÍ 1500 LƯỢT/NGÀY) ---
+# Tuyệt đối không dùng 'latest' nữa. Dùng đích danh con này:
+try:
+    model = genai.GenerativeModel("models/gemini-2.0-flash-lite-001")
+except:
+    # Dự phòng
+    model = genai.GenerativeModel("gemini-2.0-flash-lite-preview-02-05")
+
+# ================= 2. GIAO DIỆN LỚP HỌC =================
+st.set_page_config(page_title="IELTS Speaking Assessment", page_icon="🎙️")
 
 st.markdown("""
     <style>
         .stApp {background-color: #f4f6f9;}
         .instruction-box {
-            background-color: white; padding: 20px; border-radius: 10px;
-            border-left: 5px solid #1e3a8a; margin-bottom: 20px;
+            background-color: white; padding: 20px; border-radius: 12px;
+            border-left: 6px solid #1e3a8a; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
         }
+        h1 {color: #1e3a8a; font-family: 'Helvetica', sans-serif;}
     </style>
 """, unsafe_allow_html=True)
 
 st.title("IELTS Speaking Assessment")
-st.caption(f"System Online | Model: {active_model.model_name.split('/')[-1]}") # Hiện tên model đang chạy
+st.markdown("**Instructor:** Mr. Tat Loc &nbsp;|&nbsp; **Class:** PLA1601")
 
 st.markdown("""
 <div class="instruction-box">
-    <strong>Hướng dẫn:</strong> Chọn chủ đề, bấm Record và trả lời (20-40s).
+    <strong style="color:#1e3a8a;">👋 Hướng dẫn nộp bài:</strong>
+    <ol>
+        <li>Chọn Topic bên dưới.</li>
+        <li>Bấm <b>Record</b> và trả lời (20-40 giây).</li>
+        <li>Chụp màn hình kết quả Feedback nộp vào nhóm lớp.</li>
+    </ol>
 </div>
 """, unsafe_allow_html=True)
 
@@ -75,42 +58,46 @@ questions = [
     "Part 1: Is there any new hobby you want to try in the future?",
     "Part 1: How do you relax after a stressful day?"
 ]
-selected_q = st.selectbox("Topic:", questions)
+selected_q = st.selectbox("📌 Select a Topic:", questions)
 
 st.write("🎙️ **Your Answer:**")
 audio_value = st.audio_input("Record")
 
 if audio_value:
-    with st.spinner("Analyzing..."):
+    with st.spinner("AI is analyzing..."):
         try:
             audio_bytes = audio_value.read()
             if len(audio_bytes) < 500:
-                st.warning("File ghi âm quá ngắn.")
+                st.error("⚠️ File ghi âm quá ngắn hoặc lỗi.")
                 st.stop()
                 
             gemini_audio_input = {"mime_type": "audio/wav", "data": audio_bytes}
             
             prompt = f"""
-            Role: IELTS Examiner. Assess: "{selected_q}".
-            INSTRUCTIONS:
-            1. Determine Band Score.
-            2. Feedback in VIETNAMESE.
-            3. Level-adaptive: Band <5 -> Simple suggestions. Band >6 -> Advanced.
+            Role: IELTS Examiner. Task: Assess speaking for "{selected_q}".
             
-            OUTPUT:
-            **1. Band Score:** [Score]
-            **2. Nhận xét:** [Pros/Cons]
-            **3. Sửa lỗi:** [Fixes]
+            INSTRUCTIONS:
+            1. Determine Band Score (0-9.0).
+            2. Provide feedback strictly in VIETNAMESE.
+            3. LEVEL-ADAPTIVE:
+               - If Band < 5.0: Suggest simple improvements.
+               - If Band 6.0+: Suggest advanced vocabulary.
+            
+            OUTPUT FORMAT (Vietnamese):
+            **1. Đánh giá (Band Score):** [Score]
+            **2. Nhận xét (Ưu/Nhược điểm):** [Pronunciation, Grammar, Fluency]
+            **3. Sửa lỗi & Nâng cấp:** [Original -> Better Version]
             **4. Tổng kết:** [Conclusion]
             """
 
-            response = active_model.generate_content([prompt, gemini_audio_input], stream=False)
+            response = model.generate_content([prompt, gemini_audio_input], stream=False)
             
-            st.success("✅ Done!")
+            st.divider()
+            st.success("✅ Đã chấm xong!")
             with st.container(border=True):
                 st.markdown(response.text)
+            st.info("💡 Tip: Chụp màn hình kết quả này để nộp bài.")
             
         except Exception as e:
-            # Lần này hiện nguyên hình lỗi ra để bắt bệnh
-            st.error("⚠️ CÓ LỖI XẢY RA:")
-            st.code(e)
+            st.error("⚠️ Lỗi kết nối (Vui lòng thử lại sau 30s).")
+            # st.code(e) # Ẩn lỗi
