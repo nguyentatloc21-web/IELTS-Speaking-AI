@@ -1,42 +1,82 @@
 import streamlit as st
-import google.generativeai as genai
+import requests
+import base64
+import json
 
-# ================= 1. NHẬP KEY (KIỂM TRA KỸ) =================
-# Thầy hãy dán Key vào giữa 2 dấu ngoặc kép.
-# ⚠️ LƯU Ý: Kiểm tra kỹ xem có dư DẤU CÁCH ở đầu hoặc cuối không nhé!
-GOOGLE_API_KEY = "AIzaSyC3vMiv7f5eJXxLKiKWoh7F6tyOGeTf0K0"
+# ================= CẤU HÌNH (DÙNG KEY MỚI) =================
+# ⚠️ DÁN KEY TỪ PROJECT MỚI VÀO ĐÂY
+API_KEY = "AIzaSyC3vMiv7f5eJXxLKiKWoh7F6tyOGeTf0K0"
 
-# Cấu hình
-genai.configure(api_key=GOOGLE_API_KEY, transport="rest")
+# ================= GIAO DIỆN =================
+st.set_page_config(page_title="IELTS Speaking", page_icon="🎙️")
+st.title("IELTS Speaking Assessment")
+st.caption("Mode: Direct API (Bypass Library Errors)")
 
-# ================= 2. GIAO DIỆN KIỂM TRA =================
-st.set_page_config(page_title="System Check", page_icon="🔧")
-st.title("🔧 Kiểm tra Kết nối Google AI")
+questions = [
+    "Part 1: What is your daily routine like?",
+    "Part 1: Are you a morning person or a night person?",
+    "Part 1: Do you often eat breakfast at home or outside?",
+    "Part 1: Do you have a healthy lifestyle?",
+    "Part 1: What do you usually do in your free time?",
+    "Part 1: Do you prefer spending time alone or with friends?",
+    "Part 1: Is there any new hobby you want to try in the future?",
+    "Part 1: How do you relax after a stressful day?"
+]
+selected_q = st.selectbox("📌 Select a Topic:", questions)
 
-st.info("Đang thử kết nối với Gemini 1.5 Flash...")
+st.write("🎙️ **Your Answer:**")
+audio_value = st.audio_input("Record")
 
-# Nút bấm để test
-if st.button("BẤM ĐỂ TEST KẾT NỐI"):
-    try:
-        # Gọi thử một câu đơn giản nhất
-        model = genai.GenerativeModel("gemini-1.5-flash")
-        response = model.generate_content("Say Hello")
-        
-        # Nếu chạy xuống được đây là NGON LÀNH
-        st.success("✅ KẾT NỐI THÀNH CÔNG! (Key hoạt động tốt)")
-        st.write("AI trả lời:", response.text)
-        st.balloons()
-        
-    except Exception as e:
-        # Nếu lỗi, in nguyên văn lỗi ra để bắt bệnh
-        st.error("❌ KẾT NỐI THẤT BẠI. Nguyên nhân chi tiết:")
-        st.code(str(e)) # Hiện nguyên hình con lỗi
-        
-        # Phân tích lỗi giúp thầy
-        err_msg = str(e)
-        if "INVALID_ARGUMENT" in err_msg or "API_KEY_INVALID" in err_msg:
-            st.warning("👉 Lỗi Key sai: Có thể thầy copy thiếu chữ hoặc thừa dấu cách.")
-        elif "PERMISSION_DENIED" in err_msg:
-            st.warning("👉 Lỗi Quyền: Key này chưa được bật 'Generative Language API'.")
-        elif "404" in err_msg:
-            st.warning("👉 Lỗi 404: Máy chủ Streamlit vẫn chưa cập nhật xong thư viện.")
+if audio_value:
+    with st.spinner("AI đang chấm điểm (Chế độ trực tiếp)..."):
+        try:
+            # 1. Chuyển file âm thanh sang mã Base64
+            audio_bytes = audio_value.read()
+            if len(audio_bytes) < 500:
+                st.error("⚠️ File quá ngắn.")
+                st.stop()
+            
+            # Mã hóa file
+            audio_b64 = base64.b64encode(audio_bytes).decode('utf-8')
+
+            # 2. Soạn nội dung gửi đi (Thủ công)
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={API_KEY}"
+            
+            headers = {'Content-Type': 'application/json'}
+            
+            payload = {
+                "contents": [{
+                    "parts": [
+                        {"text": f"Role: IELTS Examiner. Assess speaking for: '{selected_q}'. Provide output in Vietnamese: Band Score, Pros/Cons, Fixes, Conclusion."},
+                        {
+                            "inline_data": {
+                                "mime_type": "audio/wav",
+                                "data": audio_b64
+                            }
+                        }
+                    ]
+                }]
+            }
+
+            # 3. Gửi đi bằng đường tắt (Requests)
+            response = requests.post(url, headers=headers, data=json.dumps(payload))
+            
+            # 4. Xử lý kết quả trả về
+            if response.status_code == 200:
+                result = response.json()
+                try:
+                    text_response = result['candidates'][0]['content']['parts'][0]['text']
+                    st.success("✅ Đã chấm xong!")
+                    with st.container(border=True):
+                        st.markdown(text_response)
+                    st.balloons()
+                except:
+                    st.error("⚠️ AI trả về lỗi định dạng (Thử lại lần nữa).")
+            else:
+                # Nếu lỗi, in rõ lỗi gì từ Google
+                st.error(f"⚠️ LỖI TỪ GOOGLE ({response.status_code}):")
+                st.code(response.text)
+
+        except Exception as e:
+            st.error("⚠️ Lỗi hệ thống:")
+            st.code(e)
