@@ -3,57 +3,112 @@ import requests
 import base64
 import json
 
-# ================= CẤU HÌNH =================
-st.set_page_config(page_title="IELTS Speaking VIP", page_icon="💎")
+# ================= CẤU HÌNH HỆ THỐNG =================
+# Giới hạn số lần nộp bài trong 1 phiên làm việc để tiết kiệm tài nguyên
+MAX_SUBMISSIONS = 3 
 
-# 1. Lấy Key từ Két sắt (Secrets)
+st.set_page_config(page_title="Lớp IELTS Thầy Lộc", page_icon="📚", layout="centered")
+
+# CSS tùy chỉnh để giao diện sạch và chuyên nghiệp hơn
+st.markdown("""
+    <style>
+    .main {
+        background-color: #f9f9f9;
+    }
+    h1 {
+        color: #2c3e50;
+        font-family: 'Helvetica Neue', sans-serif;
+        font-size: 2.2rem;
+    }
+    .stButton button {
+        background-color: #2980b9;
+        color: white;
+        border-radius: 5px;
+    }
+    .stAlert {
+        background-color: #ecf0f1;
+        color: #2c3e50;
+        border: 1px solid #bdc3c7;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# Khởi tạo bộ đếm số lần nộp bài
+if 'submission_count' not in st.session_state:
+    st.session_state['submission_count'] = 0
+
+# Lấy Key từ Secrets
 try:
     API_KEY = st.secrets["GOOGLE_API_KEY"]
 except:
-    st.error("⚠️ Chưa tìm thấy Key. Thầy hãy dán Key AIzaSy... vào Secrets nhé!")
+    st.error("⚠️ Hệ thống đang bảo trì (Chưa cấu hình API Key). Vui lòng liên hệ Thầy Lộc.")
     st.stop()
 
-# ================= GIAO DIỆN =================
-st.title("💎 IELTS Speaking Examiner (VIP Mode)")
-st.caption("Powered by: Google Gemini 2.0 Flash (Paid/Billing Account)")
+# ================= GIAO DIỆN CHÍNH =================
+st.title("Nộp Bài Tập Nói - Lớp Thầy Lộc")
+st.markdown("---")
+st.write("Chào bạn! Đây là trợ lý AI của Thầy Lộc. Bạn hãy chọn chủ đề bên dưới và nộp bài ghi âm nhé.")
+st.write(f"⚡ **Lượt nộp còn lại:** {MAX_SUBMISSIONS - st.session_state['submission_count']}/{MAX_SUBMISSIONS}")
 
-# Danh sách câu hỏi
+# Danh sách câu hỏi (Thầy có thể sửa lại tiếng Việt cho thân thiện hơn)
 questions = [
-    "Part 1: What is your daily routine like?",
-    "Part 1: Are you a morning person or a night person?",
-    "Part 1: Do you often eat breakfast at home or outside?",
-    "Part 1: Do you have a healthy lifestyle?",
-    "Part 1: What do you usually do in your free time?",
-    "Part 1: Is there any new hobby you want to try in the future?",
-    "Part 1: How do you relax after a stressful day?"
+    "Topic 1: Kể về thói quen hàng ngày của bạn (Daily Routine)",
+    "Topic 2: Bạn là người dậy sớm hay thức khuya? (Morning/Night Person)",
+    "Topic 3: Bạn thường ăn sáng ở nhà hay bên ngoài?",
+    "Topic 4: Bạn có lối sống lành mạnh không?",
+    "Topic 5: Sở thích lúc rảnh rỗi của bạn là gì?",
+    "Topic 6: Một kỹ năng mới bạn muốn học trong tương lai?",
+    "Topic 7: Cách bạn thư giãn sau một ngày căng thẳng?"
 ]
-selected_q = st.selectbox("📌 Select a Topic:", questions)
+selected_topic = st.selectbox("📌 Chọn chủ đề bài tập:", questions)
 
-st.write("🎙️ **Your Answer:**")
-audio_value = st.audio_input("Record")
+st.write("🎙️ **Ghi âm câu trả lời của bạn:**")
+audio_value = st.audio_input("Nhấn để ghi âm")
 
-# ================= XỬ LÝ =================
+# ================= XỬ LÝ LOGIC =================
 if audio_value:
-    with st.spinner("AI đang chấm điểm bằng tài khoản VIP..."):
+    # 1. Kiểm tra giới hạn lượt nộp
+    if st.session_state['submission_count'] >= MAX_SUBMISSIONS:
+        st.warning("⛔ Bạn đã hết lượt nộp bài hôm nay. Hãy quay lại sau hoặc liên hệ Thầy Lộc nhé!")
+        st.stop()
+
+    with st.spinner("Trợ lý đang nghe và chấm bài..."):
         try:
-            # 1. Chuyển đổi file âm thanh sang mã Base64
+            # 2. Xử lý file âm thanh
             audio_bytes = audio_value.read()
-            if len(audio_bytes) < 500:
-                st.error("⚠️ File ghi âm quá ngắn, thầy nói dài hơn xíu nhé.")
+            if len(audio_bytes) < 1000: # Tăng giới hạn tối thiểu lên chút để lọc tạp âm
+                st.error("⚠️ File ghi âm quá ngắn hoặc không có tiếng. Bạn vui lòng nói lại nhé.")
                 st.stop()
             
             audio_b64 = base64.b64encode(audio_bytes).decode('utf-8')
 
-            # 2. GỬI ĐẾN GOOGLE GEMINI 2.0 FLASH
-            # (Model này xịn nhất, tài khoản thường bị khóa, nhưng tài khoản thầy đã Add thẻ nên dùng vô tư)
+            # 3. Gửi đến Gemini 2.0 Flash
             url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
-            
             headers = {'Content-Type': 'application/json'}
             
+            # === PROMPT (LINH HỒN CỦA TRỢ LÝ) ===
+            # Đây là phần chỉ đạo AI chấm điểm theo ý thầy
+            prompt_text = f"""
+            Vai trò: Bạn là Trợ lý AI thân thiện của lớp IELTS Thầy Lộc.
+            Nhiệm vụ: Nghe và nhận xét bài nói của học viên về chủ đề: '{selected_topic}'.
+            
+            Yêu cầu quan trọng về Feedback:
+            1. Tự động phát hiện trình độ:
+               - Nếu học viên nói yếu/ngập ngừng: Dùng từ vựng đơn giản, động viên là chính, chỉ sửa lỗi ngữ pháp cơ bản.
+               - Nếu học viên nói tốt: Góp ý khắt khe hơn, gợi ý từ vựng nâng cao (Idioms/Collocations).
+            2. Tuyệt đối không dùng văn phong quá học thuật hay "như máy". Hãy nói chuyện tự nhiên như một người hướng dẫn tận tâm.
+            3. Trả về kết quả bằng Tiếng Việt theo cấu trúc sau (Dùng Markdown):
+               - 🎯 **Band điểm ước lượng:** (Đưa ra khoảng, ví dụ 5.0 - 5.5)
+               - 🌟 **Điểm sáng:** (Khen ngợi 1-2 điểm tốt nhất)
+               - 🛠️ **Góp ý cải thiện:** (Chỉ ra 2 lỗi quan trọng nhất cần sửa ngay, đừng liệt kê quá nhiều gây nản)
+               - 💡 **Thử nói lại thế này nhé:** (Viết lại 1 câu của học viên theo cách hay hơn/tự nhiên hơn)
+               - 💬 **Lời nhắn từ Trợ lý:** (Một câu động viên ngắn gọn).
+            """
+
             payload = {
                 "contents": [{
                     "parts": [
-                        {"text": f"Role: IELTS Examiner. Assess speaking for: '{selected_q}'. Feedback in Vietnamese: Band Score, Pros/Cons, Fixes, Conclusion."},
+                        {"text": prompt_text},
                         {
                             "inline_data": {
                                 "mime_type": "audio/wav",
@@ -64,34 +119,24 @@ if audio_value:
                 }]
             }
 
-            # 3. Gửi request
+            # 4. Gửi request
             response = requests.post(url, headers=headers, data=json.dumps(payload))
             
-            # 4. Đọc kết quả
             if response.status_code == 200:
                 result = response.json()
-                try:
-                    text_response = result['candidates'][0]['content']['parts'][0]['text']
-                    
-                    st.success("✅ THÀNH CÔNG! (Billing Account Verified)")
-                    st.divider()
-                    
-                    # Hiển thị kết quả đẹp
-                    with st.container(border=True):
-                        st.markdown(text_response)
-                        
-                    st.balloons() # Thả bóng bay chúc mừng thầy!
-                except Exception as parse_err:
-                    st.error("⚠️ Lỗi đọc nội dung trả về (JSON Error).")
-                    st.code(result)
-            else:
-                # Nếu vẫn lỗi thì in chi tiết ra để xem
-                st.error(f"⚠️ Lỗi kết nối ({response.status_code}):")
-                st.code(response.text)
+                text_response = result['candidates'][0]['content']['parts'][0]['text']
                 
-                if response.status_code == 403:
-                    st.warning("👉 Gợi ý: Lỗi 403 thường do thầy chưa bật 'Generative Language API'. Thầy vào lại trang tạo Key, tìm API này và bấm ENABLE nhé.")
+                # Tăng biến đếm số lần nộp thành công
+                st.session_state['submission_count'] += 1
+                
+                # Hiển thị kết quả
+                st.success("✅ Đã chấm xong! Dưới đây là nhận xét chi tiết:")
+                with st.container(border=True):
+                    st.markdown(text_response)
+            else:
+                st.error("⚠️ Có lỗi kết nối. Bạn vui lòng thử lại sau.")
+                # (Chỉ hiện mã lỗi cho thầy xem nếu cần debug, ẩn với học viên)
+                # st.write(response.text) 
 
         except Exception as e:
-            st.error("⚠️ Lỗi hệ thống:")
-            st.code(e)
+            st.error("⚠️ Hệ thống đang bận. Bạn hãy thử lại nhé.")
