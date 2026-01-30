@@ -4,7 +4,7 @@ import google.generativeai as genai
 # ================= 1. NHẬP KEY (KIỂM TRA KỸ) =================
 # Thầy hãy dán Key vào giữa 2 dấu ngoặc kép.
 # ⚠️ LƯU Ý: Kiểm tra kỹ xem có dư DẤU CÁCH ở đầu hoặc cuối không nhé!
-GOOGLE_API_KEY = "DÁN_KEY_MỚI_CỦA_THẦY_VÀO_ĐÂY"
+GOOGLE_API_KEY = "AIzaSyC3vMiv7f5eJXxLKiKWoh7F6tyOGeTf0K0"
 
 # Cấu hình
 genai.configure(api_key=GOOGLE_API_KEY, transport="rest")
