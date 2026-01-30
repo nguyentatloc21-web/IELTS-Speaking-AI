@@ -4,14 +4,14 @@ import base64
 import json
 import time
 
-# ================= CẤU HÌNH (QUAN TRỌNG) =================
-# ⚠️ DÁN CÁI KEY MỚI TẠO NGÀY 30/1 (ĐUÔI ...f0K0) VÀO ĐÂY:
+# ================= CẤU HÌNH =================
+# ⚠️ DÁN KEY MỚI CỦA THẦY VÀO ĐÂY (Key ...f0K0)
 API_KEY = "AIzaSyC3vMiv7f5eJXxLKiKWoh7F6tyOGeTf0K0" 
 
 # ================= GIAO DIỆN =================
 st.set_page_config(page_title="IELTS Speaking", page_icon="🎙️")
 st.title("IELTS Speaking Assessment")
-st.caption("Mode: Direct API | Model: Gemini 1.5 Flash (Auto-Retry)")
+st.caption("Mode: Auto-Detect Model | Account: Free Tier")
 
 questions = [
     "Part 1: What is your daily routine like?",
@@ -27,63 +27,85 @@ selected_q = st.selectbox("📌 Select a Topic:", questions)
 st.write("🎙️ **Your Answer:**")
 audio_value = st.audio_input("Record")
 
-def send_to_google(api_key, audio_b64, question, retry_count=0):
-    """Hàm gửi dữ liệu có khả năng tự thử lại khi bị Google chặn"""
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
-    headers = {'Content-Type': 'application/json'}
-    payload = {
-        "contents": [{
-            "parts": [
-                {"text": f"Role: IELTS Examiner. Assess speaking for: '{question}'. Feedback in Vietnamese: Band Score, Pros/Cons, Fixes, Conclusion."},
-                {
-                    "inline_data": {
-                        "mime_type": "audio/wav",
-                        "data": audio_b64
-                    }
-                }
-            ]
-        }]
-    }
+def try_generate(api_key, audio_b64, question):
+    """Hàm thử lần lượt các Model khác nhau cho đến khi được thì thôi"""
     
-    response = requests.post(url, headers=headers, data=json.dumps(payload))
+    # Danh sách các tên Model có thể dùng được (Thử lần lượt)
+    candidate_models = [
+        "gemini-1.5-flash",          # Ưu tiên 1: Bản chuẩn
+        "gemini-1.5-flash-latest",   # Ưu tiên 2: Bản mới nhất
+        "gemini-1.5-flash-001",      # Ưu tiên 3: Bản ổn định cũ
+        "gemini-pro"                 # Đường cùng: Bản Pro (chỉ text, nhưng thử vận may)
+    ]
     
-    # Nếu bị lỗi 429 (Quá tải), chờ 5s rồi thử lại (tối đa 3 lần)
-    if response.status_code == 429 and retry_count < 3:
-        st.toast(f"⏳ Hệ thống đang bận, đang thử lại lần {retry_count+1}...", icon="🔄")
-        time.sleep(5)
-        return send_to_google(api_key, audio_b64, question, retry_count + 1)
-        
-    return response
+    last_error = ""
+
+    for model_name in candidate_models:
+        try:
+            # Tạo URL với tên model hiện tại
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
+            
+            headers = {'Content-Type': 'application/json'}
+            payload = {
+                "contents": [{
+                    "parts": [
+                        {"text": f"Role: IELTS Examiner. Assess speaking for: '{question}'. Feedback in Vietnamese: Band Score, Pros/Cons, Fixes, Conclusion."},
+                        {
+                            "inline_data": {
+                                "mime_type": "audio/wav",
+                                "data": audio_b64
+                            }
+                        }
+                    ]
+                }]
+            }
+            
+            # Gửi đi
+            response = requests.post(url, headers=headers, data=json.dumps(payload))
+            
+            if response.status_code == 200:
+                # Nếu thành công -> Trả về kết quả ngay
+                return True, response.json(), model_name
+            else:
+                # Nếu thất bại -> Lưu lỗi lại và thử con tiếp theo
+                error_detail = response.text
+                last_error = f"Model {model_name} lỗi: {error_detail}"
+                continue 
+
+        except Exception as e:
+            last_error = str(e)
+            continue
+            
+    # Nếu thử hết danh sách mà vẫn không được
+    return False, last_error, None
 
 if audio_value:
-    with st.spinner("AI đang chấm điểm (Vui lòng đợi)..."):
+    with st.spinner("AI đang tìm model phù hợp và chấm điểm..."):
         try:
             # 1. Xử lý file
             audio_bytes = audio_value.read()
             if len(audio_bytes) < 500:
-                st.error("⚠️ File ghi âm quá ngắn (dưới 1 giây).")
+                st.error("⚠️ File quá ngắn.")
                 st.stop()
             
             audio_b64 = base64.b64encode(audio_bytes).decode('utf-8')
 
-            # 2. Gửi đi (Có cơ chế tự thử lại)
-            response = send_to_google(API_KEY, audio_b64, selected_q)
+            # 2. Gọi hàm tự động dò model
+            success, result, used_model = try_generate(API_KEY, audio_b64, selected_q)
             
             # 3. Xử lý kết quả
-            if response.status_code == 200:
-                result = response.json()
+            if success:
                 try:
                     text_response = result['candidates'][0]['content']['parts'][0]['text']
-                    st.success("✅ THÀNH CÔNG!")
+                    st.success(f"✅ THÀNH CÔNG! (Đã dùng model: {used_model})")
                     with st.container(border=True):
                         st.markdown(text_response)
                     st.balloons()
                 except:
-                    st.error("⚠️ Lỗi đọc kết quả từ Google.")
+                    st.error("⚠️ Lỗi đọc nội dung trả về.")
             else:
-                # Hiện lỗi chi tiết nếu thất bại hoàn toàn
-                st.error(f"⚠️ Lỗi Google ({response.status_code}):")
-                st.code(response.text)
+                st.error("⚠️ TẤT CẢ MODEL ĐỀU THẤT BẠI.")
+                st.code(result) # In lỗi cuối cùng ra xem
 
         except Exception as e:
             st.error("⚠️ Lỗi hệ thống:")
