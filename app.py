@@ -2,8 +2,8 @@ import streamlit as st
 import google.generativeai as genai
 
 # ================= 1. CẤU HÌNH (DÙNG KEY MỚI) =================
-# ⚠️ DÁN KEY MỚI VÀO ĐÂY (Key cũ đã bị khóa 24h rồi)
-GOOGLE_API_KEY = "DAIzaSyA7Rn_kvSEZ63ZEfIsrTGnZEh57aVCZvEM"
+# ⚠️ DÁN KEY MỚI VÀO ĐÂY
+GOOGLE_API_KEY = "DÁN_KEY_MỚI_CỦA_THẦY_VÀO_ĐÂY"
 
 try:
     genai.configure(api_key=GOOGLE_API_KEY, transport="rest")
@@ -11,17 +11,21 @@ except Exception as e:
     st.error(f"Lỗi Key: {e}")
     st.stop()
 
-# --- CHIẾN THUẬT AN TOÀN TUYỆT ĐỐI ---
-# Dùng "gemini-pro" bản chuẩn. Con này máy chủ nào cũng nhận diện được.
-model = genai.GenerativeModel("gemini-pro")
+# --- DÙNG GEMINI 1.5 FLASH (BẢN CHUẨN) ---
+# Con này mới nghe được âm thanh. Code dưới sẽ xử lý lỗi 404.
+try:
+    model = genai.GenerativeModel("gemini-1.5-flash")
+except:
+    # Dự phòng nếu máy chủ chưa cập nhật kịp
+    model = genai.GenerativeModel("models/gemini-1.5-flash")
 
 # ================= 2. GIAO DIỆN =================
 st.set_page_config(page_title="IELTS Speaking", page_icon="🎙️")
 st.title("IELTS Speaking Assessment")
-st.caption("System Status: Online (Standard Mode)")
+st.markdown("**Class:** PLA1601 | **Instructor:** Mr. Tat Loc")
 
 # Hướng dẫn
-st.info("👋 Hướng dẫn: Chọn chủ đề -> Bấm Record -> Chờ 5-10 giây để AI chấm điểm.")
+st.info("👋 Hướng dẫn: Chọn chủ đề -> Bấm Record -> Chờ AI chấm điểm.")
 
 questions = [
     "Part 1: What is your daily routine like?",
@@ -39,7 +43,7 @@ st.write("🎙️ **Your Answer:**")
 audio_value = st.audio_input("Record")
 
 if audio_value:
-    with st.spinner("Đang chấm điểm... (Mất khoảng 5 giây)"):
+    with st.spinner("AI đang chấm điểm..."):
         try:
             audio_bytes = audio_value.read()
             if len(audio_bytes) < 500:
@@ -61,6 +65,6 @@ if audio_value:
                 st.markdown(response.text)
             
         except Exception as e:
-            # Hiện nguyên hình lỗi để bắt bệnh
-            st.error("⚠️ LỖI:")
+            st.error("⚠️ LỖI KỸ THUẬT:")
             st.code(e)
+            st.warning("👉 Nếu thấy lỗi 404: Thầy hãy làm Bước 3 (Xóa Cache) bên dưới.")
