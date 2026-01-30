@@ -1,5 +1,6 @@
 import streamlit as st
 import google.generativeai as genai
+import time
 
 # ================= 1. CẤU HÌNH (DÙNG KEY MỚI) =================
 # ⚠️ DÁN KEY MỚI VÀO ĐÂY
@@ -11,20 +12,42 @@ except Exception as e:
     st.error(f"Lỗi Key: {e}")
     st.stop()
 
-# --- DÙNG GEMINI 1.5 FLASH (BẢN CHUẨN) ---
-# Con này mới nghe được âm thanh. Code dưới sẽ xử lý lỗi 404.
-try:
-    model = genai.GenerativeModel("gemini-1.5-flash")
-except:
-    # Dự phòng nếu máy chủ chưa cập nhật kịp
-    model = genai.GenerativeModel("models/gemini-1.5-flash")
+# --- CHIẾN THUẬT "BẮN LIÊN THANH" (SHOTGUN STRATEGY) ---
+# Thử lần lượt các tên gọi khác nhau của dòng 1.5 Flash
+# Con nào chạy được thì lấy luôn, không quan tâm tên gì.
+candidate_models = [
+    "gemini-1.5-flash",          # Tên chuẩn
+    "models/gemini-1.5-flash",   # Tên đầy đủ
+    "gemini-1.5-flash-latest",   # Tên bản mới nhất
+    "gemini-1.5-flash-001",      # Tên mã hiệu
+    "gemini-1.5-flash-002"       # Tên bản nâng cấp
+]
 
-# ================= 2. GIAO DIỆN =================
+active_model = None
+error_log = []
+
+for m_name in candidate_models:
+    try:
+        # Thử khởi tạo
+        test_model = genai.GenerativeModel(m_name)
+        active_model = test_model
+        # Nếu dòng này chạy qua mà không lỗi -> Thành công!
+        break 
+    except Exception as e:
+        error_log.append(str(e))
+        continue
+
+# Nếu thử hết 5 cái tên mà vẫn xịt -> Do thư viện quá cũ
+if not active_model:
+    st.error("⚠️ LỖI PHIÊN BẢN CŨ (Cần cập nhật requirements.txt)")
+    st.warning("Máy chủ chưa chịu cập nhật phần mềm. Thầy hãy làm Bước 3 (Xóa Cache) nhé!")
+    st.stop()
+
+# ================= 2. GIAO DIỆN LỚP HỌC =================
 st.set_page_config(page_title="IELTS Speaking", page_icon="🎙️")
 st.title("IELTS Speaking Assessment")
-st.markdown("**Class:** PLA1601 | **Instructor:** Mr. Tat Loc")
+st.markdown("**Instructor:** Mr. Tat Loc | **Model:** Gemini 1.5 Flash")
 
-# Hướng dẫn
 st.info("👋 Hướng dẫn: Chọn chủ đề -> Bấm Record -> Chờ AI chấm điểm.")
 
 questions = [
@@ -43,7 +66,7 @@ st.write("🎙️ **Your Answer:**")
 audio_value = st.audio_input("Record")
 
 if audio_value:
-    with st.spinner("AI đang chấm điểm..."):
+    with st.spinner("AI đang chấm điểm (Mất khoảng 5-10s)..."):
         try:
             audio_bytes = audio_value.read()
             if len(audio_bytes) < 500:
@@ -58,13 +81,12 @@ if audio_value:
             Output: Band Score, Pros/Cons, Fixes, Conclusion.
             """
 
-            response = model.generate_content([prompt, gemini_audio_input], stream=False)
+            response = active_model.generate_content([prompt, gemini_audio_input], stream=False)
             
-            st.success("✅ Đã xong!")
+            st.success("✅ Đã chấm xong!")
             with st.container(border=True):
                 st.markdown(response.text)
             
         except Exception as e:
-            st.error("⚠️ LỖI KỸ THUẬT:")
+            st.error("⚠️ CÓ LỖI XẢY RA:")
             st.code(e)
-            st.warning("👉 Nếu thấy lỗi 404: Thầy hãy làm Bước 3 (Xóa Cache) bên dưới.")
