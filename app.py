@@ -10,7 +10,7 @@ API_KEY = "AIzaSyC3vMiv7f5eJXxLKiKWoh7F6tyOGeTf0K0"
 # ================= GIAO DIỆN =================
 st.set_page_config(page_title="IELTS Speaking", page_icon="🎙️")
 st.title("IELTS Speaking Assessment")
-st.caption("Mode: Direct API (Bypass Library Errors)")
+st.caption("Mode: Direct API | Model: Gemini 2.0 Flash Lite")
 
 questions = [
     "Part 1: What is your daily routine like?",
@@ -28,7 +28,7 @@ st.write("🎙️ **Your Answer:**")
 audio_value = st.audio_input("Record")
 
 if audio_value:
-    with st.spinner("AI đang chấm điểm (Chế độ trực tiếp)..."):
+    with st.spinner("AI đang chấm điểm (Model 2.0 Lite)..."):
         try:
             # 1. Chuyển file âm thanh sang mã Base64
             audio_bytes = audio_value.read()
@@ -36,11 +36,12 @@ if audio_value:
                 st.error("⚠️ File quá ngắn.")
                 st.stop()
             
-            # Mã hóa file
+            # Mã hóa file để gửi qua đường truyền internet
             audio_b64 = base64.b64encode(audio_bytes).decode('utf-8')
 
-            # 2. Soạn nội dung gửi đi (Thủ công)
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={API_KEY}"
+            # 2. ĐỊA CHỈ NGƯỜI NHẬN (ĐÃ SỬA ĐÚNG TÊN MODEL CỦA THẦY)
+            # Thay vì gọi 1.5 (bị lỗi 404), ta gọi đích danh con 2.0 Lite
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite-001:generateContent?key={API_KEY}"
             
             headers = {'Content-Type': 'application/json'}
             
@@ -58,10 +59,10 @@ if audio_value:
                 }]
             }
 
-            # 3. Gửi đi bằng đường tắt (Requests)
+            # 3. Gửi đi
             response = requests.post(url, headers=headers, data=json.dumps(payload))
             
-            # 4. Xử lý kết quả trả về
+            # 4. Xử lý kết quả
             if response.status_code == 200:
                 result = response.json()
                 try:
@@ -71,9 +72,9 @@ if audio_value:
                         st.markdown(text_response)
                     st.balloons()
                 except:
-                    st.error("⚠️ AI trả về lỗi định dạng (Thử lại lần nữa).")
+                    st.error("⚠️ AI trả về lỗi định dạng (Thầy hãy thử thu âm lại dài hơn chút).")
             else:
-                # Nếu lỗi, in rõ lỗi gì từ Google
+                # Nếu vẫn lỗi thì in ra xem nó kêu ca cái gì
                 st.error(f"⚠️ LỖI TỪ GOOGLE ({response.status_code}):")
                 st.code(response.text)
 
