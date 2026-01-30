@@ -1,9 +1,9 @@
 import streamlit as st
 import google.generativeai as genai
 
-# ================= 1. CẤU HÌNH (QUAN TRỌNG: DÙNG KEY MỚI) =================
-# ⚠️ Thay Key mới vào đây (Key cũ đã bị khóa hôm nay)
-GOOGLE_API_KEY = "AIzaSyA7Rn_kvSEZ63ZEfIsrTGnZEh57aVCZvEM"
+# ================= 1. CẤU HÌNH (DÙNG KEY MỚI) =================
+# ⚠️ DÁN KEY MỚI VÀO ĐÂY (Key cũ đã bị khóa 24h rồi)
+GOOGLE_API_KEY = "DAIzaSyA7Rn_kvSEZ63ZEfIsrTGnZEh57aVCZvEM"
 
 try:
     genai.configure(api_key=GOOGLE_API_KEY, transport="rest")
@@ -11,42 +11,17 @@ except Exception as e:
     st.error(f"Lỗi Key: {e}")
     st.stop()
 
-# --- CHỌN MODEL "LITE" (MIỄN PHÍ 1500 LƯỢT/NGÀY) ---
-# Tuyệt đối không dùng 'latest' nữa. Dùng đích danh con này:
-try:
-    model = genai.GenerativeModel("models/gemini-2.0-flash-lite-001")
-except:
-    # Dự phòng
-    model = genai.GenerativeModel("gemini-2.0-flash-lite-preview-02-05")
+# --- CHIẾN THUẬT AN TOÀN TUYỆT ĐỐI ---
+# Dùng "gemini-pro" bản chuẩn. Con này máy chủ nào cũng nhận diện được.
+model = genai.GenerativeModel("gemini-pro")
 
-# ================= 2. GIAO DIỆN LỚP HỌC =================
-st.set_page_config(page_title="IELTS Speaking Assessment", page_icon="🎙️")
-
-st.markdown("""
-    <style>
-        .stApp {background-color: #f4f6f9;}
-        .instruction-box {
-            background-color: white; padding: 20px; border-radius: 12px;
-            border-left: 6px solid #1e3a8a; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            margin-bottom: 25px;
-        }
-        h1 {color: #1e3a8a; font-family: 'Helvetica', sans-serif;}
-    </style>
-""", unsafe_allow_html=True)
-
+# ================= 2. GIAO DIỆN =================
+st.set_page_config(page_title="IELTS Speaking", page_icon="🎙️")
 st.title("IELTS Speaking Assessment")
-st.markdown("**Instructor:** Mr. Tat Loc &nbsp;|&nbsp; **Class:** PLA1601")
+st.caption("System Status: Online (Standard Mode)")
 
-st.markdown("""
-<div class="instruction-box">
-    <strong style="color:#1e3a8a;">👋 Hướng dẫn nộp bài:</strong>
-    <ol>
-        <li>Chọn Topic bên dưới.</li>
-        <li>Bấm <b>Record</b> và trả lời (20-40 giây).</li>
-        <li>Chụp màn hình kết quả Feedback nộp vào nhóm lớp.</li>
-    </ol>
-</div>
-""", unsafe_allow_html=True)
+# Hướng dẫn
+st.info("👋 Hướng dẫn: Chọn chủ đề -> Bấm Record -> Chờ 5-10 giây để AI chấm điểm.")
 
 questions = [
     "Part 1: What is your daily routine like?",
@@ -64,40 +39,28 @@ st.write("🎙️ **Your Answer:**")
 audio_value = st.audio_input("Record")
 
 if audio_value:
-    with st.spinner("AI is analyzing..."):
+    with st.spinner("Đang chấm điểm... (Mất khoảng 5 giây)"):
         try:
             audio_bytes = audio_value.read()
             if len(audio_bytes) < 500:
-                st.error("⚠️ File ghi âm quá ngắn hoặc lỗi.")
+                st.error("⚠️ File quá ngắn.")
                 st.stop()
                 
             gemini_audio_input = {"mime_type": "audio/wav", "data": audio_bytes}
             
             prompt = f"""
-            Role: IELTS Examiner. Task: Assess speaking for "{selected_q}".
-            
-            INSTRUCTIONS:
-            1. Determine Band Score (0-9.0).
-            2. Provide feedback strictly in VIETNAMESE.
-            3. LEVEL-ADAPTIVE:
-               - If Band < 5.0: Suggest simple improvements.
-               - If Band 6.0+: Suggest advanced vocabulary.
-            
-            OUTPUT FORMAT (Vietnamese):
-            **1. Đánh giá (Band Score):** [Score]
-            **2. Nhận xét (Ưu/Nhược điểm):** [Pronunciation, Grammar, Fluency]
-            **3. Sửa lỗi & Nâng cấp:** [Original -> Better Version]
-            **4. Tổng kết:** [Conclusion]
+            Role: IELTS Examiner. Assess speaking for: "{selected_q}".
+            Feedback in VIETNAMESE.
+            Output: Band Score, Pros/Cons, Fixes, Conclusion.
             """
 
             response = model.generate_content([prompt, gemini_audio_input], stream=False)
             
-            st.divider()
-            st.success("✅ Đã chấm xong!")
+            st.success("✅ Đã xong!")
             with st.container(border=True):
                 st.markdown(response.text)
-            st.info("💡 Tip: Chụp màn hình kết quả này để nộp bài.")
             
         except Exception as e:
-            st.error("⚠️ Lỗi kết nối (Vui lòng thử lại sau 30s).")
-            # st.code(e) # Ẩn lỗi
+            # Hiện nguyên hình lỗi để bắt bệnh
+            st.error("⚠️ LỖI:")
+            st.code(e)
