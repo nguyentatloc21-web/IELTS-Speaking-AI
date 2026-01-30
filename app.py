@@ -2,10 +2,10 @@ import streamlit as st
 import requests
 import json
 import base64
+import re
 
-# ================= 1. DỮ LIỆU & CẤU HÌNH (TEACHER INPUT) =================
+# ================= 1. CẤU HÌNH & DỮ LIỆU (TEACHER INPUT) =================
 
-# Cấu hình Lớp học
 CLASS_CONFIG = {
     "PLA1601": {"level": "3.0 - 4.0", "desc": "Lớp Nền tảng"},
     "DIA2024": {"level": "4.0 - 5.0", "desc": "Lớp Diamond"},
@@ -13,20 +13,13 @@ CLASS_CONFIG = {
     "ELITE1912": {"level": "6.5 - 7.0", "desc": "Lớp Elite"}
 }
 
-# Danh sách Chủ đề Listening (Cho học viên chọn)
 LISTENING_TOPICS = [
-    "Công nghệ & AI (Technology)",
-    "Sức khỏe & Tinh thần (Health & Mental)",
-    "Kinh doanh & Khởi nghiệp (Business)",
-    "Văn hóa & Du lịch (Culture & Travel)",
-    "Tâm lý học (Psychology)",
-    "Vụ án & Trinh thám (True Crime)",
-    "Môi trường (Environment)",
-    "Giáo dục (Education)",
-    "Thể thao (Sports)"
+    "Công nghệ (Technology & AI)", "Sức khỏe (Health & Fitness)", 
+    "Kinh doanh (Business & Startups)", "Du lịch (Travel & Culture)", 
+    "Tâm lý học (Psychology)", "Giáo dục (Education)", 
+    "Môi trường (Environment)", "Thể thao (Sports)"
 ]
 
-# --- DỮ LIỆU SPEAKING ---
 SPEAKING_CONTENT = {
     "Lesson 1: Work & Study": [
         "Q1: Do you work or are you a student?",
@@ -47,7 +40,6 @@ SPEAKING_CONTENT = {
     ]
 }
 
-# --- DỮ LIỆU READING (FULL PASSAGE & EXPLANATION) ---
 READING_CONTENT = {
     "Lesson 2: Marine Chronometer": {
         "status": "Active",
@@ -62,30 +54,19 @@ Theoretically, knowing the longitude position was quite simple, even for the peo
 The simple and again obvious answer is that one takes an accurate clock with him, which he sets to the home time before leaving. A comparison with the local time (easily identified by checking the position of the Sun) would indicate the time difference between the home time and the local time, and thus the distance from home was obtained. The truth was that nobody in the 18th century had ever managed to create a clock that could endure the violent shaking of a ship and the fluctuating temperature while still maintaining the accuracy of time for navigation.
 
 After 1714, as an attempt to find a solution to the problem, the British government offered a tremendous amount of £20,000, which were to be managed by the magnificently named ‘Board of Longitude’. If timekeeper was the answer (and there could be other proposed solutions, since the money wasn’t only offered for timekeeper), then the error of the required timekeeping for achieving this goal needed to be within 2.8 seconds a day, which was considered impossible for any clock or watch at sea, even when they were in their finest conditions.
-
-This award, worth about £2 million today, inspired the self-taught Yorkshire carpenter John Harrison to attempt a design for a practical marine clock. In the later stage of his early career, he worked alongside his younger brother James. The first big project of theirs was to build a turret clock for the stables at Brockelsby Park, which was revolutionary because it required no lubrication. Harrison designed a marine clock in 1730, and he travelled to London in seek of financial aid. He explained his ideas to Edmond Halley, the Astronomer Royal, who then introduced him to George Graham, Britain’s first-class clockmaker. Graham provided him with financial aid for his early-stage work on sea clocks. It took Harrison five years to build Harrison Number One or HI. Later, he sought the improvement from alternate design and produced H4 with the giant clock appearance. Remarkable as it was, the Board of Longitude wouldn’t grant him the prize for some time until it was adequately satisfied.
-
-Harrison had a principal contestant for the tempting prize at that time, an English mathematician called John Hadley, who developed sextant. The sextant is the tool that people adopt to measure angles, such as the one between the Sun and the horizon, for a calculation of the location of ships or planes. In addition, his invention is significant since it can help determine longitude.
-
-Most chronometer forerunners of that particular generation were English, but that doesn’t mean every achievement was made by them. One wonderful figure in the history is the Lancastrian Thomas Earnshaw, who created the ultimate form of chronometer escapement—the spring detent escapement—and made the final decision on format and productions system for the marine chronometer, which turns it into a genuine modem commercial product, as well as a safe and pragmatic way of navigation at sea over the next century and half.
         """,
-        # Phần câu hỏi & Giải thích chi tiết
         "questions_fill": [
-            {"id": "q1", "q": "1. Sailors were able to use the position of the Sun to calculate [.........].", "a": "local time", "exp": "Vị trí thông tin đoạn 4: 'A comparison with the local time (easily identified by checking the position of the Sun)...' -> Giờ địa phương được xác định nhờ mặt trời."},
-            {"id": "q2", "q": "2. An invention that could win the competition would lose no more than [.........] every day.", "a": "2.8 seconds", "exp": "Vị trí thông tin đoạn 5: '...needed to be within 2.8 seconds a day...' -> Sai số cho phép là 2.8 giây/ngày."},
-            {"id": "q3", "q": "3. John and James Harrison’s clock worked accurately without [.........].", "a": "lubrication", "exp": "Vị trí thông tin đoạn 6: '...revolutionary because it required no lubrication.' -> Không cần bôi trơn."},
-            {"id": "q4", "q": "4. Harrison’s main competitor’s invention was known as [.........].", "a": "sextant", "exp": "Vị trí thông tin đoạn 7: '...John Hadley, who developed sextant.' -> Đối thủ chính phát triển kính lục phân."},
-            {"id": "q5", "q": "5. Hadley’s instrument can use [.........] to make a calculation of location of ships or planes.", "a": "angles", "exp": "Vị trí thông tin đoạn 7: 'The sextant is the tool that people adopt to measure angles...' -> Dùng để đo góc."},
-            {"id": "q6", "q": "6. The modern version of Harrison’s invention is called [.........].", "a": "marine chronometer", "exp": "Vị trí thông tin đoạn 8: '...turns it into a genuine modem commercial product... marine chronometer...' -> Đồng hồ hàng hải."}
+            {"id": "q1", "q": "1. Sailors were able to use the position of the Sun to calculate [.........].", "a": "local time", "exp": "Dẫn chứng: 'A comparison with the local time (easily identified by checking the position of the Sun)...'"},
+            {"id": "q2", "q": "2. An invention that could win the competition would lose no more than [.........] every day.", "a": "2.8 seconds", "exp": "Dẫn chứng: '...needed to be within 2.8 seconds a day...'"},
+            {"id": "q3", "q": "3. The British government offered an amount of [.........] for the solution.", "a": "£20,000", "exp": "Dẫn chứng: '...British government offered a tremendous amount of £20,000...'"}
         ]
     }
 }
 
-# Tạo Menu (Lesson 1-10)
-SPEAKING_MENU = list(SPEAKING_CONTENT.keys()) + [f"Lesson {i}" for i in range(3, 11)]
+SPEAKING_MENU = list(SPEAKING_CONTENT.keys()) + [f"Lesson {i}: (Sắp ra mắt)" for i in range(3, 11)]
 READING_MENU = [f"Lesson {i}" if i != 2 else "Lesson 2: Marine Chronometer" for i in range(1, 11)]
 
-# ================= 2. CẤU HÌNH HỆ THỐNG =================
+# ================= 2. HỆ THỐNG & API =================
 st.set_page_config(page_title="Mr. Tat Loc IELTS Portal", page_icon="🎓", layout="wide")
 
 st.markdown("""
@@ -94,8 +75,7 @@ st.markdown("""
     h1 {color: #003366; font-size: 24px; font-weight: 700;}
     h2 {color: #004080; font-size: 18px; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 20px;}
     .stButton button {background-color: #004080; color: white; border-radius: 4px;}
-    .stAlert {background-color: #f0f8ff; border: 1px solid #d6e9c6; color: #3c763d;}
-    .explanation-box {background-color: #f9f9f9; padding: 10px; border-left: 3px solid #004080; margin-top: 5px; font-size: 0.9rem;}
+    .explanation-box {background-color: #f0f7ff; padding: 10px; border-left: 4px solid #004080; margin-top: 5px; font-size: 0.9rem;}
     </style>
 """, unsafe_allow_html=True)
 
@@ -105,18 +85,36 @@ except:
     st.error("⚠️ Lỗi: Chưa có API Key.")
     st.stop()
 
-# ================= 3. LOGIC FUNCTIONS =================
-def call_gemini(prompt):
+# --- HÀM GỌI API GEMINI (ĐÃ TỐI ƯU JSON) ---
+def call_gemini(prompt, expect_json=False):
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
     headers = {'Content-Type': 'application/json'}
-    data = {"contents": [{"parts": [{"text": prompt}]}]}
+    
+    # Nếu cần JSON, thêm chỉ dẫn rõ ràng vào prompt
+    final_prompt = prompt
+    if expect_json:
+        final_prompt += "\n\nIMPORTANT: Output STRICTLY JSON without Markdown formatting (no ```json or ```)."
+    
+    data = {"contents": [{"parts": [{"text": final_prompt}]}]}
+    
     try:
         resp = requests.post(url, headers=headers, data=json.dumps(data))
         if resp.status_code == 200:
-            return resp.json()['candidates'][0]['content']['parts'][0]['text']
-        else: return "Hệ thống đang bận, vui lòng thử lại."
-    except: return "Lỗi kết nối mạng."
+            text = resp.json()['candidates'][0]['content']['parts'][0]['text']
+            if expect_json:
+                # Làm sạch chuỗi nếu AI lỡ thêm markdown
+                text = re.sub(r"```json|```", "", text).strip()
+            return text
+        else:
+            return None
+    except:
+        return None
 
+# --- QUẢN LÝ SESSION STATE ---
+if 'speaking_attempts' not in st.session_state: st.session_state['speaking_attempts'] = {}
+if 'generated_quiz' not in st.session_state: st.session_state['generated_quiz'] = None
+
+# ================= 3. LOGIC ĐĂNG NHẬP =================
 def login():
     st.markdown("<div style='text-align: center; margin-top: 50px;'><h1>MR. TAT LOC IELTS CLASS</h1></div>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 1, 1])
@@ -148,110 +146,171 @@ else:
         st.divider()
         if st.button("Đăng xuất"): logout()
 
-    # --- 1. SPEAKING ---
+    # --- MODULE 1: SPEAKING (ĐÃ GIỚI HẠN 5 LẦN & FORMAT MỚI) ---
     if menu == "🗣️ Speaking":
         st.title("Luyện Tập Speaking")
         col1, col2 = st.columns([1, 2])
         with col1:
             lesson_choice = st.selectbox("Chọn bài học:", SPEAKING_MENU)
         
-        # Nếu bài học có dữ liệu
         if lesson_choice in SPEAKING_CONTENT:
             with col2:
                 q_list = SPEAKING_CONTENT[lesson_choice]
                 question = st.selectbox("Câu hỏi:", q_list)
             
-            st.info(f"🎙️ **Topic:** {question}")
-            audio = st.audio_input("Ghi âm câu trả lời:", key=f"rec_{question}")
+            # Kiểm tra số lần nộp
+            attempts = st.session_state['speaking_attempts'].get(question, 0)
+            remaining = 5 - attempts
             
-            if audio:
-                with st.spinner("AI đang chấm điểm..."):
-                    audio_b64 = base64.b64encode(audio.read()).decode('utf-8')
-                    prompt = f"""
-                    Role: IELTS Examiner. Student Level: {user['level']['level']}.
-                    Task: Assess speaking response for "{question}".
-                    Output: Vietnamese markdown.
-                    Structure:
-                    - **Band Score Estimate**
-                    - **Feedback** (Fluency, Vocab, Grammar)
-                    - **Correction** (Original vs Better version)
-                    """
-                    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
-                    payload = {"contents": [{"parts": [{"text": prompt}, {"inline_data": {"mime_type": "audio/wav", "data": audio_b64}}]}]}
-                    try:
-                        resp = requests.post(url, headers={'Content-Type': 'application/json'}, data=json.dumps(payload))
-                        if resp.status_code == 200:
-                            st.markdown(resp.json()['candidates'][0]['content']['parts'][0]['text'])
-                    except: st.error("Lỗi hệ thống.")
+            st.markdown(f"**Topic:** {question}")
+            
+            if remaining > 0:
+                st.info(f"⚡ Bạn còn **{remaining}** lượt trả lời cho câu này.")
+                audio = st.audio_input("Ghi âm câu trả lời:", key=f"rec_{question}")
+                
+                if audio:
+                    with st.spinner("AI đang chấm điểm..."):
+                        audio_b64 = base64.b64encode(audio.read()).decode('utf-8')
+                        
+                        # PROMPT THEO YÊU CẦU CỦA THẦY
+                        prompt = f"""
+                        Role: IELTS Examiner.
+                        Student Level: {user['level']['level']}.
+                        Task: Evaluate response for "{question}".
+                        Tone: Professional, constructive. Output in Vietnamese.
+                        
+                        Format:
+                        **BAND SCORE:** [Range]
+                        **FEEDBACK:**
+                        - **Fluency:** [Comment]
+                        - **Vocabulary:** [Good words used] vs [Words to improve]
+                        - **Grammar:** [Mistakes fixed]
+                        **IMPROVEMENT:**
+                        Original: "[Quote]" -> Better: "[Correction]"
+                        """
+                        
+                        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
+                        payload = {"contents": [{"parts": [{"text": prompt}, {"inline_data": {"mime_type": "audio/wav", "data": audio_b64}}]}]}
+                        
+                        try:
+                            resp = requests.post(url, headers={'Content-Type': 'application/json'}, data=json.dumps(payload))
+                            if resp.status_code == 200:
+                                st.markdown(resp.json()['candidates'][0]['content']['parts'][0]['text'])
+                                # Trừ lượt sau khi thành công
+                                st.session_state['speaking_attempts'][question] = attempts + 1
+                            else:
+                                st.error("Lỗi kết nối Google.")
+                        except: st.error("Lỗi hệ thống.")
+            else:
+                st.warning("⛔ Bạn đã hết 5 lượt trả lời cho câu hỏi này. Vui lòng chuyển sang câu khác.")
         else:
             st.info("Bài học này chưa cập nhật.")
 
-    # --- 2. READING ---
+    # --- MODULE 2: READING (TƯƠNG TÁC AI XỊN HƠN) ---
     elif menu == "📖 Reading":
         st.title("Luyện Reading & Từ Vựng")
         lesson_choice = st.selectbox("Chọn bài đọc:", READING_MENU)
         
-        if "Marine Chronometer" in lesson_choice: # Chỉ Lesson 2 có nội dung
+        if "Marine Chronometer" in lesson_choice:
             data = READING_CONTENT["Lesson 2: Marine Chronometer"]
             
-            tab1, tab2 = st.tabs(["📝 Bài Đọc & Điền Từ", "🤖 Luyện Từ Vựng (AI)"])
+            tab1, tab2 = st.tabs(["📝 Bài Đọc & Điền Từ", "🤖 Bài Tập Từ Vựng AI (Tương tác)"])
             
-            # Tab 1: Bài đọc chính + Chấm điểm
+            # TAB 1: Bài điền từ cơ bản
             with tab1:
                 with st.expander("📄 HIỂN THỊ BÀI ĐỌC (FULL TEXT)", expanded=True):
                     st.markdown(data['text'])
                 
-                st.subheader("Questions 1-6: Fill in the blanks")
+                st.subheader("Fill in the blanks")
                 with st.form("read_fill"):
                     user_answers = {}
                     for q in data['questions_fill']:
                         user_answers[q['id']] = st.text_input(q['q'])
                     
-                    submitted = st.form_submit_button("Nộp bài & Xem Giải Thích")
-                    
-                    if submitted:
+                    if st.form_submit_button("Nộp bài"):
                         score = 0
                         for q in data['questions_fill']:
                             u_ans = user_answers[q['id']].strip().lower()
                             c_ans = q['a'].lower()
-                            
-                            # Hiển thị kết quả từng câu
                             if u_ans == c_ans:
-                                st.success(f"✅ **Đúng:** {q['a']}")
+                                st.success(f"✅ Đúng: {q['a']}")
                                 score += 1
                             else:
-                                st.error(f"❌ **Sai:** Bạn điền '{user_answers[q['id']]}' -> Đáp án: '{q['a']}'")
-                            
-                            # HIỂN THỊ GIẢI THÍCH (CHO CẢ ĐÚNG VÀ SAI)
-                            st.markdown(f"<div class='explanation-box'>💡 <b>Giải thích:</b> {q['exp']}</div>", unsafe_allow_html=True)
-                        
-                        st.divider()
-                        st.info(f"📊 **Tổng điểm: {score}/{len(data['questions_fill'])}**")
+                                st.error(f"❌ Sai: Bạn điền '{user_answers[q['id']]}' -> Đáp án: '{q['a']}'")
+                            st.markdown(f"<div class='explanation-box'>💡 {q['exp']}</div>", unsafe_allow_html=True)
+                        st.info(f"Điểm: {score}/{len(data['questions_fill'])}")
 
-            # Tab 2: AI Generate bài tập
+            # TAB 2: Bài tập AI tương tác (JSON Parsing)
             with tab2:
-                st.info("Bấm nút bên dưới để AI tạo ra các bài tập từ vựng mới dựa trên bài đọc này.")
+                st.info("Bấm nút dưới để AI tạo 3 câu trắc nghiệm từ vựng mới.")
                 
-                col_gen1, col_gen2 = st.columns(2)
-                with col_gen1:
-                    if st.button("✨ Tạo bài tập Trắc nghiệm (Multiple Choice)"):
-                        with st.spinner("AI đang soạn đề..."):
-                            prompt = f"Create 5 multiple choice vocabulary questions based on this text: \n{data['text']}\n Format: Question, 4 Options, Answer Key. Output in Vietnamese."
-                            st.markdown(call_gemini(prompt))
-                
-                with col_gen2:
-                    if st.button("🧩 Tạo bài tập Nối từ (Matching)"):
-                        with st.spinner("AI đang soạn đề..."):
-                            prompt = f"Create a matching exercise (5 words) with definitions based on this text: \n{data['text']}\n Output in Vietnamese."
-                            st.markdown(call_gemini(prompt))
+                if st.button("✨ Tạo Bài Tập Mới"):
+                    with st.spinner("AI đang soạn đề trắc nghiệm..."):
+                        # Prompt ép kiểu JSON
+                        prompt = f"""
+                        Create 3 multiple choice vocabulary questions based on this text:
+                        {data['text'][:2000]}
+                        
+                        Output STRICTLY JSON array format like this:
+                        [
+                            {{"question": "What does X mean?", "options": ["A", "B", "C", "D"], "answer": "A", "explanation": "Because..."}},
+                            ...
+                        ]
+                        Do not use Markdown blocks.
+                        """
+                        json_str = call_gemini(prompt, expect_json=True)
+                        if json_str:
+                            try:
+                                quiz_data = json.loads(json_str)
+                                st.session_state['generated_quiz'] = quiz_data
+                            except:
+                                st.error("Lỗi định dạng dữ liệu từ AI. Vui lòng thử lại.")
+                        else:
+                            st.error("Hệ thống bận, không thể tạo bài tập lúc này.")
+
+                # Hiển thị bài tập nếu đã có trong Session State
+                if st.session_state['generated_quiz']:
+                    st.divider()
+                    st.subheader("✍️ Bài Tập Trắc Nghiệm")
+                    
+                    with st.form("ai_quiz_form"):
+                        user_choices = {}
+                        quiz = st.session_state['generated_quiz']
+                        
+                        for i, q in enumerate(quiz):
+                            st.write(f"**Câu {i+1}:** {q['question']}")
+                            # Dùng radio button cho tương tác
+                            user_choices[i] = st.radio(f"Chọn đáp án câu {i+1}", q['options'], key=f"ai_q_{i}", index=None)
+                            st.write("---")
+                        
+                        if st.form_submit_button("Chấm điểm"):
+                            score = 0
+                            for i, q in enumerate(quiz):
+                                u_choice = user_choices.get(i)
+                                if u_choice:
+                                    # So sánh đáp án (AI thường trả về full text option hoặc ký tự A,B,C)
+                                    # Ta so sánh chuỗi tương đối
+                                    if u_choice == q['answer'] or u_choice.startswith(q['answer']):
+                                        st.success(f"✅ Câu {i+1}: Chính xác!")
+                                        score += 1
+                                    else:
+                                        st.error(f"❌ Câu {i+1}: Sai. Đáp án đúng là {q['answer']}")
+                                    
+                                    # Hiện giải thích
+                                    if 'explanation' in q:
+                                        st.markdown(f"<div class='explanation-box'>💡 {q['explanation']}</div>", unsafe_allow_html=True)
+                                else:
+                                    st.warning(f"⚠️ Câu {i+1}: Bạn chưa chọn đáp án.")
+                            
+                            st.info(f"Kết quả: {score}/{len(quiz)}")
 
         else:
             st.info("Bài học này chưa cập nhật.")
 
-    # --- 3. LISTENING ---
+    # --- MODULE 3: LISTENING (FIX LỖI & TỐI ƯU) ---
     elif menu == "🎧 Listening":
         st.title("Luyện Nghe Chủ Động")
-        st.info("Chọn chủ đề bạn thích, hệ thống sẽ đề xuất kênh phù hợp.")
+        st.info("Chọn chủ đề -> AI gợi ý Kênh -> Dán Script -> AI Dịch.")
         
         col1, col2 = st.columns(2)
         with col1:
@@ -259,33 +318,35 @@ else:
         with col2:
             duration = st.selectbox("Thời lượng:", ["Ngắn (3-5 phút)", "Trung bình (10-15 phút)", "Dài (> 30 phút)"])
             
-        if st.button("🔍 Tìm nguồn nghe"):
-            with st.spinner("AI đang tìm kiếm..."):
+        if st.button("🔍 Tìm Kênh Phù Hợp"):
+            with st.spinner("Đang tìm kiếm..."):
+                # Prompt ngắn gọn hơn để tránh lỗi 429/Busy
                 prompt = f"""
-                Role: IELTS Teacher. Student Level: {user['level']['level']}.
-                Task: Suggest 3 Youtube Channels or Podcasts for topic "{topic}" with duration "{duration}".
-                Output Language: Vietnamese.
-                Format:
-                1. **[Tên Kênh]**
-                   - Tại sao phù hợp: [Giải thích]
-                   - Từ khóa tìm kiếm: [Keyword]
+                Suggest 2 Youtube Channels or Podcasts for IELTS level {user['level']['level']} about "{topic}".
+                Format Vietnamese:
+                - **[Tên]**: [Lý do ngắn gọn]
                 """
-                st.markdown(call_gemini(prompt))
+                result = call_gemini(prompt)
+                if result:
+                    st.markdown(result)
+                else:
+                    st.error("Hệ thống đang bận. Bạn hãy thử chọn chủ đề khác xem sao nhé.")
 
         st.divider()
-        st.subheader("Phân tích Script & Dịch Song Ngữ")
-        script_input = st.text_area("Dán Script (lời thoại) video bạn tìm được vào đây:", height=200)
+        st.subheader("Phân tích Script")
+        script_input = st.text_area("Dán Script vào đây:", height=200)
         
-        if st.button("Dịch & Giải thích Từ Vựng"):
+        if st.button("Dịch & Highlight"):
             if script_input:
-                with st.spinner("AI đang phân tích..."):
+                with st.spinner("Đang phân tích..."):
                     prompt = f"""
-                    Role: IELTS Teacher. Level: {user['level']['level']}.
-                    Task:
-                    1. Translate to Vietnamese (Sentence by sentence).
-                    2. Highlight 5-7 useful words for band {user['level']['level']}.
-                    Script: {script_input[:3000]}
+                    Translate to Vietnamese. Highlight 5 hard vocabulary words for level {user['level']['level']}.
+                    Script: {script_input[:2000]}
                     """
-                    st.markdown(call_gemini(prompt))
+                    result = call_gemini(prompt)
+                    if result:
+                        st.markdown(result)
+                    else:
+                        st.error("Script quá dài hoặc hệ thống bận.")
             else:
-                st.warning("Vui lòng dán script vào trước.")
+                st.warning("Vui lòng dán script.")
