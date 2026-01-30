@@ -3,18 +3,17 @@ import requests
 import base64
 import json
 
-# ================= CẤU HÌNH (LẤY TỪ SECRETS) =================
-# Code này sẽ tự lấy Key ...zTERY mà thầy đã lưu trong Settings
+# ================= CẤU HÌNH (LẤY KEY zTERY TỪ KÉT SẮT) =================
 try:
     API_KEY = st.secrets["GOOGLE_API_KEY"]
 except:
-    st.error("⚠️ Chưa tìm thấy Key trong Secrets.")
+    st.error("⚠️ Lỗi: Chưa tìm thấy Key trong Secrets.")
     st.stop()
 
 # ================= GIAO DIỆN =================
 st.set_page_config(page_title="IELTS Speaking", page_icon="🎙️")
 st.title("IELTS Speaking Assessment")
-st.caption("System: Key zTERY (New) | Model: Gemini 2.0 Flash")
+st.caption("System: Key zTERY (New) | Model: Gemini 2.0 Flash LITE")
 
 questions = [
     "Part 1: What is your daily routine like?",
@@ -31,7 +30,7 @@ st.write("🎙️ **Your Answer:**")
 audio_value = st.audio_input("Record")
 
 if audio_value:
-    with st.spinner("AI đang chấm điểm (Gemini 2.0)..."):
+    with st.spinner("AI đang chấm điểm (Bản Lite miễn phí)..."):
         try:
             # 1. Xử lý file
             audio_bytes = audio_value.read()
@@ -41,9 +40,9 @@ if audio_value:
             
             audio_b64 = base64.b64encode(audio_bytes).decode('utf-8')
 
-            # 2. GỌI GEMINI 2.0 FLASH
-            # Key mới zTERY + Model mới 2.0 = CHUẨN BÀI
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
+            # 2. QUAN TRỌNG NHẤT: DÙNG BẢN LITE (gemini-2.0-flash-lite-001)
+            # Đây là con duy nhất Google cho dùng Free khi con Standard bị khóa
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite-001:generateContent?key={API_KEY}"
             
             headers = {'Content-Type': 'application/json'}
             
