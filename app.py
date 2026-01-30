@@ -3,7 +3,7 @@ import google.generativeai as genai
 
 # ================= 1. CẤU HÌNH (DÙNG KEY MỚI) =================
 # ⚠️ DÁN KEY MỚI VÀO ĐÂY
-GOOGLE_API_KEY = "DÁN_KEY_MỚI_CỦA_THẦY_VÀO_ĐÂY"
+GOOGLE_API_KEY = "AIzaSyA7Rn_kvSEZ63ZEfIsrTGnZEh57aVCZvEM"
 
 try:
     genai.configure(api_key=GOOGLE_API_KEY, transport="rest")
