@@ -1,24 +1,8 @@
 import streamlit as st
-import subprocess
-import sys
-
-# ================= 0. BIỆN PHÁP MẠNH: TỰ ĐỘNG CÀI ĐẶT THƯ VIỆN =================
-# Đoạn này sẽ ép máy chủ cài bản mới nhất, bất chấp file requirements cũ
-try:
-    import google.generativeai as genai
-    # Kiểm tra version, nếu cũ quá thì cài lại
-    import importlib.metadata
-    version = importlib.metadata.version("google-generativeai")
-    if version < "0.7.2":
-        st.toast("🔄 Đang cập nhật hệ thống... Vui lòng đợi!", icon="🛠️")
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "google-generativeai>=0.7.2"])
-        st.rerun() # Khởi động lại app sau khi cài xong
-except:
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "google-generativeai>=0.7.2"])
-    st.rerun()
+import google.generativeai as genai
 
 # ================= 1. CẤU HÌNH (DÙNG KEY MỚI) =================
-# ⚠️ DÁN KEY MỚI CỦA THẦY VÀO ĐÂY
+# ⚠️ DÁN KEY MỚI VÀO ĐÂY
 GOOGLE_API_KEY = "AIzaSyA7Rn_kvSEZ63ZEfIsrTGnZEh57aVCZvEM"
 
 try:
@@ -27,18 +11,19 @@ except Exception as e:
     st.error(f"Lỗi Key: {e}")
     st.stop()
 
-# --- DÙNG MODEL 1.5 FLASH (BẢN CHUẨN) ---
-# Bây giờ thư viện đã mới rồi, chắc chắn gọi tên này sẽ được
+# --- CHỌN ĐÚNG MODEL CÓ TRONG TÀI KHOẢN THẦY ---
+# Tuyệt đối không gọi 1.5 Flash nữa vì tài khoản thầy không có.
+# Gọi chính xác tên này (Đã check trong list thầy gửi):
 try:
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    model = genai.GenerativeModel("models/gemini-2.0-flash-lite-001")
 except:
-    # Dự phòng cuối cùng
-    model = genai.GenerativeModel("models/gemini-1.5-flash")
+    # Nếu xui quá thì thử gọi tên ngắn gọn của nó
+    model = genai.GenerativeModel("gemini-2.0-flash-lite-001")
 
-# ================= 2. GIAO DIỆN =================
+# ================= 2. GIAO DIỆN LỚP HỌC =================
 st.set_page_config(page_title="IELTS Speaking", page_icon="🎙️")
 st.title("IELTS Speaking Assessment")
-st.markdown("**Class:** PLA1601 | **Instructor:** Mr. Tat Loc")
+st.markdown("**Instructor:** Mr. Tat Loc | **Model:** Gemini 2.0 Flash Lite")
 
 st.info("👋 Hướng dẫn: Chọn chủ đề -> Bấm Record -> Chờ AI chấm điểm.")
 
@@ -58,7 +43,7 @@ st.write("🎙️ **Your Answer:**")
 audio_value = st.audio_input("Record")
 
 if audio_value:
-    with st.spinner("AI đang chấm điểm (Mất khoảng 5-10s)..."):
+    with st.spinner("AI đang chấm điểm (Model 2.0 Lite)..."):
         try:
             audio_bytes = audio_value.read()
             if len(audio_bytes) < 500:
@@ -80,5 +65,11 @@ if audio_value:
                 st.markdown(response.text)
             
         except Exception as e:
-            st.error("⚠️ Lỗi:")
+            st.error("⚠️ LỖI KẾT NỐI:")
             st.code(e)
+            # Kiểm tra nếu lỗi 429 (Hết lượt)
+            if "429" in str(e):
+                st.warning("Key này đã hết hạn mức hôm nay. Vui lòng đổi Key khác.")
+            # Kiểm tra lỗi 404 (Không tìm thấy model)
+            elif "404" in str(e):
+                st.warning("Vẫn không tìm thấy Model. Có thể Google đang cập nhật danh sách.")
