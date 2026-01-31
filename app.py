@@ -156,9 +156,9 @@ else:
         st.divider()
         if st.button("Đăng xuất"): logout()
 
-    # --- MODULE 1: SPEAKING (ĐÃ GIỚI HẠN 5 LẦN & FORMAT MỚI) ---
+      # --- MODULE 1: SPEAKING (ĐÃ NÂNG CẤP PROMPT FEEDBACK) ---
     if menu == "🗣️ Speaking":
-        st.title("Luyện Tập Speaking")
+        st.title("🗣️ Luyện Tập Speaking")
         col1, col2 = st.columns([1, 2])
         with col1:
             lesson_choice = st.selectbox("Chọn bài học:", SPEAKING_MENU)
@@ -166,9 +166,9 @@ else:
         if lesson_choice in SPEAKING_CONTENT:
             with col2:
                 q_list = SPEAKING_CONTENT[lesson_choice]
-                question = st.selectbox("Câu hỏi:", q_list)
+                question = st.selectbox("Chọn câu hỏi:", q_list)
             
-            # Kiểm tra số lần nộp
+            # Quản lý lượt trả lời (Max 5)
             attempts = st.session_state['speaking_attempts'].get(question, 0)
             remaining = 5 - attempts
             
@@ -179,52 +179,59 @@ else:
                 audio = st.audio_input("Ghi âm câu trả lời:", key=f"rec_{question}")
                 
                 if audio:
-                    with st.spinner("Đang chấm điểm..."):
-                        audio_b64 = base64.b64encode(audio.read()).decode('utf-8')
-                        
-                        # PROMPT THEO YÊU CẦU CỦA THẦY
-                        prompt = f"""
-                        Role: IELTS Examiner.
-                        Student Level: {user['level']['level']}.
-                        Task: Evaluate response for "{question}".
-                        Tone: Professional, constructive, detailed. Output in Vietnamese.
-                        
-                        Format strictly as below using Markdown:
-                            
-                            ### KẾT QUẢ ĐÁNH GIÁ
-                            * **Band Score Ước lượng:** [Range, e.g., 5.0 - 5.5]
-                            * **Nhận xét chung:** [Tổng quan về độ tự nhiên, phản xạ]
-                            
-                            ### PHÂN TÍCH CHI TIẾT
-                            **1. Fluency & Coherence (Độ trôi chảy):**
-                            * [Nhận xét chi tiết về ngập ngừng, tốc độ, từ nối]
-                            
-                            **2. Lexical Resource (Từ vựng):**
-                            * **Điểm cộng:** [Liệt kê các từ hay/đúng chủ đề đã dùng]
-                            * **Cần cải thiện:** [Các từ dùng sai ngữ cảnh hoặc lặp lại]
-                            
-                            **3. Grammatical Range & Accuracy (Ngữ pháp):**
-                            * [Chỉ ra lỗi sai thì, cấu trúc câu và cách sửa]
-                            
-                            ### NÂNG CẤP CÂU TRẢ LỜI (Paraphrase)
-                            * **Câu của bạn:** "[Trích dẫn]"
-                            * **Gợi ý cải thiện:** "[Viết lại câu đó hay hơn, chuẩn native hơn, phù hợp với trình độ, kèm giải thích]"
-                            """
-                        
-                        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
-                        payload = {"contents": [{"parts": [{"text": prompt}, {"inline_data": {"mime_type": "audio/wav", "data": audio_b64}}]}]}
-                        
+                    with st.spinner("Đang chấm bài..."):
                         try:
-                            resp = requests.post(url, headers={'Content-Type': 'application/json'}, data=json.dumps(payload))
-                            if resp.status_code == 200:
-                                st.markdown(resp.json()['candidates'][0]['content']['parts'][0]['text'])
-                                # Trừ lượt sau khi thành công
-                                st.session_state['speaking_attempts'][question] = attempts + 1
+                            audio_bytes = audio.read()
+                            if len(audio_bytes) < 1000:
+                                st.warning("File âm thanh quá ngắn. Vui lòng thử lại.")
                             else:
-                                st.error("Lỗi kết nối Google.")
-                        except: st.error("Lỗi hệ thống.")
+                                audio_b64 = base64.b64encode(audio_bytes).decode('utf-8')
+                                
+                                # PROMPT CỰC XỊN CHO IELTS SPEAKING
+                                prompt = f"""
+                                Role: Senior IELTS Speaking Examiner (Friendly & Constructive).
+                                Student Level: {user['level']['level']}.
+                                Task: Assess speaking response for "{question}".
+                                
+                                CRITICAL INSTRUCTIONS:
+                                1. **Scoring:** Be encouraging. If they communicate clearly, don't grade too harshly.
+                                2. **Criteria:** You MUST evaluate based on 4 IELTS criteria:
+                                   - Fluency & Coherence
+                                   - Lexical Resource
+                                   - Grammatical Range & Accuracy
+                                   - **Pronunciation** (Estimate based on audio flow/intonation)
+                                3. **Improvement:** Suggest a **NATURAL, SPOKEN** way to say it. Avoid "fancy" or "academic writing" words. Use phrasal verbs or common collocations suitable for speaking.
+                                
+                                OUTPUT FORMAT (Vietnamese Markdown):
+                                
+                                ### KẾT QUẢ: [Band Score]
+                                
+                                ### CHI TIẾT 4 TIÊU CHÍ:
+                                1. **Fluency & Coherence:** [Nhận xét độ trôi chảy, ngập ngừng]
+                                2. **Lexical Resource:** [Từ vựng tốt đã dùng vs Từ nên thay thế]
+                                3. **Grammar:** [Lỗi ngữ pháp & Cách sửa]
+                                4. **Pronunciation & Intonation:** [Nhận xét về ngữ điệu, trọng âm, hoặc các âm bị nuốt/sai]
+                                
+                                ### NÂNG CẤP TỰ NHIÊN:
+                                * **Câu của bạn:** "[Trích dẫn]"
+                                * **Cách nói tự nhiên hơn:** "[Viết lại theo văn phong NÓI, tự nhiên, native]"
+                                  *(Giải thích ngắn: Tại sao cách này tự nhiên hơn?)*
+                                """
+                                
+                                url = f"[https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=](https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=){API_KEY}"
+                                payload = {"contents": [{"parts": [{"text": prompt}, {"inline_data": {"mime_type": "audio/wav", "data": audio_b64}}]}]}
+                                
+                                resp = requests.post(url, headers={'Content-Type': 'application/json'}, data=json.dumps(payload))
+                                
+                                if resp.status_code == 200:
+                                    st.markdown(resp.json()['candidates'][0]['content']['parts'][0]['text'])
+                                    st.session_state['speaking_attempts'][question] = attempts + 1
+                                else:
+                                    st.error(f"⚠️ Lỗi Google (Mã {resp.status_code}): {resp.text}")
+                        except Exception as e:
+                            st.error(f"Lỗi hệ thống: {e}")
             else:
-                st.warning("⛔ Bạn đã hết 5 lượt trả lời cho câu hỏi này. Vui lòng chuyển sang câu khác.")
+                st.warning("⛔ Đã hết 5 lượt trả lời cho câu này. Hãy chuyển sang câu khác.")
         else:
             st.info("Bài học này chưa cập nhật.")
 
