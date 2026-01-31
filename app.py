@@ -156,9 +156,9 @@ else:
         st.divider()
         if st.button("Đăng xuất"): logout()
 
-      # --- MODULE 1: SPEAKING (ĐÃ NÂNG CẤP PROMPT FEEDBACK) ---
+    # --- MODULE 1: SPEAKING (ĐÃ GIỚI HẠN 5 LẦN & FORMAT MỚI) ---
     if menu == "🗣️ Speaking":
-        st.title("🗣️ Luyện Tập Speaking")
+        st.title("Luyện Tập Speaking")
         col1, col2 = st.columns([1, 2])
         with col1:
             lesson_choice = st.selectbox("Chọn bài học:", SPEAKING_MENU)
@@ -166,9 +166,9 @@ else:
         if lesson_choice in SPEAKING_CONTENT:
             with col2:
                 q_list = SPEAKING_CONTENT[lesson_choice]
-                question = st.selectbox("Chọn câu hỏi:", q_list)
+                question = st.selectbox("Câu hỏi:", q_list)
             
-            # Quản lý lượt trả lời (Max 5)
+            # Kiểm tra số lần nộp
             attempts = st.session_state['speaking_attempts'].get(question, 0)
             remaining = 5 - attempts
             
@@ -179,20 +179,15 @@ else:
                 audio = st.audio_input("Ghi âm câu trả lời:", key=f"rec_{question}")
                 
                 if audio:
-                    with st.spinner("Đang chấm bài..."):
-                        try:
-                            audio_bytes = audio.read()
-                            if len(audio_bytes) < 1000:
-                                st.warning("File âm thanh quá ngắn. Vui lòng thử lại.")
-                            else:
-                                audio_b64 = base64.b64encode(audio_bytes).decode('utf-8')
-                                
-                                # PROMPT CỰC XỊN CHO IELTS SPEAKING
-                                prompt = f"""
-                                Role: Senior IELTS Speaking Examiner (Friendly & Constructive).
+                    with st.spinner("Đang chấm điểm..."):
+                        audio_b64 = base64.b64encode(audio.read()).decode('utf-8')
+                        
+                        # PROMPT THEO YÊU CẦU CỦA THẦY
+                        prompt = f"""
+                        Role: Senior IELTS Speaking Examiner (Friendly & Constructive).
                                 Student Level: {user['level']['level']}.
                                 Task: Assess speaking response for "{question}".
-                                
+                                Output in Vietnamese
                                 CRITICAL INSTRUCTIONS:
                                 1. **Scoring:** Be encouraging. If they communicate clearly, don't grade too harshly.
                                 2. **Criteria:** You MUST evaluate based on 4 IELTS criteria:
@@ -202,7 +197,7 @@ else:
                                    - **Pronunciation** (Estimate based on audio flow/intonation)
                                 3. **Improvement:** Suggest a **NATURAL, SPOKEN** way to say it. Avoid "fancy" or "academic writing" words. Use phrasal verbs or common collocations suitable for speaking.
                                 
-                                OUTPUT FORMAT (Vietnamese Markdown):
+                                OUTPUT FORMAT:
                                 
                                 ### KẾT QUẢ: [Band Score]
                                 
@@ -212,26 +207,26 @@ else:
                                 3. **Grammar:** [Lỗi ngữ pháp & Cách sửa]
                                 4. **Pronunciation & Intonation:** [Nhận xét về ngữ điệu, trọng âm, hoặc các âm bị nuốt/sai]
                                 
-                                ### NÂNG CẤP TỰ NHIÊN:
+                                ### ĐỀ XUẤT CẢI THIỆN:
                                 * **Câu của bạn:** "[Trích dẫn]"
                                 * **Cách nói tự nhiên hơn:** "[Viết lại theo văn phong NÓI, tự nhiên, native]"
                                   *(Giải thích ngắn: Tại sao cách này tự nhiên hơn?)*
                                 """
-                                
-                                url = f"[https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=](https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=){API_KEY}"
-                                payload = {"contents": [{"parts": [{"text": prompt}, {"inline_data": {"mime_type": "audio/wav", "data": audio_b64}}]}]}
-                                
-                                resp = requests.post(url, headers={'Content-Type': 'application/json'}, data=json.dumps(payload))
-                                
-                                if resp.status_code == 200:
-                                    st.markdown(resp.json()['candidates'][0]['content']['parts'][0]['text'])
-                                    st.session_state['speaking_attempts'][question] = attempts + 1
-                                else:
-                                    st.error(f"⚠️ Lỗi Google (Mã {resp.status_code}): {resp.text}")
-                        except Exception as e:
-                            st.error(f"Lỗi hệ thống: {e}")
+                        
+                        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
+                        payload = {"contents": [{"parts": [{"text": prompt}, {"inline_data": {"mime_type": "audio/wav", "data": audio_b64}}]}]}
+                        
+                        try:
+                            resp = requests.post(url, headers={'Content-Type': 'application/json'}, data=json.dumps(payload))
+                            if resp.status_code == 200:
+                                st.markdown(resp.json()['candidates'][0]['content']['parts'][0]['text'])
+                                # Trừ lượt sau khi thành công
+                                st.session_state['speaking_attempts'][question] = attempts + 1
+                            else:
+                                st.error("Lỗi kết nối Google.")
+                        except: st.error("Lỗi hệ thống.")
             else:
-                st.warning("⛔ Đã hết 5 lượt trả lời cho câu này. Hãy chuyển sang câu khác.")
+                st.warning("⛔ Bạn đã hết 5 lượt trả lời cho câu hỏi này. Vui lòng chuyển sang câu khác.")
         else:
             st.info("Bài học này chưa cập nhật.")
 
