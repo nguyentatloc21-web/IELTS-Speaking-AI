@@ -18,8 +18,7 @@ LISTENING_TOPICS = [
     "Công nghệ (Technology & AI)", "Sức khỏe (Health & Fitness)", 
     "Kinh doanh (Business & Startups)", "Du lịch (Travel & Culture)", 
     "Tâm lý học (Psychology)", "Giáo dục (Education)", 
-    "Môi trường (Environment)", "Thể thao (Sports)",
-    "Vụ án & Trinh thám (True Crime)", "Lịch sử (History)"
+    "Môi trường (Environment)", "Thể thao (Sports)"
 ]
 
 SPEAKING_CONTENT = {
@@ -42,7 +41,7 @@ SPEAKING_CONTENT = {
     ]
 }
 
-# READING: FULL TEXT & STATIC QUESTIONS
+# READING: FULL PASSAGE & STATIC QUESTIONS
 READING_CONTENT = {
     "Lesson 2: Marine Chronometer": {
         "status": "Active",
@@ -89,7 +88,7 @@ st.markdown("""
     .stButton button {background-color: #004080; color: white; border-radius: 6px; font-weight: 600; padding: 0.5rem 1rem;}
     .stButton button:hover {background-color: #002244;}
     .explanation-box {
-        background-color: #f0f7ff; 
+        background-color: #e8f4fd; 
         padding: 15px; 
         border-radius: 8px;
         border-left: 5px solid #004080; 
@@ -366,7 +365,7 @@ else:
                 """
                 result = call_gemini(prompt)
                 if result: st.markdown(result)
-                else: st.warning("⚠️ Máy chủ đang bận. Bạn vui lòng bấm nút lại lần nữa nhé!")
+                else: st.warning("⚠️ Máy chủ đang bận. Bạn vui lòng bấm nút lại lần nữa hoặc tải lại trang!")
 
         st.divider()
         st.subheader("Phân tích Script & Dịch Song Ngữ")
