@@ -41,7 +41,6 @@ SPEAKING_CONTENT = {
     ]
 }
 
-# READING: FULL TEXT KHÔNG CẮT BỚT
 READING_CONTENT = {
     "Lesson 2: Marine Chronometer": {
         "status": "Active",
@@ -64,12 +63,12 @@ Harrison had a principal contestant for the tempting prize at that time, an Engl
 Most chronometer forerunners of that particular generation were English, but that doesn’t mean every achievement was made by them. One wonderful figure in the history is the Lancastrian Thomas Earnshaw, who created the ultimate form of chronometer escapement—the spring detent escapement—and made the final decision on format and productions system for the marine chronometer, which turns it into a genuine modem commercial product, as well as a safe and pragmatic way of navigation at sea over the next century and half.
         """,
         "questions_fill": [
-            {"id": "q1", "q": "1. Sailors were able to use the position of the Sun to calculate [.........].", "a": "local time", "exp": "Dẫn chứng (Đoạn 4): 'A comparison with the local time (easily identified by checking the position of the Sun)...' -> Mặt trời giúp xác định giờ địa phương."},
-            {"id": "q2", "q": "2. An invention that could win the competition would lose no more than [.........] every day.", "a": "2.8 seconds", "exp": "Dẫn chứng (Đoạn 5): '...needed to be within 2.8 seconds a day...' -> Sai số cho phép là 2.8 giây/ngày."},
-            {"id": "q3", "q": "3. John and James Harrison’s clock worked accurately without [.........].", "a": "lubrication", "exp": "Dẫn chứng (Đoạn 6): '...revolutionary because it required no lubrication.' -> Không cần dầu bôi trơn."},
-            {"id": "q4", "q": "4. Harrison’s main competitor’s invention was known as [.........].", "a": "sextant", "exp": "Dẫn chứng (Đoạn 7): '...John Hadley, who developed sextant.' -> Đối thủ là John Hadley với kính lục phân."},
-            {"id": "q5", "q": "5. Hadley’s instrument can use [.........] to make a calculation of location of ships or planes.", "a": "angles", "exp": "Dẫn chứng (Đoạn 7): 'The sextant is the tool that people adopt to measure angles...' -> Dùng để đo góc."},
-            {"id": "q6", "q": "6. The modern version of Harrison’s invention is called [.........].", "a": "marine chronometer", "exp": "Dẫn chứng (Đoạn 8): '...turns it into a genuine modem commercial product... marine chronometer...' -> Đồng hồ hàng hải."}
+            {"id": "q1", "q": "1. Sailors were able to use the position of the Sun to calculate [.........].", "a": "local time", "exp": "Vị trí thông tin đoạn 4: 'A comparison with the local time...' -> Giờ địa phương được xác định nhờ mặt trời."},
+            {"id": "q2", "q": "2. An invention that could win the competition would lose no more than [.........] every day.", "a": "2.8 seconds", "exp": "Vị trí thông tin đoạn 5: '...needed to be within 2.8 seconds a day...' -> Sai số cho phép là 2.8 giây/ngày."},
+            {"id": "q3", "q": "3. John and James Harrison’s clock worked accurately without [.........].", "a": "lubrication", "exp": "Vị trí thông tin đoạn 6: '...revolutionary because it required no lubrication.' -> Không cần bôi trơn."},
+            {"id": "q4", "q": "4. Harrison’s main competitor’s invention was known as [.........].", "a": "sextant", "exp": "Vị trí thông tin đoạn 7: '...John Hadley, who developed sextant.' -> Đối thủ chính phát triển kính lục phân."},
+            {"id": "q5", "q": "5. Hadley’s instrument can use [.........] to make a calculation of location of ships or planes.", "a": "angles", "exp": "Vị trí thông tin đoạn 7: 'The sextant is the tool that people adopt to measure angles...' -> Dùng để đo góc."},
+            {"id": "q6", "q": "6. The modern version of Harrison’s invention is called [.........].", "a": "marine chronometer", "exp": "Vị trí thông tin đoạn 8: '...turns it into a genuine modem commercial product... marine chronometer...' -> Đồng hồ hàng hải."}
         ]
     }
 }
@@ -86,6 +85,7 @@ st.markdown("""
     h1 {color: #003366; font-size: 26px; font-weight: 700;}
     h2 {color: #004080; font-size: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 25px;}
     .stButton button {background-color: #004080; color: white; border-radius: 6px; font-weight: 600; padding: 0.5rem 1rem;}
+    .stButton button:hover {background-color: #002244;}
     .explanation-box {
         background-color: #e8f4fd; 
         padding: 15px; 
@@ -192,49 +192,42 @@ else:
                     with st.spinner("Thầy Lộc AI đang chấm chi tiết..."):
                         try:
                             audio_bytes = audio.read()
-                            audio_b64 = base64.b64encode(audio_bytes).decode('utf-8')
-                            
-                            # PROMPT CHI TIẾT THEO YÊU CẦU
-                            prompt = f"""
-                            Role: IELTS Examiner.
-                            Student Level: {user['level']['level']} (Class {user['class']}).
-                            Task: Evaluate response for "{question}".
-                            Tone: Professional, constructive, detailed. Output in Vietnamese.
-                            
-                            Format strictly as below using Markdown:
-                            
-                            ### 📊 KẾT QUẢ ĐÁNH GIÁ
-                            * **Band Score Ước lượng:** [Range, e.g., 5.0 - 5.5]
-                            * **Nhận xét chung:** [Tổng quan về độ tự nhiên, phản xạ]
-                            
-                            ### 🔍 PHÂN TÍCH CHI TIẾT
-                            **1. Fluency & Coherence (Độ trôi chảy):**
-                            * [Nhận xét chi tiết về ngập ngừng, tốc độ, từ nối]
-                            
-                            **2. Lexical Resource (Từ vựng):**
-                            * ✅ **Điểm cộng:** [Liệt kê các từ hay/đúng chủ đề đã dùng]
-                            * ⚠️ **Cần cải thiện:** [Các từ dùng sai ngữ cảnh hoặc lặp lại]
-                            
-                            **3. Grammatical Range & Accuracy (Ngữ pháp):**
-                            * [Chỉ ra lỗi sai thì, cấu trúc câu và cách sửa]
-                            
-                            ### 💡 NÂNG CẤP CÂU TRẢ LỜI (Paraphrase)
-                            * **Original (Câu của bạn):** "[Trích dẫn]"
-                            * **Better (Thầy Lộc gợi ý):** "[Viết lại câu đó hay hơn, chuẩn native hơn]"
-                            """
-                            
-                            url = f"[https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=](https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=){API_KEY}"
-                            payload = {"contents": [{"parts": [{"text": prompt}, {"inline_data": {"mime_type": "audio/wav", "data": audio_b64}}]}]}
-                            
-                            resp = requests.post(url, headers={'Content-Type': 'application/json'}, data=json.dumps(payload))
-                            
-                            if resp.status_code == 200:
-                                st.markdown(resp.json()['candidates'][0]['content']['parts'][0]['text'])
-                                st.session_state['speaking_attempts'][question] = attempts + 1
+                            if len(audio_bytes) < 1000:
+                                st.warning("File âm thanh quá ngắn. Vui lòng thử lại.")
                             else:
-                                st.error(f"⚠️ Lỗi Google (Mã {resp.status_code}): {resp.text}")
-                                if resp.status_code == 429:
-                                    st.warning("👉 Bạn đang gửi yêu cầu quá nhanh. Vui lòng đợi 1 phút.")
+                                audio_b64 = base64.b64encode(audio_bytes).decode('utf-8')
+                                
+                                # PROMPT CHI TIẾT THEO YÊU CẦU
+                                prompt = f"""
+                                Role: IELTS Examiner.
+                                Student Level: {user['level']['level']} (Class {user['class']}).
+                                Task: Evaluate response for "{question}".
+                                Tone: Professional, constructive, detailed. Output in Vietnamese.
+                                
+                                Format strictly as below using Markdown:
+                                
+                                ### 📊 BAND SCORE: [Range, e.g., 5.0 - 5.5]
+                                
+                                ### 📝 FEEDBACK
+                                - **Fluency:** [Comment on speed, pauses, hesitation]
+                                - **Vocabulary:** [List good words used] vs [Suggest words to improve]
+                                - **Grammar:** [Identify mistakes and fix them]
+                                
+                                ### 💡 IMPROVEMENT
+                                Original: "[Quote one sentence from student]" 
+                                -> Better: "[Rewrite it to sound more natural/academic]"
+                                """
+                                
+                                url = f"[https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=](https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=){API_KEY}"
+                                payload = {"contents": [{"parts": [{"text": prompt}, {"inline_data": {"mime_type": "audio/wav", "data": audio_b64}}]}]}
+                                
+                                resp = requests.post(url, headers={'Content-Type': 'application/json'}, data=json.dumps(payload))
+                                
+                                if resp.status_code == 200:
+                                    st.markdown(resp.json()['candidates'][0]['content']['parts'][0]['text'])
+                                    st.session_state['speaking_attempts'][question] = attempts + 1
+                                else:
+                                    st.error(f"⚠️ Lỗi Google (Mã {resp.status_code}): {resp.text}")
                         except Exception as e:
                             st.error(f"Lỗi hệ thống: {e}")
             else:
@@ -257,7 +250,7 @@ else:
                 with st.expander("📄 ĐỌC VĂN BẢN (FULL TEXT)", expanded=True):
                     st.markdown(data['text'])
                 
-                st.subheader("Fill in the blanks (Điền từ vào chỗ trống)")
+                st.subheader("Fill in the blanks")
                 with st.form("read_fill"):
                     user_answers = {}
                     for q in data['questions_fill']:
@@ -277,7 +270,7 @@ else:
                             
                             st.markdown(f"**{q['q']}**")
                             st.markdown(f"{status_icon} Kết quả: {status_text}", unsafe_allow_html=True)
-                            st.markdown(f"<div class='explanation-box'><b>Giải thích chi tiết:</b><br>{q['exp']}</div>", unsafe_allow_html=True)
+                            st.markdown(f"<div class='explanation-box'>💡 <b>Giải thích chi tiết:</b><br>{q['exp']}</div>", unsafe_allow_html=True)
                             st.write("---")
                             
                         st.info(f"📊 **Tổng điểm: {score}/{len(data['questions_fill'])}**")
