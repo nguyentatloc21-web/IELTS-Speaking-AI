@@ -46,8 +46,6 @@ def save_speaking_log(student, class_code, lesson, question, full_feedback):
                 ws.append_row(["Timestamp", "Student", "Class", "Lesson", "Question", "Band_Short", "Score_Num", "Full_Feedback"])
             
             # --- LOGIC TRÍCH XUẤT ĐIỂM SỐ ---
-            # Tìm dòng chứa "Band Score" hoặc "Kết quả"
-            # Regex này tìm số dạng x.x (ví dụ 5.0, 6.5)
             score_num = 0.0
             band_short = "N/A"
             
@@ -59,7 +57,6 @@ def save_speaking_log(student, class_code, lesson, question, full_feedback):
                     band_short = str(score_num)
                 except: pass
             
-            # Nếu không tìm thấy, thử tìm số đầu tiên xuất hiện trong dòng đầu
             if score_num == 0.0:
                 first_line = full_feedback.split('\n')[0]
                 match_fallback = re.search(r"(\d+\.?\d*)", first_line)
@@ -67,16 +64,16 @@ def save_speaking_log(student, class_code, lesson, question, full_feedback):
                     score_num = float(match_fallback.group(1))
                     band_short = str(score_num)
 
-            # Lưu vào Sheet (Đảm bảo đủ 8 cột để không bị trật)
+            # Lưu vào Sheet
             ws.append_row([
                 str(datetime.now()), 
                 student, 
                 class_code, 
                 lesson, 
                 question, 
-                band_short,  # Cột 6: Text ngắn (VD: "5.5")
-                score_num,   # Cột 7: Số thực (VD: 5.5) -> Dùng để tính toán
-                full_feedback # Cột 8: Bài feedback đầy đủ
+                band_short,  # Cột 6
+                score_num,   # Cột 7: Số thực
+                full_feedback # Cột 8
             ])
             st.toast("✅ Đã lưu điểm và feedback vào hệ thống!", icon="💾")
     except Exception as e:
@@ -98,6 +95,11 @@ def save_reading_log(student, class_code, lesson, score, total):
     except: pass
 
 def get_leaderboard(class_code):
+    """
+    Logic tính điểm ĐƠN GIẢN & NHANH CHÓNG:
+    - Speaking: Trung bình cộng tất cả các lần nộp.
+    - Reading: Điểm cao nhất từng đạt được.
+    """
     try:
         sheet = connect_gsheet()
         if not sheet: return None, None
@@ -114,11 +116,10 @@ def get_leaderboard(class_code):
                     # Chuyển cột điểm sang số
                     df_s['Score_Num'] = pd.to_numeric(df_s['Score_Num'], errors='coerce').fillna(0)
                     
-                    # Logic: Lấy điểm cao nhất của mỗi câu hỏi -> Tính trung bình các câu
-                    best_s = df_s.groupby(['Student', 'Question'])['Score_Num'].max().reset_index()
-                    lb_s = best_s.groupby('Student')['Score_Num'].mean().reset_index()
+                    # LOGIC MỚI: Tính trung bình cộng đơn giản của tất cả bài nộp
+                    lb_s = df_s.groupby('Student')['Score_Num'].mean().reset_index()
                     lb_s.columns = ['Học Viên', 'Điểm Speaking (TB)']
-                    lb_s = lb_s.sort_values(by='Điểm Speaking (TB)', ascending=False)
+                    lb_s = lb_s.sort_values(by='Điểm Speaking (TB)', ascending=False).head(10) # Lấy Top 10
                 else: lb_s = None
             else: lb_s = None
         except: lb_s = None
@@ -131,10 +132,11 @@ def get_leaderboard(class_code):
                 df_r = df_r[df_r['Class'] == class_code]
                 if not df_r.empty:
                     df_r['Score'] = pd.to_numeric(df_r['Score'], errors='coerce')
-                    # Reading: Lấy điểm cao nhất từng đạt được
+                    
+                    # LOGIC MỚI: Lấy điểm cao nhất (Max)
                     lb_r = df_r.groupby('Student')['Score'].max().reset_index()
                     lb_r.columns = ['Học Viên', 'Điểm Reading (Max)']
-                    lb_r = lb_r.sort_values(by='Điểm Reading (Max)', ascending=False)
+                    lb_r = lb_r.sort_values(by='Điểm Reading (Max)', ascending=False).head(10) # Lấy Top 10
                 else: lb_r = None
             else: lb_r = None
         except: lb_r = None
