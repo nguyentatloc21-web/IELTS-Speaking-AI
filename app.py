@@ -2,7 +2,73 @@ import streamlit as st
 import requests
 import json
 import base64
+import pandas as pd
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+from datetime import datetime
 import re
+
+# ================= 1. KẾT NỐI GOOGLE SHEETS =================
+# Hàm kết nối Database
+def connect_gsheet():
+    try:
+        # Lấy credentials từ Secrets
+        scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+        creds_dict = dict(st.secrets["gcp_service_account"]) # Lấy từ mục đã dán trong Secrets
+        creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+        client = gspread.authorize(creds)
+        # Mở file Sheet theo tên (Phải chính xác 100%)
+        sheet = client.open("IELTS_DB") 
+        return sheet
+    except Exception as e:
+        st.error(f"⚠️ Lỗi kết nối Google Sheet: {e}")
+        return None
+
+# Hàm lưu điểm Speaking
+def save_speaking_log(student, class_code, lesson, question, band, feedback):
+    try:
+        sheet = connect_gsheet()
+        if sheet:
+            ws = sheet.worksheet("Speaking_Logs")
+            ws.append_row([str(datetime.now()), student, class_code, lesson, question, band, feedback])
+    except: pass
+
+# Hàm lưu điểm Reading
+def save_reading_log(student, class_code, lesson, score, total, details):
+    try:
+        sheet = connect_gsheet()
+        if sheet:
+            ws = sheet.worksheet("Reading_Logs")
+            ws.append_row([str(datetime.now()), student, class_code, lesson, score, total, details])
+    except: pass
+
+# Hàm lấy Bảng Xếp Hạng (Speaking)
+def get_speaking_leaderboard(class_code, lesson):
+    try:
+        sheet = connect_gsheet()
+        if sheet:
+            ws = sheet.worksheet("Speaking_Logs")
+            data = ws.get_all_records()
+            df = pd.DataFrame(data)
+            
+            # Lọc theo lớp và bài học
+            df = df[(df['Class'] == class_code) & (df['Lesson'] == lesson)]
+            
+            if df.empty: return None
+            
+            # Logic: Lấy điểm cao nhất của mỗi câu hỏi -> Tính trung bình các câu
+            # Chuyển Band_Score sang số (nếu AI trả về chuỗi)
+            df['Band_Score'] = pd.to_numeric(df['Band_Score'], errors='coerce')
+            
+            # Group theo Học sinh và Câu hỏi (Lấy max mỗi câu)
+            best_attempts = df.groupby(['Student', 'Question'])['Band_Score'].max().reset_index()
+            
+            # Tính trung bình cộng các câu của mỗi học sinh
+            leaderboard = best_attempts.groupby('Student')['Band_Score'].mean().reset_index()
+            leaderboard = leaderboard.sort_values(by='Band_Score', ascending=False)
+            
+            return leaderboard
+    except: return None
 
 # ================= 1. CẤU HÌNH & DỮ LIỆU (TEACHER INPUT) =================
 
@@ -82,10 +148,22 @@ st.set_page_config(page_title="Mr. Tat Loc IELTS Portal", page_icon="🎓", layo
 st.markdown("""
     <style>
     .main {background-color: #ffffff; font-family: 'Segoe UI', sans-serif;}
-    h1 {color: #003366; font-size: 24px; font-weight: 700;}
-    h2 {color: #004080; font-size: 18px; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 20px;}
-    .stButton button {background-color: #004080; color: white; border-radius: 4px;}
-    .explanation-box {background-color: #f0f7ff; padding: 10px; border-left: 4px solid #004080; margin-top: 5px; font-size: 0.9rem;}
+    h1 {color: #003366; font-size: 26px; font-weight: 700;}
+    h2 {color: #004080; font-size: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 25px;}
+    .stButton button {background-color: #004080; color: white; border-radius: 6px; font-weight: 600; padding: 0.5rem 1rem;}
+    .stButton button:hover {background-color: #002244;}
+    .explanation-box {
+        background-color: #e8f4fd; 
+        padding: 15px; 
+        border-radius: 8px;
+        border-left: 5px solid #004080; 
+        margin-top: 10px; 
+        font-size: 0.95rem;
+        color: #2c3e50;
+    }
+    .correct-ans {color: #27ae60; font-weight: bold;}
+    .wrong-ans {color: #c0392b; font-weight: bold;}
+    .stRadio label {font-size: 16px;}
     </style>
 """, unsafe_allow_html=True)
 
