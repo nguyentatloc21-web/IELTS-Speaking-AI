@@ -405,34 +405,31 @@ else:
                                 # TỰ ĐỘNG NHẬN DIỆN ĐỊNH DẠNG ÂM THANH (Fix lỗi Mobile)
                                 mime_type = audio.type if audio.type else "audio/wav"
                                 prompt = f"""
-                                Role: Senior IELTS Speaking Examiner (Friendly & Constructive).
-                                Student Level: {user['level']['level']}.
+                                Role: Senior IELTS Speaking Examiner (Friendly but Strict on Rubric).
                                 Task: Assess speaking response for "{question}".
-                                Output in Vietnamese
-                                Only assess if the answer is relevant. Otherwise, give him/her a second chance
-                                CRITICAL INSTRUCTIONS:
-                                1. **Scoring:** Be encouraging. If they communicate clearly, don't grade too harshly.
-                                2. **Criteria:** You MUST evaluate based on 4 IELTS criteria:
-                                   - Fluency & Coherence
-                                   - Lexical Resource
-                                   - Grammatical Range & Accuracy
-                                   - **Pronunciation** (Estimate based on audio flow/intonation)
-                                3. **Improvement:** Suggest a **NATURAL, SPOKEN** way to say it. Avoid "fancy" or "academic writing" words. Use phrasal verbs or common collocations suitable for speaking.
+                                
+                                **RUBRIC CHẤM ĐIỂM (BẮT BUỘC TUÂN THỦ):**
+                                - **Band 7-8-9:** Nói trôi chảy, ít ngắt quãng. Sử dụng từ nối, từ vựng phong phú (idioms, collocations) chính xác. Cấu trúc ngữ pháp phức tạp (câu điều kiện, mệnh đề quan hệ) thành thạo. Phát âm chuẩn, có ngữ điệu.
+                                - **Band 6:** Nói mạch lạc nhưng đôi khi mất kết nối. Có dùng từ nối. Vốn từ đủ dùng, bắt đầu paraphrase. Có sử dụng câu phức nhưng vẫn còn lỗi. Phát âm rõ ràng.
+                                - **Band 5:** Duy trì được mạch nói nhưng hay lặp lại/tự sửa sai. Vốn từ hạn chế ở các chủ đề quen thuộc. Dùng câu đơn đúng, câu phức thường sai.
+                                - **Band 4:** Hay ngập ngừng, nói câu cụt. Vốn từ nghèo nàn, lặp lại. Ngữ pháp rất cơ bản, mắc lỗi thường xuyên.
+                                
+                                **Input Audio Context:** This is a student from class level {user['level']['level']}. However, GRADE BASED ON PERFORMANCE, not just level. E.g., if they use high-level idioms like "bilingual MC", "on the side" correctly, they deserve Band 6.0+ regardless of their class.
                                 
                                 OUTPUT FORMAT (Vietnamese Markdown):
                                 
-                                ### KẾT QUẢ: [Band Score]
+                                ### 🎯 KẾT QUẢ: [Band Score] (Chấm công tâm theo rubric)
                                 
-                                ### CHI TIẾT 4 TIÊU CHÍ:
-                                1. **Fluency & Coherence:** [Nhận xét độ trôi chảy, ngập ngừng, mở rộng/đào sâu được câu trả lời ở mức nào?]
-                                2. **Lexical Resource:** [Từ vựng tốt đã dùng vs Từ nên thay thế]
-                                3. **Grammar:** [Lỗi ngữ pháp & Cách sửa]
-                                4. **Pronunciation & Intonation:** [Nhận xét về ngữ điệu, trọng âm, hoặc các âm bị nuốt/sai, âm đuôi, số ít số nhiều]
+                                ### 📝 PHÂN TÍCH CHI TIẾT (Dựa trên 4 tiêu chí):
+                                1. **Fluency & Coherence:** [Nhận xét độ trôi chảy, các từ nối đã dùng]
+                                2. **Lexical Resource:** [Đánh giá vốn từ, collocations, idioms (nếu có)]
+                                3. **Grammatical Range & Accuracy:** [Nhận xét cấu trúc câu đơn/phức, thì sử dụng]
+                                4. **Pronunciation:** [Nhận xét về âm đuôi, ngữ điệu, trọng âm]
                                 
-                                ### ĐỀ XUẤT CẢI THIỆN:
-                                * **Câu của bạn:** "[Trích dẫn]"
-                                * **Cách nói tự nhiên hơn:** "[Viết lại theo văn phong NÓI, tự nhiên, native]"
-                                  *(Giải thích: Tại sao cách này tự nhiên hơn? giải thích rõ ràng dễ hiểu với từng thay đổi nhỏ)*
+                                ### 💡 ĐỀ XUẤT CẢI THIỆN (Chi tiết):
+                                * **Original:** "[Trích dẫn câu nói của học viên]"
+                                * **Better:** "[Phiên bản nâng cấp tự nhiên hơn/Native speaker style]"
+                                * **Giải thích chi tiết:** [Giải thích từng thay đổi nhỏ: tại sao dùng từ này thay từ kia, cấu trúc này hay hơn chỗ nào...]
                                 """
                         
                                 url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
