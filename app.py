@@ -432,7 +432,7 @@ else:
                                 ### ĐỀ XUẤT CẢI THIỆN:
                                 * **Câu của bạn:** "[Trích dẫn]"
                                 * **Cách nói tự nhiên hơn:** "[Viết lại theo văn phong NÓI, tự nhiên, native]"
-                                  *(Giải thích: Tại sao cách này tự nhiên hơn?)*
+                                  *(Giải thích: Tại sao cách này tự nhiên hơn? giải thích rõ ràng dễ hiểu với từng thay đổi nhỏ)*
                                 """
                         
                                 url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
