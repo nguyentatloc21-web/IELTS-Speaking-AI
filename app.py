@@ -311,7 +311,7 @@ else:
     # --- MODULE 4: LEADERBOARD (Ưu tiên hiển thị đầu để dễ thấy) ---
     if menu == "🏆 Bảng Xếp Hạng":
         st.title(f"🏆 Bảng Xếp Hạng Lớp {user['class']}")
-        st.info("Cập nhật theo thời gian thực (Top 10).")
+        st.info("Top 10 học viên xuất sắc nhất. Dữ liệu được cập nhật liên tục.")
         
         if st.button("🔄 Làm mới"): st.rerun()
 
@@ -322,7 +322,7 @@ else:
             st.subheader("🎤 Speaking (Điểm TB)")
             if lb_s is not None and not lb_s.empty:
                 lb_s.index = range(1, len(lb_s) + 1)
-                st.dataframe(lb_s.style.format({"Điểm Speaking (TB)": "{:.2f}"}).background_gradient(cmap="Blues"), use_container_width=True)
+                st.dataframe(lb_s.style.format({"Điểm Speaking (TB)": "{:.2f}"}), use_container_width=True)
             else:
                 st.info("Chưa có dữ liệu.")
                 
@@ -330,7 +330,7 @@ else:
             st.subheader("📚 Reading (Điểm Max)")
             if lb_r is not None and not lb_r.empty:
                 lb_r.index = range(1, len(lb_r) + 1)
-                st.dataframe(lb_r.style.format({"Điểm Reading (Max)": "{:.1f}"}).background_gradient(cmap="Greens"), use_container_width=True)
+                st.dataframe(lb_r.style.format({"Điểm Reading (Max)": "{:.1f}"}), use_container_width=True)
             else:
                 st.info("Chưa có dữ liệu.")
 
