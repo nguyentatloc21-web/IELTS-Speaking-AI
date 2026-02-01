@@ -9,72 +9,108 @@ from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
 
 # ================= 1. KẾT NỐI GOOGLE SHEETS (DATABASE) =================
-# Hàm kết nối an toàn với xử lý lỗi
 def connect_gsheet():
+    """Kết nối Google Sheets an toàn, chấp nhận mọi định dạng Secrets"""
     try:
         scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+        
+        # 1. Thử lấy từ mục [gcp_service_account] (Chuẩn TOML)
         if "gcp_service_account" in st.secrets:
             creds_dict = dict(st.secrets["gcp_service_account"])
-            creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
-            client = gspread.authorize(creds)
-            sheet = client.open("IELTS_DB") # Tên file Google Sheet phải chuẩn
-            return sheet
+        # 2. Thử lấy từ Root (Nếu thầy lỡ dán JSON trực tiếp)
+        elif "private_key" in st.secrets:
+            # Lọc lấy các trường cần thiết từ secrets
+            creds_dict = {k: v for k, v in st.secrets.items() if k in ["type", "project_id", "private_key_id", "private_key", "client_email", "client_id", "auth_uri", "token_uri", "auth_provider_x509_cert_url", "client_x509_cert_url"]}
         else:
             return None
+
+        creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+        client = gspread.authorize(creds)
+        sheet = client.open("IELTS_DB") # Tên file Sheet phải chính xác
+        return sheet
+        
     except Exception as e:
+        print(f"DB Error: {e}")
         return None
 
-# Hàm lưu điểm Speaking
 def save_speaking_log(student, class_code, lesson, question, band_text, feedback_summary):
     try:
         sheet = connect_gsheet()
         if sheet:
-            ws = sheet.worksheet("Speaking_Logs")
-            # Trích xuất số điểm từ text (VD: "5.0 - 5.5" -> lấy 5.25 hoặc 5.0)
-            score_match = re.search(r"(\d+\.?\d*)", str(band_text))
-            score_num = float(score_match.group(1)) if score_match else 0
+            try:
+                ws = sheet.worksheet("Speaking_Logs")
+            except:
+                ws = sheet.add_worksheet(title="Speaking_Logs", rows="1000", cols="10")
+                # Tạo header nếu chưa có (Khớp với cột thầy yêu cầu)
+                ws.append_row(["Timestamp", "Student", "Class", "Lesson", "Question", "Band_Score", "Feedback_Summary"])
             
-            ws.append_row([str(datetime.now()), student, class_code, lesson, question, band_text, score_num])
+            # Lưu đúng thứ tự cột thầy đã tạo
+            ws.append_row([str(datetime.now()), student, class_code, lesson, question, band_text, feedback_summary])
+            st.toast("✅ Đã lưu kết quả vào Database!", icon="💾")
     except: pass
 
-# Hàm lưu điểm Reading
 def save_reading_log(student, class_code, lesson, score, total):
     try:
         sheet = connect_gsheet()
         if sheet:
-            ws = sheet.worksheet("Reading_Logs")
-            ws.append_row([str(datetime.now()), student, class_code, lesson, score, total, f"{score}/{total}"])
+            try:
+                ws = sheet.worksheet("Reading_Logs")
+            except:
+                ws = sheet.add_worksheet(title="Reading_Logs", rows="1000", cols="10")
+                # Tạo header nếu chưa có (Khớp với cột thầy yêu cầu)
+                ws.append_row(["Timestamp", "Student", "Class", "Lesson", "Score", "Total", "Details"])
+            
+            # Details ở đây mình sẽ lưu phần trăm
+            details = f"{round((score / total) * 100, 1)}%" if total > 0 else "0%"
+            ws.append_row([str(datetime.now()), student, class_code, lesson, score, total, details])
+            st.toast("✅ Đã lưu kết quả Reading!", icon="💾")
     except: pass
 
-# Hàm lấy Bảng Xếp Hạng
 def get_leaderboard(class_code):
     try:
         sheet = connect_gsheet()
-        if sheet:
-            # Lấy dữ liệu Speaking
-            ws = sheet.worksheet("Speaking_Logs")
-            data = ws.get_all_records()
-            df = pd.DataFrame(data)
+        if not sheet: return None, None
+
+        # Speaking Leaderboard
+        try:
+            ws_s = sheet.worksheet("Speaking_Logs")
+            df_s = pd.DataFrame(ws_s.get_all_records())
             
-            if df.empty: return None, None
-            
-            # Lọc theo lớp hiện tại
-            if 'Class' in df.columns:
-                df = df[df['Class'] == class_code]
-            
-            # Tính điểm trung bình của từng học sinh (Lấy điểm cao nhất của mỗi câu -> TB các câu)
-            # Giả sử cột lưu điểm số thực là cột số 7 (index 6 - Score_Num)
-            # Lưu ý: Cần đảm bảo Sheet có cột tiêu đề: Timestamp, Student, Class, Lesson, Question, Band_Text, Score_Num
-            if 'Score_Num' in df.columns:
-                # 1. Lấy điểm cao nhất của mỗi câu hỏi mà học sinh đã làm
-                best_attempts = df.groupby(['Student', 'Question'])['Score_Num'].max().reset_index()
-                # 2. Tính trung bình cộng các câu hỏi
-                final_ranking = best_attempts.groupby('Student')['Score_Num'].mean().reset_index()
-                final_ranking.columns = ['Học Viên', 'Điểm Speaking TB']
-                final_ranking = final_ranking.sort_values(by='Điểm Speaking TB', ascending=False)
-                return final_ranking, None
-            
-            return None, None
+            if not df_s.empty and 'Class' in df_s.columns and 'Band_Score' in df_s.columns:
+                df_s = df_s[df_s['Class'] == class_code]
+                if not df_s.empty:
+                    # Hàm tách số từ chuỗi Band_Score (VD: "Band: 5.5" -> 5.5)
+                    def extract_score(val):
+                        match = re.search(r"(\d+\.?\d*)", str(val))
+                        return float(match.group(1)) if match else 0.0
+                    
+                    df_s['Numeric_Score'] = df_s['Band_Score'].apply(extract_score)
+
+                    # Lấy điểm cao nhất mỗi câu -> TB các câu
+                    best_s = df_s.groupby(['Student', 'Question'])['Numeric_Score'].max().reset_index()
+                    lb_s = best_s.groupby('Student')['Numeric_Score'].mean().reset_index()
+                    lb_s.columns = ['Học Viên', 'Điểm Speaking (TB)']
+                    lb_s = lb_s.sort_values(by='Điểm Speaking (TB)', ascending=False)
+                else: lb_s = None
+            else: lb_s = None
+        except: lb_s = None
+
+        # Reading Leaderboard
+        try:
+            ws_r = sheet.worksheet("Reading_Logs")
+            df_r = pd.DataFrame(ws_r.get_all_records())
+            if not df_r.empty and 'Class' in df_r.columns and 'Score' in df_r.columns:
+                df_r = df_r[df_r['Class'] == class_code]
+                if not df_r.empty:
+                    df_r['Score'] = pd.to_numeric(df_r['Score'], errors='coerce')
+                    lb_r = df_r.groupby('Student')['Score'].max().reset_index()
+                    lb_r.columns = ['Học Viên', 'Điểm Reading (Max)']
+                    lb_r = lb_r.sort_values(by='Điểm Reading (Max)', ascending=False)
+                else: lb_r = None
+            else: lb_r = None
+        except: lb_r = None
+
+        return lb_s, lb_r
     except: return None, None
 
 # ================= 1. CẤU HÌNH & DỮ LIỆU (TEACHER INPUT) =================
@@ -481,3 +517,23 @@ else:
                         st.error("Script quá dài hoặc hệ thống bận.")
             else:
                 st.warning("Vui lòng dán script.")
+
+                 # --- MODULE 4: LEADERBOARD ---
+    elif menu == "🏆 Bảng Xếp Hạng":
+        st.title(f"🏆 Bảng Xếp Hạng Lớp {user['class']}")
+        st.info("Top 10 học viên xuất sắc nhất.")
+        
+        lb_s, lb_r = get_leaderboard(user['class'])
+        
+        st.subheader("🎤 Speaking Leaderboard")
+        if lb_s is not None and not lb_s.empty:
+            st.dataframe(lb_s.style.format({"Điểm Speaking (TB)": "{:.2f}"}), use_container_width=True)
+        else:
+            st.info("Chưa có dữ liệu Speaking.")
+
+        st.divider()
+        st.subheader("📚 Reading Leaderboard")
+        if lb_r is not None and not lb_r.empty:
+            st.dataframe(lb_r, use_container_width=True)
+        else:
+            st.info("Chưa có dữ liệu Reading.")
