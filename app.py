@@ -272,9 +272,9 @@ else:
                             
                         st.info(f"📊 **Tổng điểm: {score}/{len(data['questions_fill'])}**")
 
-                        # TAB 2: Bài tập AI tương tác (JSON Parsing)
+            # TAB 2: Bài tập AI tương tác (JSON Parsing)
             with tab2:
-                st.info(f"Dành cho trình độ: **{user['level']['level']}**. AI sẽ tạo bài tập trắc nghiệm đa dạng để bạn hiểu sâu từ vựng.")
+                st.info(f"Dành cho trình độ: **{user['level']['level']}**. AI sẽ tạo bài tập trắc nghiệm giúp bạn hiểu sâu từ vựng.")
                 
                 if st.button("✨ Tạo Bài Tập Mới"):
                     with st.spinner("AI đang soạn đề..."):
@@ -283,13 +283,23 @@ else:
                         Based on the text 'Invention of Marine Chronometer', create 10 Vocabulary Questions suitable for IELTS Band {user['level']['level']}.
                         
                         REQUIREMENTS:
-                        1. **Practical Meaning:** The first 5 questions, ask for the Vietnamese meaning of a key word in a specific context (not just dictionary definition).
-                        2. **Contextual Use:** The last 5 questions, ask user to fill in a blank in a NEW sentence using a word from the text.
-                        3. **Avoid Obscure words:** Focus on useful academic words (e.g., accurate, essential, determine, reliance).
+                        
+                        1. **Part 1 (Questions 1-5): Practical Meaning**
+                           - Select 5 academic words from the text (e.g., longitude, reliance, fluctuate).
+                           - Ask for their meaning **in Vietnamese**.
+                           - **CRITICAL:** Do NOT reveal the meaning in the question.
+                           - Good example: "Từ 'fluctuating' trong đoạn 4 có nghĩa là gì?"
+                           - Options: 4 Vietnamese definitions.
+                        
+                        2. **Part 2 (Questions 6-10): Contextual Use**
+                           - Select 5 other academic words.
+                           - Create a **NEW English sentence** (unrelated to marine history) with a blank.
+                           - Ask user to choose the correct word to fill in.
+                           - Options: 4 English words from the text.
                         
                         Output STRICTLY JSON array format:
                         [
-                            {{"question": "Complete the sentence: Accurate timekeeping was ______ for navigation.", "options": ["A. essential", "B. optional", "C. useless", "D. minor"], "answer": "A. essential", "explanation": "The text mentions 'essential coordinates', meaning absolutely necessary."}}
+                            {{"question": "Question text?", "options": ["A. Option 1", "B. Option 2", "C. Option 3", "D. Option 4"], "answer": "A. Option 1", "explanation": "Brief explanation in Vietnamese."}}
                         ]
                         """
                         json_str = call_gemini(prompt, expect_json=True)
@@ -337,6 +347,7 @@ else:
                             st.info(f"Kết quả: {score}/{len(quiz)}")
         else:
             st.info("Bài học này chưa cập nhật.")
+
 
     # --- MODULE 3: LISTENING (FIX LỖI & TỐI ƯU) ---
     elif menu == "🎧 Listening":
