@@ -405,8 +405,8 @@ else:
                                     st.markdown(text_result)
                                     st.session_state['speaking_attempts'][question] = attempts + 1
                                     
-                                    # LƯU ĐIỂM
-                                    save_speaking_log(user['name'], user['class'], lesson_choice, question, text_result[:50], text_result)
+                                    # LƯU ĐIỂM (Đã sửa lỗi tham số thừa)
+                                    save_speaking_log(user['name'], user['class'], lesson_choice, question, text_result)
                                 else:
                                     st.error(f"⚠️ Lỗi Google (Mã {resp.status_code}): {resp.text}")
                         except Exception as e:
@@ -456,7 +456,8 @@ else:
                             st.write("---")
                             
                         st.info(f"📊 **Tổng điểm: {score}/{len(data['questions_fill'])}**")
-
+                        # LƯU ĐIỂM READING
+                        save_reading_log(user['name'], user['class'], lesson_choice, score, len(data['questions_fill']))
             # TAB 2: Bài tập AI tương tác (JSON Parsing)
             with tab2:
                 st.info(f"Dành cho trình độ: **{user['level']['level']}**. AI sẽ tạo bài tập trắc nghiệm giúp bạn hiểu sâu từ vựng.")
