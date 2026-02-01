@@ -10,31 +10,31 @@ from datetime import datetime
 
 # ================= 1. KẾT NỐI GOOGLE SHEETS (DATABASE) =================
 def connect_gsheet():
-    """Kết nối Google Sheets an toàn, chấp nhận mọi định dạng Secrets"""
+    """Kết nối Google Sheets an toàn"""
     try:
         scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
         
-        # 1. Thử lấy từ mục [gcp_service_account] (Chuẩn TOML)
         if "gcp_service_account" in st.secrets:
             creds_dict = dict(st.secrets["gcp_service_account"])
-        # 2. Thử lấy từ Root (Nếu thầy lỡ dán JSON trực tiếp)
         elif "private_key" in st.secrets:
-            # Lọc lấy các trường cần thiết từ secrets
             creds_dict = {k: v for k, v in st.secrets.items() if k in ["type", "project_id", "private_key_id", "private_key", "client_email", "client_id", "auth_uri", "token_uri", "auth_provider_x509_cert_url", "client_x509_cert_url"]}
         else:
             return None
 
         creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
         client = gspread.authorize(creds)
-        sheet = client.open("IELTS_DB") # Tên file Sheet phải chính xác
+        sheet = client.open("IELTS_DB") 
         return sheet
         
     except Exception as e:
-        # Không làm gián đoạn app nếu lỗi DB, chỉ in log
         print(f"DB Error: {e}")
         return None
 
-def save_speaking_log(student, class_code, lesson, question, band_text, feedback_summary):
+def save_speaking_log(student, class_code, lesson, question, full_feedback):
+    """
+    Hàm lưu điểm Speaking thông minh:
+    Tự động lọc tìm con số Band Score trong bài văn feedback dài.
+    """
     try:
         sheet = connect_gsheet()
         if sheet:
@@ -42,16 +42,45 @@ def save_speaking_log(student, class_code, lesson, question, band_text, feedback
                 ws = sheet.worksheet("Speaking_Logs")
             except:
                 ws = sheet.add_worksheet(title="Speaking_Logs", rows="1000", cols="10")
-                # Tạo header nếu chưa có
-                ws.append_row(["Timestamp", "Student", "Class", "Lesson", "Question", "Band_Score", "Feedback_Summary", "Score_Num"])
+                # Header chuẩn 8 cột
+                ws.append_row(["Timestamp", "Student", "Class", "Lesson", "Question", "Band_Short", "Score_Num", "Full_Feedback"])
             
-            # Lấy số điểm từ chuỗi text (VD: "5.0 - 5.5" -> 5.0)
-            score_match = re.search(r"(\d+\.?\d*)", str(band_text))
-            score_num = float(score_match.group(1)) if score_match else 0
+            # --- LOGIC TRÍCH XUẤT ĐIỂM SỐ ---
+            # Tìm dòng chứa "Band Score" hoặc "Kết quả"
+            # Regex này tìm số dạng x.x (ví dụ 5.0, 6.5)
+            score_num = 0.0
+            band_short = "N/A"
             
-            ws.append_row([str(datetime.now()), student, class_code, lesson, question, band_text, feedback_summary, score_num])
-            st.toast("✅ Đã lưu kết quả vào Database!", icon="💾")
-    except: pass
+            # Tìm các mẫu số phổ biến trong bài chấm IELTS
+            match = re.search(r"(?:Band Score|KẾT QUẢ|BAND|Band).*?(\d+\.?\d*)", full_feedback, re.IGNORECASE)
+            if match:
+                try:
+                    score_num = float(match.group(1))
+                    band_short = str(score_num)
+                except: pass
+            
+            # Nếu không tìm thấy, thử tìm số đầu tiên xuất hiện trong dòng đầu
+            if score_num == 0.0:
+                first_line = full_feedback.split('\n')[0]
+                match_fallback = re.search(r"(\d+\.?\d*)", first_line)
+                if match_fallback:
+                    score_num = float(match_fallback.group(1))
+                    band_short = str(score_num)
+
+            # Lưu vào Sheet (Đảm bảo đủ 8 cột để không bị trật)
+            ws.append_row([
+                str(datetime.now()), 
+                student, 
+                class_code, 
+                lesson, 
+                question, 
+                band_short,  # Cột 6: Text ngắn (VD: "5.5")
+                score_num,   # Cột 7: Số thực (VD: 5.5) -> Dùng để tính toán
+                full_feedback # Cột 8: Bài feedback đầy đủ
+            ])
+            st.toast("✅ Đã lưu điểm và feedback vào hệ thống!", icon="💾")
+    except Exception as e:
+        print(f"Save Error: {e}")
 
 def save_reading_log(student, class_code, lesson, score, total):
     try:
@@ -63,7 +92,7 @@ def save_reading_log(student, class_code, lesson, score, total):
                 ws = sheet.add_worksheet(title="Reading_Logs", rows="1000", cols="10")
                 ws.append_row(["Timestamp", "Student", "Class", "Lesson", "Score", "Total", "Percentage"])
             
-            percentage = f"{round((score / total) * 100, 1)}%" if total > 0 else "0%"
+            percentage = round((score / total) * 100, 1) if total > 0 else 0
             ws.append_row([str(datetime.now()), student, class_code, lesson, score, total, percentage])
             st.toast("✅ Đã lưu kết quả Reading!", icon="💾")
     except: pass
@@ -73,58 +102,45 @@ def get_leaderboard(class_code):
         sheet = connect_gsheet()
         if not sheet: return None, None
 
-        # Speaking Leaderboard
+        # 1. Speaking Leaderboard
         try:
             ws_s = sheet.worksheet("Speaking_Logs")
             df_s = pd.DataFrame(ws_s.get_all_records())
             
-            if not df_s.empty and 'Class' in df_s.columns:
+            # Kiểm tra cột Score_Num (Cột số 7)
+            if not df_s.empty and 'Class' in df_s.columns and 'Score_Num' in df_s.columns:
                 df_s = df_s[df_s['Class'] == class_code]
                 if not df_s.empty:
-                    # Ưu tiên cột Score_Num nếu có
-                    target_col = 'Score_Num' if 'Score_Num' in df_s.columns else 'Band_Score'
+                    # Chuyển cột điểm sang số
+                    df_s['Score_Num'] = pd.to_numeric(df_s['Score_Num'], errors='coerce').fillna(0)
                     
-                    # Nếu phải dùng Band_Score (text), parse lại
-                    if target_col == 'Band_Score':
-                        def extract_score(val):
-                            match = re.search(r"(\d+\.?\d*)", str(val))
-                            return float(match.group(1)) if match else 0.0
-                        df_s['Numeric_Score'] = df_s['Band_Score'].apply(extract_score)
-                        calc_col = 'Numeric_Score'
-                    else:
-                        df_s[target_col] = pd.to_numeric(df_s[target_col], errors='coerce')
-                        calc_col = target_col
-
-                    # Lấy điểm cao nhất mỗi câu -> TB các câu
-                    best_s = df_s.groupby(['Student', 'Question'])[calc_col].max().reset_index()
-                    lb_s = best_s.groupby('Student')[calc_col].mean().reset_index()
+                    # Logic: Lấy điểm cao nhất của mỗi câu hỏi -> Tính trung bình các câu
+                    best_s = df_s.groupby(['Student', 'Question'])['Score_Num'].max().reset_index()
+                    lb_s = best_s.groupby('Student')['Score_Num'].mean().reset_index()
                     lb_s.columns = ['Học Viên', 'Điểm Speaking (TB)']
                     lb_s = lb_s.sort_values(by='Điểm Speaking (TB)', ascending=False)
                 else: lb_s = None
             else: lb_s = None
         except: lb_s = None
 
-        # Reading Leaderboard
+        # 2. Reading Leaderboard
         try:
             ws_r = sheet.worksheet("Reading_Logs")
             df_r = pd.DataFrame(ws_r.get_all_records())
             if not df_r.empty and 'Class' in df_r.columns:
                 df_r = df_r[df_r['Class'] == class_code]
                 if not df_r.empty:
-                    # Cần cột Score để tính
-                    if 'Score' in df_r.columns:
-                        df_r['Score'] = pd.to_numeric(df_r['Score'], errors='coerce')
-                        lb_r = df_r.groupby('Student')['Score'].max().reset_index()
-                        lb_r.columns = ['Học Viên', 'Điểm Reading (Max)']
-                        lb_r = lb_r.sort_values(by='Điểm Reading (Max)', ascending=False)
-                    else: lb_r = None
+                    df_r['Score'] = pd.to_numeric(df_r['Score'], errors='coerce')
+                    # Reading: Lấy điểm cao nhất từng đạt được
+                    lb_r = df_r.groupby('Student')['Score'].max().reset_index()
+                    lb_r.columns = ['Học Viên', 'Điểm Reading (Max)']
+                    lb_r = lb_r.sort_values(by='Điểm Reading (Max)', ascending=False)
                 else: lb_r = None
             else: lb_r = None
         except: lb_r = None
 
         return lb_s, lb_r
     except: return None, None
-
 
 # ================= 1. CẤU HÌNH & DỮ LIỆU (TEACHER INPUT) =================
 
@@ -289,6 +305,32 @@ else:
         menu = st.radio("CHỌN KỸ NĂNG:", ["🗣️ Speaking", "📖 Reading", "🎧 Listening"])
         st.divider()
         if st.button("Đăng xuất"): logout()
+
+    # --- MODULE 4: LEADERBOARD (Ưu tiên hiển thị đầu để dễ thấy) ---
+    if menu == "🏆 Bảng Xếp Hạng":
+        st.title(f"🏆 Bảng Xếp Hạng Lớp {user['class']}")
+        st.info("Cập nhật theo thời gian thực (Top 10).")
+        
+        if st.button("🔄 Làm mới"): st.rerun()
+
+        lb_s, lb_r = get_leaderboard(user['class'])
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            st.subheader("🎤 Speaking (Điểm TB)")
+            if lb_s is not None and not lb_s.empty:
+                lb_s.index = range(1, len(lb_s) + 1)
+                st.dataframe(lb_s.style.format({"Điểm Speaking (TB)": "{:.2f}"}).background_gradient(cmap="Blues"), use_container_width=True)
+            else:
+                st.info("Chưa có dữ liệu.")
+                
+        with col2:
+            st.subheader("📚 Reading (Điểm Max)")
+            if lb_r is not None and not lb_r.empty:
+                lb_r.index = range(1, len(lb_r) + 1)
+                st.dataframe(lb_r.style.format({"Điểm Reading (Max)": "{:.1f}"}).background_gradient(cmap="Greens"), use_container_width=True)
+            else:
+                st.info("Chưa có dữ liệu.")
 
     # --- MODULE 1: SPEAKING (ĐÃ GIỚI HẠN 5 LẦN & FORMAT MỚI) ---
     if menu == "🗣️ Speaking":
@@ -539,28 +581,3 @@ else:
                         st.error("Script quá dài hoặc hệ thống bận.")
             else:
                 st.warning("Vui lòng dán script.")
-
-    # --- MODULE 4: LEADERBOARD ---
-    elif menu == "🏆 Bảng Xếp Hạng":
-        st.title(f"🏆 Bảng Xếp Hạng Lớp {user['class']}")
-        st.info("Top 10 học viên xuất sắc nhất. Dữ liệu được cập nhật liên tục.")
-        
-        if st.button("🔄 Làm mới bảng xếp hạng"):
-            st.rerun()
-
-        lb_s, lb_r = get_leaderboard(user['class'])
-        
-        st.subheader("🎤 Speaking Leaderboard")
-        if lb_s is not None and not lb_s.empty:
-            lb_s.index = range(1, len(lb_s) + 1)
-            st.dataframe(lb_s.style.format({"Điểm Speaking (TB)": "{:.2f}"}).background_gradient(cmap="Blues", subset=["Điểm Speaking (TB)"]), use_container_width=True)
-        else:
-            st.info("Chưa có dữ liệu Speaking cho lớp này.")
-
-        st.divider()
-        st.subheader("📚 Reading Leaderboard")
-        if lb_r is not None and not lb_r.empty:
-            lb_r.index = range(1, len(lb_r) + 1)
-            st.dataframe(lb_r.style.format({"Điểm Reading (Max)": "{:.1f}"}).background_gradient(cmap="Greens", subset=["Điểm Reading (Max)"]), use_container_width=True)
-        else:
-            st.info("Chưa có dữ liệu Reading cho lớp này.")
