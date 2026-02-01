@@ -7,7 +7,7 @@ import re
 # ================= 1. CẤU HÌNH & DỮ LIỆU (TEACHER INPUT) =================
 
 CLASS_CONFIG = {
-    "PLA1601": {"level": "3.0 - 4.0", "desc": "Lớp Nền tảng"},
+    "PLA1601": {"level": "3.0 - 4.0", "desc": "Lớp Platinum"},
     "DIA2024": {"level": "4.0 - 5.0", "desc": "Lớp Diamond"},
     "MAS0901": {"level": "5.0 - 6.0", "desc": "Lớp Master"},
     "ELITE1912": {"level": "6.5 - 7.0", "desc": "Lớp Elite"}
@@ -198,7 +198,7 @@ else:
                                    - **Pronunciation** (Estimate based on audio flow/intonation)
                                 3. **Improvement:** Suggest a **NATURAL, SPOKEN** way to say it. Avoid "fancy" or "academic writing" words. Use phrasal verbs or common collocations suitable for speaking.
                                 
-                                OUTPUT FORMAT:
+                                OUTPUT FORMAT (Vietnamese Markdown):
                                 
                                 ### KẾT QUẢ: [Band Score]
                                 
@@ -272,7 +272,7 @@ else:
                             
                         st.info(f"📊 **Tổng điểm: {score}/{len(data['questions_fill'])}**")
 
-            # TAB 2: Bài tập AI tương tác
+                        # TAB 2: Bài tập AI tương tác (JSON Parsing)
             with tab2:
                 st.info(f"Dành cho trình độ: **{user['level']['level']}**. AI sẽ tạo bài tập trắc nghiệm đa dạng để bạn hiểu sâu từ vựng.")
                 
@@ -283,8 +283,8 @@ else:
                         Based on the text 'Invention of Marine Chronometer', create 10 Vocabulary Questions suitable for IELTS Band {user['level']['level']}.
                         
                         REQUIREMENTS:
-                        1. **Contextual Use:** Ask user to fill in a blank in a NEW sentence using a word from the text.
-                        2. **Practical Meaning:** Ask for the meaning of a key word in a specific context (not just dictionary definition).
+                        1. **Practical Meaning:** The first 5 questions, ask for the Vietnamese meaning of a key word in a specific context (not just dictionary definition).
+                        2. **Contextual Use:** The last 5 questions, ask user to fill in a blank in a NEW sentence using a word from the text.
                         3. **Avoid Obscure words:** Focus on useful academic words (e.g., accurate, essential, determine, reliance).
                         
                         Output STRICTLY JSON array format:
@@ -300,6 +300,7 @@ else:
                             except: st.error("Lỗi dữ liệu từ AI. Vui lòng thử lại.")
                         else: st.warning("⚠️ Máy chủ Google đang quá tải. Vui lòng thử lại sau giây lát.")
 
+                # Hiển thị bài tập nếu đã có trong Session State
                 if st.session_state['generated_quiz']:
                     st.divider()
                     st.subheader("✍️ Bài Tập Ôn Luyện")
@@ -310,20 +311,29 @@ else:
                         
                         for i, q in enumerate(quiz):
                             st.markdown(f"**Câu {i+1}: {q['question']}**")
-                            user_choices[i] = st.radio(f"Lựa chọn câu {i+1}", q['options'], key=f"ai_{i}", label_visibility="collapsed")
+                            # Dùng radio button cho tương tác
+                            user_choices[i] = st.radio(f"Lựa chọn câu {i+1}", q['options'], key=f"ai_q_{i}", label_visibility="collapsed")
                             st.write("")
                         
                         if st.form_submit_button("Chấm điểm"):
                             score = 0
                             for i, q in enumerate(quiz):
                                 u_choice = user_choices.get(i)
-                                if u_choice and (u_choice == q['answer'] or u_choice.split(".")[0] == q['answer'].split(".")[0]):
-                                    st.success(f"✅ Câu {i+1}: Chính xác!")
-                                    score += 1
+                                if u_choice:
+                                    # So sánh đáp án (AI thường trả về full text option hoặc ký tự A,B,C)
+                                    # Ta so sánh chuỗi tương đối
+                                    if u_choice == q['answer'] or u_choice.startswith(q['answer']):
+                                        st.success(f"✅ Câu {i+1}: Chính xác!")
+                                        score += 1
+                                    else:
+                                        st.error(f"❌ Câu {i+1}: Sai. Đáp án đúng là {q['answer']}")
+                                    
+                                    # Hiện giải thích
+                                    if 'explanation' in q:
+                                        st.markdown(f"<div class='explanation-box'>💡 {q['explanation']}</div>", unsafe_allow_html=True)
                                 else:
-                                    st.error(f"❌ Câu {i+1}: Sai. Đáp án đúng là: **{q['answer']}**")
-                                
-                                st.markdown(f"<div class='explanation-box'>💡 {q.get('explanation', 'Không có giải thích')}</div>", unsafe_allow_html=True)
+                                    st.warning(f"⚠️ Câu {i+1}: Bạn chưa chọn đáp án.")
+                            
                             st.info(f"Kết quả: {score}/{len(quiz)}")
         else:
             st.info("Bài học này chưa cập nhật.")
