@@ -32,8 +32,7 @@ def connect_gsheet():
 
 def save_speaking_log(student, class_code, lesson, question, full_feedback):
     """
-    Hàm lưu điểm Speaking thông minh:
-    Tự động lọc tìm con số Band Score trong bài văn feedback dài.
+    Hàm lưu điểm Speaking thông minh
     """
     try:
         sheet = connect_gsheet()
@@ -72,7 +71,7 @@ def save_speaking_log(student, class_code, lesson, question, full_feedback):
                 lesson, 
                 question, 
                 band_short,  # Cột 6
-                score_num,   # Cột 7: Số thực
+                score_num,   # Cột 7
                 full_feedback # Cột 8
             ])
             st.toast("✅ Đã lưu điểm và feedback vào hệ thống!", icon="💾")
@@ -96,9 +95,8 @@ def save_reading_log(student, class_code, lesson, score, total):
 
 def get_leaderboard(class_code):
     """
-    Logic tính điểm ĐƠN GIẢN & NHANH CHÓNG:
-    - Speaking: Trung bình cộng tất cả các lần nộp.
-    - Reading: Điểm cao nhất từng đạt được.
+    Hàm lấy bảng xếp hạng MẠNH MẼ HƠN (Robust):
+    Xử lý được trường hợp cột bị lệch hoặc thiếu tiêu đề.
     """
     try:
         sheet = connect_gsheet()
@@ -107,36 +105,76 @@ def get_leaderboard(class_code):
         # 1. Speaking Leaderboard
         try:
             ws_s = sheet.worksheet("Speaking_Logs")
-            df_s = pd.DataFrame(ws_s.get_all_records())
+            # Dùng get_all_values để lấy dữ liệu thô, an toàn hơn get_all_records khi header bị lỗi
+            raw_data = ws_s.get_all_values()
             
-            # Kiểm tra cột Score_Num (Cột số 7)
-            if not df_s.empty and 'Class' in df_s.columns and 'Score_Num' in df_s.columns:
-                df_s = df_s[df_s['Class'] == class_code]
-                if not df_s.empty:
-                    # Chuyển cột điểm sang số
-                    df_s['Score_Num'] = pd.to_numeric(df_s['Score_Num'], errors='coerce').fillna(0)
+            if len(raw_data) > 1:
+                # Tạo DataFrame từ dữ liệu thô
+                headers = raw_data[0]
+                # Chuẩn hóa header: xóa khoảng trắng thừa
+                headers = [h.strip() for h in headers]
+                df_s = pd.DataFrame(raw_data[1:], columns=headers)
+                
+                # Lọc theo lớp
+                if 'Class' in df_s.columns:
+                    df_s = df_s[df_s['Class'] == class_code]
                     
-                    # LOGIC MỚI: Tính trung bình cộng đơn giản của tất cả bài nộp
-                    lb_s = df_s.groupby('Student')['Score_Num'].mean().reset_index()
-                    lb_s.columns = ['Học Viên', 'Điểm Speaking (TB)']
-                    lb_s = lb_s.sort_values(by='Điểm Speaking (TB)', ascending=False).head(10) # Lấy Top 10
+                    if not df_s.empty:
+                        # TÌM CỘT ĐIỂM SỐ (Linh hoạt)
+                        score_col = None
+                        if 'Score_Num' in df_s.columns:
+                            score_col = 'Score_Num'
+                        elif 'Band_Score' in df_s.columns:
+                            score_col = 'Band_Score'
+                        elif 'Band_Short' in df_s.columns:
+                            score_col = 'Band_Short'
+                        
+                        if score_col:
+                            # Hàm làm sạch dữ liệu điểm số (chuyển text sang float)
+                            def clean_score(val):
+                                try:
+                                    # Tìm số thực đầu tiên trong chuỗi
+                                    found = re.search(r"(\d+\.?\d*)", str(val))
+                                    return float(found.group(1)) if found else 0.0
+                                except: return 0.0
+
+                            df_s['Final_Score'] = df_s[score_col].apply(clean_score)
+                            
+                            # Loại bỏ điểm 0 (lỗi)
+                            df_s = df_s[df_s['Final_Score'] > 0]
+                            
+                            if not df_s.empty:
+                                # Tính điểm trung bình
+                                lb_s = df_s.groupby('Student')['Final_Score'].mean().reset_index()
+                                lb_s.columns = ['Học Viên', 'Điểm Speaking (TB)']
+                                lb_s = lb_s.sort_values(by='Điểm Speaking (TB)', ascending=False).head(10)
+                            else: lb_s = None
+                        else: lb_s = None
+                    else: lb_s = None
                 else: lb_s = None
             else: lb_s = None
-        except: lb_s = None
+        except Exception as e: 
+            print(f"Speaking LB Error: {e}")
+            lb_s = None
 
         # 2. Reading Leaderboard
         try:
             ws_r = sheet.worksheet("Reading_Logs")
-            df_r = pd.DataFrame(ws_r.get_all_records())
-            if not df_r.empty and 'Class' in df_r.columns:
-                df_r = df_r[df_r['Class'] == class_code]
-                if not df_r.empty:
-                    df_r['Score'] = pd.to_numeric(df_r['Score'], errors='coerce')
-                    
-                    # LOGIC MỚI: Lấy điểm cao nhất (Max)
-                    lb_r = df_r.groupby('Student')['Score'].max().reset_index()
-                    lb_r.columns = ['Học Viên', 'Điểm Reading (Max)']
-                    lb_r = lb_r.sort_values(by='Điểm Reading (Max)', ascending=False).head(10) # Lấy Top 10
+            raw_r = ws_r.get_all_values()
+            
+            if len(raw_r) > 1:
+                headers_r = [h.strip() for h in raw_r[0]]
+                df_r = pd.DataFrame(raw_r[1:], columns=headers_r)
+                
+                if 'Class' in df_r.columns:
+                    df_r = df_r[df_r['Class'] == class_code]
+                    if not df_r.empty and 'Score' in df_r.columns:
+                        df_r['Numeric_Score'] = pd.to_numeric(df_r['Score'], errors='coerce').fillna(0)
+                        
+                        lb_r = df_r.groupby('Student')['Numeric_Score'].max().reset_index()
+                        lb_r.columns = ['Học Viên', 'Điểm Reading (Max)']
+                        lb_r = lb_r.sort_values(by='Điểm Reading (Max)', ascending=False).head(10)
+                    else: lb_r = None
                 else: lb_r = None
             else: lb_r = None
         except: lb_r = None
@@ -308,7 +346,7 @@ else:
         st.divider()
         if st.button("Đăng xuất"): logout()
 
-    # --- MODULE 4: LEADERBOARD (Ưu tiên hiển thị đầu để dễ thấy) ---
+     # --- MODULE 4: LEADERBOARD (Ưu tiên hiển thị đầu để dễ thấy) ---
     if menu == "🏆 Bảng Xếp Hạng":
         st.title(f"🏆 Bảng Xếp Hạng Lớp {user['class']}")
         st.info("Top 10 học viên xuất sắc nhất. Dữ liệu được cập nhật liên tục.")
@@ -400,7 +438,7 @@ else:
                                 url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
                                 payload = {"contents": [{"parts": [{"text": prompt}, {"inline_data": {"mime_type": "audio/wav", "data": audio_b64}}]}]}
                         
-                                rresp = requests.post(url, headers={'Content-Type': 'application/json'}, data=json.dumps(payload))
+                                resp = requests.post(url, headers={'Content-Type': 'application/json'}, data=json.dumps(payload))
                                 
                                 if resp.status_code == 200:
                                     text_result = resp.json()['candidates'][0]['content']['parts'][0]['text']
