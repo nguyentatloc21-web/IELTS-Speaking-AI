@@ -331,8 +331,8 @@ else:
                                 audio_b64 = base64.b64encode(audio_bytes).decode('utf-8')
                                 # TỰ ĐỘNG NHẬN DIỆN ĐỊNH DẠNG ÂM THANH (Fix lỗi Mobile)
                                 mime_type = audio.type if audio.type else "audio/wav"
-                        prompt = f"""
-                        Role: Senior IELTS Speaking Examiner (Friendly & Constructive).
+                                prompt = f"""
+                                Role: Senior IELTS Speaking Examiner (Friendly & Constructive).
                                 Student Level: {user['level']['level']}.
                                 Task: Assess speaking response for "{question}".
                                 Output in Vietnamese
@@ -362,20 +362,24 @@ else:
                                   *(Giải thích: Tại sao cách này tự nhiên hơn?)*
                                 """
                         
-                        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
-                        payload = {"contents": [{"parts": [{"text": prompt}, {"inline_data": {"mime_type": "audio/wav", "data": audio_b64}}]}]}
+                                url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
+                                payload = {"contents": [{"parts": [{"text": prompt}, {"inline_data": {"mime_type": "audio/wav", "data": audio_b64}}]}]}
                         
-                        try:
-                            resp = requests.post(url, headers={'Content-Type': 'application/json'}, data=json.dumps(payload))
-                            if resp.status_code == 200:
-                                st.markdown(resp.json()['candidates'][0]['content']['parts'][0]['text'])
-                                # Trừ lượt sau khi thành công
-                                st.session_state['speaking_attempts'][question] = attempts + 1
-                            else:
-                                st.error("Lỗi kết nối Google.")
-                        except: st.error("Lỗi hệ thống.")
+                                resp = requests.post(url, headers={'Content-Type': 'application/json'}, data=json.dumps(payload))
+                                
+                                if resp.status_code == 200:
+                                    text_result = resp.json()['candidates'][0]['content']['parts'][0]['text']
+                                    st.markdown(text_result)
+                                    st.session_state['speaking_attempts'][question] = attempts + 1
+                                    
+                                    # LƯU ĐIỂM
+                                    save_speaking_log(user['name'], user['class'], lesson_choice, question, text_result[:50], text_result)
+                                else:
+                                    st.error(f"⚠️ Lỗi Google (Mã {resp.status_code}): {resp.text}")
+                        except Exception as e:
+                            st.error(f"Lỗi hệ thống: {e}")
             else:
-                st.warning("⛔ Bạn đã hết 5 lượt trả lời cho câu hỏi này. Vui lòng chuyển sang câu khác.")
+                st.warning("⛔ Đã hết 5 lượt trả lời.")
         else:
             st.info("Bài học này chưa cập nhật.")
 
@@ -545,10 +549,10 @@ else:
             else:
                 st.warning("Vui lòng dán script.")
 
-# --- MODULE 4: LEADERBOARD ---
+    # --- MODULE 4: LEADERBOARD ---
     elif menu == "🏆 Bảng Xếp Hạng":
         st.title(f"🏆 Bảng Xếp Hạng Lớp {user['class']}")
-        st.info("Top 10 học viên xuất sắc nhất.")
+        st.info("Top 10 học viên xuất sắc nhất. Dữ liệu được cập nhật liên tục.")
         
         if st.button("🔄 Làm mới bảng xếp hạng"):
             st.rerun()
@@ -558,7 +562,7 @@ else:
         st.subheader("🎤 Speaking Leaderboard")
         if lb_s is not None and not lb_s.empty:
             lb_s.index = range(1, len(lb_s) + 1)
-            st.dataframe(lb_s.style.format({"Điểm Speaking (TB)": "{:.2f}"}).background_gradient(cmap="Blues"), use_container_width=True)
+            st.dataframe(lb_s.style.format({"Điểm Speaking (TB)": "{:.2f}"}).background_gradient(cmap="Blues", subset=["Điểm Speaking (TB)"]), use_container_width=True)
         else:
             st.info("Chưa có dữ liệu Speaking cho lớp này.")
 
@@ -566,6 +570,6 @@ else:
         st.subheader("📚 Reading Leaderboard")
         if lb_r is not None and not lb_r.empty:
             lb_r.index = range(1, len(lb_r) + 1)
-            st.dataframe(lb_r.style.format({"Điểm Reading (Max)": "{:.1f}"}).background_gradient(cmap="Greens"), use_container_width=True)
+            st.dataframe(lb_r.style.format({"Điểm Reading (Max)": "{:.1f}"}).background_gradient(cmap="Greens", subset=["Điểm Reading (Max)"]), use_container_width=True)
         else:
             st.info("Chưa có dữ liệu Reading cho lớp này.")
