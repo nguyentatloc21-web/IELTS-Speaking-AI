@@ -188,6 +188,7 @@ else:
                                 Student Level: {user['level']['level']}.
                                 Task: Assess speaking response for "{question}".
                                 Output in Vietnamese
+                                Only assess if the answer is relevant. Otherwise, give him/her a second chance
                                 CRITICAL INSTRUCTIONS:
                                 1. **Scoring:** Be encouraging. If they communicate clearly, don't grade too harshly.
                                 2. **Criteria:** You MUST evaluate based on 4 IELTS criteria:
@@ -202,15 +203,15 @@ else:
                                 ### KẾT QUẢ: [Band Score]
                                 
                                 ### CHI TIẾT 4 TIÊU CHÍ:
-                                1. **Fluency & Coherence:** [Nhận xét độ trôi chảy, ngập ngừng]
+                                1. **Fluency & Coherence:** [Nhận xét độ trôi chảy, ngập ngừng, mở rộng/đào sâu được câu trả lời ở mức nào?]
                                 2. **Lexical Resource:** [Từ vựng tốt đã dùng vs Từ nên thay thế]
                                 3. **Grammar:** [Lỗi ngữ pháp & Cách sửa]
-                                4. **Pronunciation & Intonation:** [Nhận xét về ngữ điệu, trọng âm, hoặc các âm bị nuốt/sai]
+                                4. **Pronunciation & Intonation:** [Nhận xét về ngữ điệu, trọng âm, hoặc các âm bị nuốt/sai, âm đuôi, số ít số nhiều]
                                 
                                 ### ĐỀ XUẤT CẢI THIỆN:
                                 * **Câu của bạn:** "[Trích dẫn]"
                                 * **Cách nói tự nhiên hơn:** "[Viết lại theo văn phong NÓI, tự nhiên, native]"
-                                  *(Giải thích ngắn: Tại sao cách này tự nhiên hơn?)*
+                                  *(Giải thích: Tại sao cách này tự nhiên hơn?)*
                                 """
                         
                         url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
@@ -238,7 +239,7 @@ else:
         if "Marine Chronometer" in lesson_choice:
             data = READING_CONTENT["Lesson 2: Marine Chronometer"]
             
-            tab1, tab2 = st.tabs(["Bài Đọc & Điền Từ (Cố định)", "Bài Tập Từ Vựng"])
+            tab1, tab2 = st.tabs(["Bài Đọc & Điền Từ", "Bài Tập Từ Vựng"])
             
             # TAB 1: Bài điền từ cơ bản
             with tab1:
@@ -271,22 +272,24 @@ else:
                             
                         st.info(f"📊 **Tổng điểm: {score}/{len(data['questions_fill'])}**")
 
-            # TAB 2: Bài tập AI tương tác (Đa dạng hóa)
+            # TAB 2: Bài tập AI tương tác
             with tab2:
-                st.info(f"Dành cho trình độ: **{user['level']['level']}**. AI sẽ tạo bài tập phù hợp để bạn ôn luyện.")
+                st.info(f"Dành cho trình độ: **{user['level']['level']}**. AI sẽ tạo bài tập trắc nghiệm đa dạng để bạn hiểu sâu từ vựng.")
                 
-                if st.button("Tạo Bài Tập Trắc Nghiệm Mới"):
-                    with st.spinner("AI đang phân tích bài đọc và tạo câu hỏi..."):
-                        # Prompt đa dạng hóa câu hỏi
+                if st.button("✨ Tạo Bài Tập Mới"):
+                    with st.spinner("AI đang soạn đề..."):
+                        # Prompt tạo câu hỏi JSON CHẤT LƯỢNG CAO
                         prompt = f"""
-                        Based on the text 'Invention of Marine Chronometer', create 3 Vocabulary Multiple Choice Questions suitable for IELTS Band {user['level']['level']}.
+                        Based on the text 'Invention of Marine Chronometer', create 10 Vocabulary Questions suitable for IELTS Band {user['level']['level']}.
                         
-                        Requirements:
-                        - Question types: Synonym matching, Contextual meaning, or Antonyms.
-                        - Level: Challenging but not impossible.
-                        - Output STRICTLY JSON array format:
+                        REQUIREMENTS:
+                        1. **Contextual Use:** Ask user to fill in a blank in a NEW sentence using a word from the text.
+                        2. **Practical Meaning:** Ask for the meaning of a key word in a specific context (not just dictionary definition).
+                        3. **Avoid Obscure words:** Focus on useful academic words (e.g., accurate, essential, determine, reliance).
+                        
+                        Output STRICTLY JSON array format:
                         [
-                            {{"question": "Question text?", "options": ["A", "B", "C", "D"], "answer": "Option text", "explanation": "Why correct?"}}
+                            {{"question": "Complete the sentence: Accurate timekeeping was ______ for navigation.", "options": ["A. essential", "B. optional", "C. useless", "D. minor"], "answer": "A. essential", "explanation": "The text mentions 'essential coordinates', meaning absolutely necessary."}}
                         ]
                         """
                         json_str = call_gemini(prompt, expect_json=True)
@@ -294,15 +297,12 @@ else:
                             try:
                                 quiz_data = json.loads(json_str)
                                 st.session_state['generated_quiz'] = quiz_data
-                            except:
-                                st.error("Lỗi dữ liệu từ AI. Vui lòng thử lại.")
-                        else:
-                            st.warning("Máy chủ đang quá tải. Thầy Lộc nhờ bạn chờ 1 phút rồi bấm lại nút này nhé!")
+                            except: st.error("Lỗi dữ liệu từ AI. Vui lòng thử lại.")
+                        else: st.warning("⚠️ Máy chủ Google đang quá tải. Vui lòng thử lại sau giây lát.")
 
-                # Hiển thị bài tập AI
                 if st.session_state['generated_quiz']:
                     st.divider()
-                    st.subheader("✍️ Bài Tập Ôn Luyện (AI)")
+                    st.subheader("✍️ Bài Tập Ôn Luyện")
                     
                     with st.form("ai_quiz_form"):
                         quiz = st.session_state['generated_quiz']
@@ -311,29 +311,27 @@ else:
                         for i, q in enumerate(quiz):
                             st.markdown(f"**Câu {i+1}: {q['question']}**")
                             user_choices[i] = st.radio(f"Lựa chọn câu {i+1}", q['options'], key=f"ai_{i}", label_visibility="collapsed")
-                            st.write("") # Spacer
+                            st.write("")
                         
                         if st.form_submit_button("Chấm điểm"):
                             score = 0
                             for i, q in enumerate(quiz):
                                 u_choice = user_choices.get(i)
-                                if u_choice and (u_choice == q['answer'] or u_choice.startswith(q['answer'])):
+                                if u_choice and (u_choice == q['answer'] or u_choice.split(".")[0] == q['answer'].split(".")[0]):
                                     st.success(f"✅ Câu {i+1}: Chính xác!")
                                     score += 1
                                 else:
                                     st.error(f"❌ Câu {i+1}: Sai. Đáp án đúng là: **{q['answer']}**")
                                 
                                 st.markdown(f"<div class='explanation-box'>💡 {q.get('explanation', 'Không có giải thích')}</div>", unsafe_allow_html=True)
-                            
                             st.info(f"Kết quả: {score}/{len(quiz)}")
-
         else:
             st.info("Bài học này chưa cập nhật.")
 
     # --- MODULE 3: LISTENING (FIX LỖI & TỐI ƯU) ---
     elif menu == "🎧 Listening":
         st.title("Luyện Nghe Chủ Động")
-        st.info("Chọn chủ đề -> AI gợi ý Kênh -> Dán Script -> AI Dịch.")
+        st.info("Chọn chủ đề -> Nhận gợi ý Kênh -> Tìm Script -> Dán vào để học.")
         
         col1, col2 = st.columns(2)
         with col1:
@@ -343,17 +341,20 @@ else:
             
         if st.button("🔍 Tìm Kênh Phù Hợp"):
             with st.spinner("Đang tìm kiếm..."):
-                # Prompt ngắn gọn hơn để tránh lỗi 429/Busy
+                # Prompt
                 prompt = f"""
-                Suggest 2 Youtube Channels or Podcasts for IELTS level {user['level']['level']} about "{topic}".
-                Format Vietnamese:
-                - **[Tên]**: [Lý do ngắn gọn]
+                Suggest 3-4 specific Youtube Channels or Podcasts suitable for IELTS Student Level {user['level']['level']} regarding topic "{topic}".
+                Output in Vietnamese.
+                Format:
+                1. **[Name of Channel/Podcast]**
+                   - **Lý do phù hợp:** [Explain clearly why this fits level {user['level']['level']}]
+                   - **Từ khóa tìm kiếm:** [Exact keyword to type in Youtube/Google]
                 """
                 result = call_gemini(prompt)
                 if result:
                     st.markdown(result)
                 else:
-                    st.error("Hệ thống đang bận. Bạn hãy thử chọn chủ đề khác xem sao nhé.")
+                    st.error("Hệ thống đang bận. Bạn vui lòng bấm nút lại lần nữa nhé!")
 
         st.divider()
         st.subheader("Phân tích Script")
@@ -363,8 +364,9 @@ else:
             if script_input:
                 with st.spinner("Đang phân tích..."):
                     prompt = f"""
-                    Translate to Vietnamese. Highlight 5 hard vocabulary words for level {user['level']['level']}.
-                    Script: {script_input[:2000]}
+                    Translate the following script to Vietnamese (Sentence by sentence or Paragraph).
+                    Then, highlight 5 vocabulary words suitable for IELTS Band {user['level']['level']}. Explain them in Vietnamese context.
+                    Script: {script_input[:2500]}
                     """
                     result = call_gemini(prompt)
                     if result:
