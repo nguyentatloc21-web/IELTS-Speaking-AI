@@ -400,7 +400,7 @@ else:
                                 url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
                                 payload = {"contents": [{"parts": [{"text": prompt}, {"inline_data": {"mime_type": "audio/wav", "data": audio_b64}}]}]}
                         
-                                resp = requests.post(url, headers={'Content-Type': 'application/json'}, data=json.dumps(payload))
+                                rresp = requests.post(url, headers={'Content-Type': 'application/json'}, data=json.dumps(payload))
                                 
                                 if resp.status_code == 200:
                                     text_result = resp.json()['candidates'][0]['content']['parts'][0]['text']
