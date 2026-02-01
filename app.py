@@ -2,73 +2,80 @@ import streamlit as st
 import requests
 import json
 import base64
+import re
 import pandas as pd
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
-import re
 
-# ================= 1. KẾT NỐI GOOGLE SHEETS =================
-# Hàm kết nối Database
+# ================= 1. KẾT NỐI GOOGLE SHEETS (DATABASE) =================
+# Hàm kết nối an toàn với xử lý lỗi
 def connect_gsheet():
     try:
-        # Lấy credentials từ Secrets
         scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-        creds_dict = dict(st.secrets["gcp_service_account"]) # Lấy từ mục đã dán trong Secrets
-        creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
-        client = gspread.authorize(creds)
-        # Mở file Sheet theo tên (Phải chính xác 100%)
-        sheet = client.open("IELTS_DB") 
-        return sheet
+        if "gcp_service_account" in st.secrets:
+            creds_dict = dict(st.secrets["gcp_service_account"])
+            creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+            client = gspread.authorize(creds)
+            sheet = client.open("IELTS_DB") # Tên file Google Sheet phải chuẩn
+            return sheet
+        else:
+            return None
     except Exception as e:
-        st.error(f"⚠️ Lỗi kết nối Google Sheet: {e}")
         return None
 
 # Hàm lưu điểm Speaking
-def save_speaking_log(student, class_code, lesson, question, band, feedback):
+def save_speaking_log(student, class_code, lesson, question, band_text, feedback_summary):
     try:
         sheet = connect_gsheet()
         if sheet:
             ws = sheet.worksheet("Speaking_Logs")
-            ws.append_row([str(datetime.now()), student, class_code, lesson, question, band, feedback])
+            # Trích xuất số điểm từ text (VD: "5.0 - 5.5" -> lấy 5.25 hoặc 5.0)
+            score_match = re.search(r"(\d+\.?\d*)", str(band_text))
+            score_num = float(score_match.group(1)) if score_match else 0
+            
+            ws.append_row([str(datetime.now()), student, class_code, lesson, question, band_text, score_num])
     except: pass
 
 # Hàm lưu điểm Reading
-def save_reading_log(student, class_code, lesson, score, total, details):
+def save_reading_log(student, class_code, lesson, score, total):
     try:
         sheet = connect_gsheet()
         if sheet:
             ws = sheet.worksheet("Reading_Logs")
-            ws.append_row([str(datetime.now()), student, class_code, lesson, score, total, details])
+            ws.append_row([str(datetime.now()), student, class_code, lesson, score, total, f"{score}/{total}"])
     except: pass
 
-# Hàm lấy Bảng Xếp Hạng (Speaking)
-def get_speaking_leaderboard(class_code, lesson):
+# Hàm lấy Bảng Xếp Hạng
+def get_leaderboard(class_code):
     try:
         sheet = connect_gsheet()
         if sheet:
+            # Lấy dữ liệu Speaking
             ws = sheet.worksheet("Speaking_Logs")
             data = ws.get_all_records()
             df = pd.DataFrame(data)
             
-            # Lọc theo lớp và bài học
-            df = df[(df['Class'] == class_code) & (df['Lesson'] == lesson)]
+            if df.empty: return None, None
             
-            if df.empty: return None
+            # Lọc theo lớp hiện tại
+            if 'Class' in df.columns:
+                df = df[df['Class'] == class_code]
             
-            # Logic: Lấy điểm cao nhất của mỗi câu hỏi -> Tính trung bình các câu
-            # Chuyển Band_Score sang số (nếu AI trả về chuỗi)
-            df['Band_Score'] = pd.to_numeric(df['Band_Score'], errors='coerce')
+            # Tính điểm trung bình của từng học sinh (Lấy điểm cao nhất của mỗi câu -> TB các câu)
+            # Giả sử cột lưu điểm số thực là cột số 7 (index 6 - Score_Num)
+            # Lưu ý: Cần đảm bảo Sheet có cột tiêu đề: Timestamp, Student, Class, Lesson, Question, Band_Text, Score_Num
+            if 'Score_Num' in df.columns:
+                # 1. Lấy điểm cao nhất của mỗi câu hỏi mà học sinh đã làm
+                best_attempts = df.groupby(['Student', 'Question'])['Score_Num'].max().reset_index()
+                # 2. Tính trung bình cộng các câu hỏi
+                final_ranking = best_attempts.groupby('Student')['Score_Num'].mean().reset_index()
+                final_ranking.columns = ['Học Viên', 'Điểm Speaking TB']
+                final_ranking = final_ranking.sort_values(by='Điểm Speaking TB', ascending=False)
+                return final_ranking, None
             
-            # Group theo Học sinh và Câu hỏi (Lấy max mỗi câu)
-            best_attempts = df.groupby(['Student', 'Question'])['Band_Score'].max().reset_index()
-            
-            # Tính trung bình cộng các câu của mỗi học sinh
-            leaderboard = best_attempts.groupby('Student')['Band_Score'].mean().reset_index()
-            leaderboard = leaderboard.sort_values(by='Band_Score', ascending=False)
-            
-            return leaderboard
-    except: return None
+            return None, None
+    except: return None, None
 
 # ================= 1. CẤU HÌNH & DỮ LIỆU (TEACHER INPUT) =================
 
