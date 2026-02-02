@@ -618,71 +618,89 @@ else:
                     else:
                         with st.spinner("Đang chấm điểm theo Band Descriptors (4-9)..."):
                             # PROMPT CHẤM BÀI
-                        prompt = f"""
-                        ## ROLE:
-                        You are a strict, Senior IELTS Writing Examiner (IDP/BC certified).
+                            prompt = f"""
+                            ## ROLE:
+                            You are a strict, Senior IELTS Writing Examiner (IDP/BC certified).
                         
-                        ## TASK:
-                        Assess the following Task 2 Essay based on the official IELTS Writing Band Descriptors.
+                            ## TASK:
+                            Assess the following Task 2 Essay based on the official IELTS Writing Band Descriptors.
                         
-                        **INPUT DATA:**
-                        - **Topic:** {data_w['question']}
-                        - **Student Essay:** {essay}
+                            **INPUT DATA:**
+                            - **Topic:** {data_w['question']}
+                            - **Student Essay:** {essay}
 
-                        ## 🛡️ GRADING RUBRIC (STRICT DIFFERENTIATORS):
-                        You must evaluate based on these specific distinctions between bands:
+                            ## 🛡️ GRADING RUBRIC (STRICT DIFFERENTIATORS):
+                            You must evaluate based on these specific distinctions between bands:
 
-                        **1. Task Response (TR):**
-                        - **Band 4:** Response is irrelevant or minimal; main ideas are difficult to identify or repetitive.
-                        - **Band 5:** Addresses the task but usually only partially; ideas are limited/undeveloped; no clear conclusions.
-                        - **Band 6:** Addresses all parts; main ideas are relevant but may be insufficiently developed or unclear.
-                        - **Band 7:** Addresses all parts; presents a clear position throughout; extends and supports main ideas.
-                        - **Band 8+:** Sufficiently addresses all parts; well-developed response with relevant, extended, and supported ideas.
+                            **1. Task Response (TR):**
+                            - **Band 4:** Response is irrelevant or minimal; main ideas are difficult to identify or repetitive.
+                            - **Band 5:** Addresses the task but usually only partially; ideas are limited/undeveloped; no clear conclusions.
+                            - **Band 6:** Addresses all parts; main ideas are relevant but may be insufficiently developed or unclear.
+                            - **Band 7:** Addresses all parts; presents a clear position throughout; extends and supports main ideas.
+                            - **Band 8+:** Sufficiently addresses all parts; well-developed response with relevant, extended, and supported ideas.
 
-                        **2. Coherence & Cohesion (CC):**
-                        - **Band 4:** No clear progression; basic or repetitive cohesive devices.
-                        - **Band 5:** Some organization but lacks overall progression; cohesive devices are inadequate, inaccurate, or overused.
-                        - **Band 6:** Arranges information coherently; uses cohesive devices effectively but they may sound **mechanical/faulty**.
-                        - **Band 7:** Logically organizes information; uses a range of cohesive devices appropriately (**natural flow**).
-                        - **Band 8+:** Sequences information and ideas logically; manages all aspects of cohesion well.
+                            **2. Coherence & Cohesion (CC):**
+                            - **Band 4:** No clear progression; basic or repetitive cohesive devices.
+                            - **Band 5:** Some organization but lacks overall progression; cohesive devices are inadequate, inaccurate, or overused.
+                            - **Band 6:** Arranges information coherently; uses cohesive devices effectively but they may sound **mechanical/faulty**.
+                            - **Band 7:** Logically organizes information; uses a range of cohesive devices appropriately (**natural flow**).
+                            - **Band 8+:** Sequences information and ideas logically; manages all aspects of cohesion well.
 
-                        **3. Lexical Resource (LR):**
-                        - **Band 4:** Basic vocabulary; used repetitively; inappropriate choices.
-                        - **Band 5:** Limited range; minimally adequate for the task; noticeable errors in spelling/formation that **may cause difficulty for the reader**.
-                        - **Band 6:** Adequate range; attempts less common items but with some inaccuracy; errors do not impede communication.
-                        - **Band 7:** Sufficient range to allow flexibility; uses **less common lexical items** with awareness of style/collocation.
-                        - **Band 8+:** Wide range; fluent and flexible; skilful use of uncommon items.
+                            **3. Lexical Resource (LR):**
+                            - **Band 4:** Basic vocabulary; used repetitively; inappropriate choices.
+                            - **Band 5:** Limited range; minimally adequate for the task; noticeable errors in spelling/formation that **may cause difficulty for the reader**.
+                            - **Band 6:** Adequate range; attempts less common items but with some inaccuracy; errors do not impede communication.
+                            - **Band 7:** Sufficient range to allow flexibility; uses **less common lexical items** with awareness of style/collocation.
+                            - **Band 8+:** Wide range; fluent and flexible; skilful use of uncommon items.
 
-                        **4. Grammatical Range & Accuracy (GRA) - *CRITICAL*:**
-                        - **Band 4:** Very limited range of structures; rare use of subordinate clauses; errors are frequent and cause strain.
-                        - **Band 5:** Attempts complex sentences but these tend to be faulty; grammatical errors are frequent and **may cause some difficulty for the reader**.
-                        - **Band 6:** Mix of simple and complex forms; errors occur but **rarely impede communication**.
-                        - **Band 7:** Uses a variety of complex structures; produces **frequent error-free sentences**.
-                        - **Band 8+:** Wide range of structures; the majority of sentences are error-free.
+                            **4. Grammatical Range & Accuracy (GRA) - *CRITICAL*:**
+                            - **Band 4:** Very limited range of structures; rare use of subordinate clauses; errors are frequent and cause strain.
+                            - **Band 5:** Attempts complex sentences but these tend to be faulty; grammatical errors are frequent and **may cause some difficulty for the reader**.
+                            - **Band 6:** Mix of simple and complex forms; errors occur but **rarely impede communication**.
+                            - **Band 7:** Uses a variety of complex structures; produces **frequent error-free sentences**.
+                            - **Band 8+:** Wide range of structures; the majority of sentences are error-free.
 
-                        ## 📝 OUTPUT REQUIREMENTS:
-                        1.  **SCORING:** Component scores (TR, CC, LR, GRA) must be INTEGERS (e.g., 4, 5, 6). Overall can be .5.
-                        2.  **FEEDBACK FORMAT:** Return a valid JSON object strictly following this structure (Language: Vietnamese):
+                            ## 📝 OUTPUT REQUIREMENTS:
+                            1.  **SCORING:** Component scores (TR, CC, LR, GRA) must be INTEGERS (e.g., 4, 5, 6). Overall can be .5.
+                            2.  **FEEDBACK FORMAT:** Return a valid JSON object strictly following this structure (Language: Vietnamese):
 
-                        {{
-                            "TR": [int], "CC": [int], "LR": [int], "GRA": [int],
-                            "Overall": [float],
-                            "Feedback": "### 🎯 KẾT QUẢ: Band [Overall]\\n\\n### 📊 CHI TIẾT ĐIỂM SỐ:\\n- **Task Response ([TR]):** [Brief explanation why based on rubric]\\n- **Coherence ([CC]):** [Brief explanation]\\n- **Lexical ([LR]):** [Brief explanation]\\n- **Grammar ([GRA]):** [Brief explanation]\\n\\n### 🛠️ SỬA LỖI CHI TIẾT (QUAN TRỌNG):\\n\\n**1. Cải thiện Từ vựng & Ngữ pháp:**\\n* ❌ **Lỗi:** [Quote exact mistake]\\n* ✅ **Sửa:** [Rewrite accurately]\\n* 💡 **Giải thích:** [Explain the error type]\\n\\n**2. Cải thiện Mạch lạc & Logic:**\\n* ❌ **Vấn đề:** [Point out logic gap or mechanical linking]\\n* 💡 **Gợi ý:** [Suggestion for better flow]\\n\\n### 💬 LỜI KHUYÊN CỦA GIÁM KHẢO:\\n[Constructive advice for next steps]"
-                        }}
-                        """
-                        res = call_gemini(prompt, expect_json=True)
-                        if res:
-                            try:
-                                grade = json.loads(res)
-                                crit = json.dumps({"TR": grade['TR'], "CC": grade['CC'], "LR": grade['LR'], "GRA": grade['GRA']})
-                                save_writing_log(user['name'], user['class'], lesson_w, "Education", grade['Overall'], crit, grade['Feedback'])
-                                
-                                st.balloons()
-                                st.success(f"🏆 OVERALL BAND: {grade['Overall']}")
-                                c1, c2, c3, c4 = st.columns(4)
-                                c1.metric("TR", grade['TR']); c2.metric("CC", grade['CC']); c3.metric("LR", grade['LR']); c4.metric("GRA", grade['GRA'])
-                                with st.container(border=True): st.markdown(grade['Feedback'])
-                            except: st.error("Lỗi chấm bài.")
+                            {{
+                                "TR": [int], "CC": [int], "LR": [int], "GRA": [int],
+                                "Overall": [float],
+                                "Feedback": "### 🎯 KẾT QUẢ: Band [Overall]\\n\\n### 📊 CHI TIẾT ĐIỂM SỐ:\\n- **Task Response ([TR]):** [Brief explanation why based on rubric]\\n- **Coherence ([CC]):** [Brief explanation]\\n- **Lexical ([LR]):** [Brief explanation]\\n- **Grammar ([GRA]):** [Brief explanation]\\n\\n### 🛠️ SỬA LỖI CHI TIẾT (QUAN TRỌNG):\\n\\n**1. Cải thiện Từ vựng & Ngữ pháp:**\\n* ❌ **Lỗi:** [Quote exact mistake]\\n* ✅ **Sửa:** [Rewrite accurately]\\n* 💡 **Giải thích:** [Explain the error type]\\n\\n**2. Cải thiện Mạch lạc & Logic:**\\n* ❌ **Vấn đề:** [Point out logic gap or mechanical linking]\\n* 💡 **Gợi ý:** [Suggestion for better flow]\\n\\n### 💬 LỜI KHUYÊN CỦA GIÁM KHẢO:\\n[Constructive advice for next steps]"
+                            }}
+                            """
+                            res = call_gemini(prompt, expect_json=True)
+                            if res:
+                                try:
+                                    grade = json.loads(res)
+                                    st.session_state['writing_result'] = grade
+                                    st.session_state['writing_step'] = 'finished'
+                                    crit = json.dumps({"TR": grade['TR'], "CC": grade['CC'], "LR": grade['LR'], "GRA": grade['GRA']})
+                                    save_writing_log(user['name'], user['class'], lesson_w, "Education", grade['Overall'], crit, grade['Feedback'])
+                                    st.rerun()
+                                except: st.error("Lỗi chấm bài.")
+
+            # --- GIAI ĐOẠN 3: KẾT QUẢ (HIỂN THỊ SAU KHI NỘP) ---
+            if st.session_state.get('writing_step') == 'finished' and st.session_state.get('writing_result'):
+                res = st.session_state['writing_result']
+                st.balloons()
+                st.success(f"🏆 OVERALL BAND: {res['Overall']}")
+                c1, c2, c3, c4 = st.columns(4)
+                c1.metric("Task Response", res['TR'])
+                c2.metric("Coherence", res['CC'])
+                c3.metric("Lexical", res['LR'])
+                c4.metric("Grammar", res['GRA'])
+                
+                with st.container(border=True):
+                    st.markdown("### 📝 Nhận xét chi tiết")
+                    st.markdown(res['Feedback'])
+                
+                if st.button("Viết lại (Resubmit)"):
+                    st.session_state['writing_step'] = 'outline'
+                    st.session_state['writing_result'] = None # Clear kết quả cũ
+                    st.rerun()
+
         else: st.warning("Bài này chưa mở.")
     
     # --- MODULE 1: SPEAKING (ĐÃ GIỚI HẠN 5 LẦN & FORMAT MỚI) ---
