@@ -270,7 +270,7 @@ st.markdown("""
     .scroll-container {
         height: 600px;
         overflow-y: auto;
-        padding: 15px;
+        padding: 20px;
         border: 1px solid #e0e0e0;
         border-radius: 8px;
         background-color: #fcfcfc;
@@ -281,14 +281,8 @@ st.markdown("""
         font-size: 16px;
         line-height: 1.8;
         color: #2c3e50;
-    }
-    
-    /* HIGHLIGHT STYLE (Vàng đậm) */
-    .highlighted {
-        background-color: #ffeb3b;
-        color: #000;
-        font-weight: 500;
-        cursor: pointer;
+        text-align: justify;
+        padding-right: 10px;
     }
     
     .explanation-box {
@@ -303,31 +297,6 @@ st.markdown("""
     .correct-ans {color: #27ae60; font-weight: bold;}
     .wrong-ans {color: #c0392b; font-weight: bold;}
     </style>
-    
-    <!-- SCRIPT ĐỂ HIGHLIGHT KHI BÔI ĐEN -->
-    <script>
-    document.addEventListener('mouseup', function() {
-        var selection = window.getSelection();
-        var selectedText = selection.toString();
-        
-        if (selectedText.length > 0) {
-            var range = selection.getRangeAt(0);
-            var span = document.createElement("span");
-            span.className = "highlighted";
-            span.title = "Click để xóa highlight";
-            span.onclick = function() {
-                var text = document.createTextNode(this.innerText);
-                this.parentNode.replaceChild(text, this);
-            };
-            try {
-                range.surroundContents(span);
-                selection.removeAllRanges();
-            } catch (e) {
-                console.log("Không thể highlight qua nhiều block");
-            }
-        }
-    });
-    </script>
 """, unsafe_allow_html=True)
 
 try:
@@ -504,7 +473,7 @@ else:
         else:
             st.info("Bài học này chưa cập nhật.")
 
-    # --- MODULE 2: READING (SPLIT VIEW & REALTIME TIMER) ---
+     # --- MODULE 2: READING (SPLIT VIEW & REALTIME TIMER) ---
     elif menu == "📖 Reading":
         st.title("📖 Luyện Reading & Từ Vựng")
         lesson_choice = st.selectbox("Chọn bài đọc:", READING_MENU)
@@ -513,6 +482,10 @@ else:
         if 'current_reading_lesson' not in st.session_state or st.session_state['current_reading_lesson'] != lesson_choice:
             st.session_state['current_reading_lesson'] = lesson_choice
             st.session_state['reading_session'] = {'status': 'intro', 'mode': None, 'end_time': None}
+            st.session_state['reading_highlight'] = ""
+            # Xóa cache intro cũ
+            if 'reading_intro_text' in st.session_state:
+                del st.session_state['reading_intro_text']
 
         if "Marine Chronometer" in lesson_choice:
             data = READING_CONTENT["Lesson 2: Marine Chronometer"]
@@ -524,12 +497,27 @@ else:
                 # --- TRẠNG THÁI 1: GIỚI THIỆU & CHỌN CHẾ ĐỘ ---
                 if st.session_state['reading_session']['status'] == 'intro':
                     st.info(f"### {data['title']}")
-                    st.markdown("""
-                    **Thông tin bài thi:**
-                    - **Chủ đề:** Lịch sử / Hàng hải
-                    - **Dạng câu hỏi:** Fill in the blanks
-                    - **Số lượng:** 6 câu hỏi
-                    """)
+                    
+                    # AI Generate Intro
+                    if 'reading_intro_text' not in st.session_state:
+                        with st.spinner("AI đang tóm tắt nội dung bài đọc..."):
+                            intro_prompt = f"""
+                            Viết một đoạn giới thiệu ngắn (khoảng 3 câu), cực kỳ hấp dẫn và gây tò mò bằng tiếng Việt về bài đọc có tiêu đề: "{data['title']}".
+                            Nội dung bài nói về việc phát minh ra đồng hồ hàng hải để xác định kinh độ trên biển, giúp cứu sống hàng ngàn thủy thủ.
+                            Hãy làm cho học viên cảm thấy bài đọc này chứa đựng kiến thức lịch sử/khoa học thú vị và hữu ích.
+                            """
+                            st.session_state['reading_intro_text'] = call_gemini(intro_prompt)
+                    
+                    # Hiển thị Intro
+                    if st.session_state.get('reading_intro_text'):
+                        st.markdown(f"**🌟 Giới thiệu chủ đề:**\n\n{st.session_state['reading_intro_text']}")
+                    else:
+                         st.markdown("""
+                        **Thông tin bài thi:**
+                        - **Chủ đề:** Lịch sử / Hàng hải (Đồng hồ đo kinh độ)
+                        - **Dạng câu hỏi:** Fill in the blanks
+                        - **Số lượng:** 6 câu hỏi
+                        """)
                     
                     col_m1, col_m2 = st.columns(2)
                     with col_m1:
@@ -556,7 +544,7 @@ else:
                         if remaining_seconds > 0:
                             # Javascript để đếm ngược mượt mà không cần reload trang
                             timer_html = f"""
-                            <div style="font-size: 20px; font-weight: bold; color: #d35400; margin-bottom: 10px;">
+                            <div style="font-size: 20px; font-weight: bold; color: #d35400; margin-bottom: 10px; font-family: 'Segoe UI', sans-serif;">
                                 ⏳ Thời gian còn lại: <span id="timer"></span>
                             </div>
                             <script>
@@ -581,8 +569,7 @@ else:
                         else:
                             st.error("🛑 ĐÃ HẾT GIỜ! Vui lòng nộp bài ngay.")
                     else:
-                        st.success("🟢 Chế độ Luyện Tập (Thoải mái thời gian)")
-                        st.caption("Mẹo: Bôi đen văn bản để highlight (Click lại để xóa).")
+                        st.success("🟢 Chế độ Luyện Tập")
 
                     # GIAO DIỆN 2 CỘT (SPLIT SCREEN)
                     col_text, col_quiz = st.columns([1, 1], gap="medium")
@@ -590,11 +577,40 @@ else:
                     # BÊN TRÁI: BÀI ĐỌC (Có cuộn riêng & Highlight)
                     with col_text:
                         st.subheader("📄 Bài Đọc")
+                        
+                        # --- CÔNG CỤ HIGHLIGHT (STABLE VERSION) ---
+                        with st.expander("🖍️ Công cụ Highlight", expanded=True):
+                            hl_text = st.text_input("Nhập từ/cụm từ muốn highlight (VD: longitude)", key="hl_input")
+                            col_h1, col_h2 = st.columns(2)
+                            with col_h1:
+                                if st.button("Tô màu"):
+                                    if hl_text:
+                                        st.session_state['reading_highlight'] = hl_text
+                            with col_h2:
+                                if st.button("Xóa"):
+                                    st.session_state['reading_highlight'] = ""
+
+                        # Hiển thị bài đọc (Có tiêu đề H2)
+                        display_text = data['text']
+                        # Thêm tiêu đề vào nội dung hiển thị (nếu chưa có)
+                        if "### Timekeeper" not in display_text:
+                             display_text = f"## {data['title']}\n\n" + display_text
+
+                        # Xử lý highlight
+                        if st.session_state['reading_highlight']:
+                            target = st.session_state['reading_highlight']
+                            # Dùng regex để highlight không phân biệt hoa thường
+                            pattern = re.compile(re.escape(target), re.IGNORECASE)
+                            display_text = pattern.sub(lambda m: f"<span style='background-color: #ffeb3b; color: black; font-weight: bold; padding: 2px;'>{m.group(0)}</span>", display_text)
+                        
+                        # Chuyển đổi xuống dòng thành thẻ <br> để hiển thị đúng trong HTML div
+                        html_text = display_text.replace("\n", "<br>")
+                        
                         # Nhúng bài đọc vào khung cuộn (scroll-container)
                         st.markdown(f"""
                         <div class="scroll-container">
                             <div class="reading-text">
-                                {data['text'].replace(chr(10), '<br>')}
+                                {html_text}
                             </div>
                         </div>
                         """, unsafe_allow_html=True)
@@ -657,6 +673,7 @@ else:
                         if st.button("Làm lại bài này"):
                             st.session_state['reading_session'] = {'status': 'intro', 'mode': None, 'end_time': None}
                             st.rerun()
+
             # TAB 2: Bài tập AI tương tác (JSON Parsing)
             with tab2:
                 st.info(f"Dành cho trình độ: **{user['level']['level']}**. AI sẽ tạo bài tập trắc nghiệm giúp bạn hiểu sâu từ vựng.")
