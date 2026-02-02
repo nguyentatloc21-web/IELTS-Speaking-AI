@@ -95,6 +95,20 @@ def save_reading_log(student, class_code, lesson, score, total, mode="Practice")
             st.toast("✅ Đã lưu kết quả Reading!", icon="💾")
     except: pass
 
+def save_writing_log(student, class_code, lesson, topic, band_score, criteria_scores, feedback):
+    """Lưu điểm Writing"""
+    try:
+        sheet = connect_gsheet()
+        if sheet:
+            try: ws = sheet.worksheet("Writing_Logs")
+            except:
+                ws = sheet.add_worksheet(title="Writing_Logs", rows="1000", cols="10")
+                ws.append_row(["Timestamp", "Student", "Class", "Lesson", "Topic", "Overall_Band", "TR_CC_LR_GRA", "Feedback"])
+            
+            ws.append_row([str(datetime.now()), student, class_code, lesson, topic, band_score, str(criteria_scores), feedback])
+            st.toast("✅ Đã lưu bài Writing!", icon="💾")
+    except: pass
+
 def get_leaderboard(class_code):
     """
     Hàm lấy bảng xếp hạng MẠNH MẼ HƠN (Robust):
@@ -180,9 +194,24 @@ def get_leaderboard(class_code):
                 else: lb_r = None
             else: lb_r = None
         except: lb_r = None
+    
+        # 3. Writing
+        try:
+            ws_w = sheet.worksheet("Writing_Logs")
+            df_w = pd.DataFrame(ws_w.get_all_records())
+            if not df_w.empty and 'Class' in df_w.columns:
+                df_w = df_w[df_w['Class'] == class_code]
+                if not df_w.empty:
+                    df_w['Overall_Band'] = pd.to_numeric(df_w['Overall_Band'], errors='coerce')
+                    lb_w = df_w.groupby('Student')['Overall_Band'].mean().reset_index()
+                    lb_w.columns = ['Học Viên', 'Điểm Writing (TB)']
+                    lb_w = lb_w.sort_values(by='Điểm Writing (TB)', ascending=False).head(10)
+                else: lb_w = None
+            else: lb_w = None
+        except: lb_w = None
 
-        return lb_s, lb_r
-    except: return None, None
+        return lb_s, lb_r, lb_w
+    except: return None, None, None
 
 # ================= 1. CẤU HÌNH & DỮ LIỆU (TEACHER INPUT) =================
 
@@ -253,9 +282,23 @@ Most chronometer forerunners of that particular generation were English, but tha
     }
 }
 
+# WRITING CONTENT (Chỉ lớp ELITE)
+WRITING_CONTENT = {
+    "Lesson 3: Education & Society": {
+        "task_type": "Task 2",
+        "time": 40,
+        "question": """
+        **Some people think that parents should teach children how to be good members of society. Others, however, believe that school is the place to learn this.**
+        
+        Discuss both views and give your opinion.
+        Give reasons for your answer and include any relevant examples from your own knowledge or experience.
+        Write at least 250 words.
+        """
+    }
+}
 SPEAKING_MENU = list(SPEAKING_CONTENT.keys()) + [f"Lesson {i}: (Sắp ra mắt)" for i in range(3, 11)]
 READING_MENU = [f"Lesson {i}" if i != 2 else "Lesson 2: Marine Chronometer" for i in range(1, 11)]
-
+WRITING_MENU = ["Lesson 3: Education & Society"]
 # ================= 2. HỆ THỐNG & API =================
 st.set_page_config(page_title="Mr. Tat Loc IELTS Portal", page_icon="🎓", layout="wide")
 
@@ -378,7 +421,8 @@ if 'speaking_attempts' not in st.session_state: st.session_state['speaking_attem
 if 'generated_quiz' not in st.session_state: st.session_state['generated_quiz'] = None
 if 'reading_session' not in st.session_state: st.session_state['reading_session'] = {'status': 'intro', 'mode': None, 'end_time': None}
 if 'reading_highlight' not in st.session_state: st.session_state['reading_highlight'] = ""
-
+if 'writing_step' not in st.session_state: st.session_state['writing_step'] = 'outline' 
+if 'writing_outline_score' not in st.session_state: st.session_state['writing_outline_score'] = 0
 # ================= 3. LOGIC ĐĂNG NHẬP =================
 def login():
     st.markdown("<div style='text-align: center; margin-top: 50px;'><h1>MR. TAT LOC IELTS CLASS</h1></div>", unsafe_allow_html=True)
@@ -411,32 +455,174 @@ else:
         st.divider()
         if st.button("Đăng xuất"): logout()
 
-     # --- MODULE 4: LEADERBOARD (Ưu tiên hiển thị đầu để dễ thấy) ---
+    # --- MODULE 4: LEADERBOARD ---
     if menu == "🏆 Bảng Xếp Hạng":
         st.title(f"🏆 Bảng Xếp Hạng Lớp {user['class']}")
-        st.info("Top 10 học viên xuất sắc nhất")
-        
         if st.button("🔄 Làm mới"): st.rerun()
+        lb_s, lb_r, lb_w = get_leaderboard(user['class'])
+        c1, c2, c3 = st.columns(3)
+        with c1:
+            st.subheader("🎤 Speaking (TB)")
+            if lb_s is not None and not lb_s.empty: st.dataframe(lb_s.style.format({"Điểm Speaking (TB)": "{:.2f}"}).background_gradient(cmap="Blues"), use_container_width=True)
+            else: st.info("Chưa có dữ liệu.")
+        with c2:
+            st.subheader("📚 Reading (Max)")
+            if lb_r is not None and not lb_r.empty: st.dataframe(lb_r.style.format({"Điểm Reading (Max)": "{:.1f}"}).background_gradient(cmap="Greens"), use_container_width=True)
+            else: st.info("Chưa có dữ liệu.")
+        with c3:
+            st.subheader("✍️ Writing (TB)")
+            if lb_w is not None and not lb_w.empty: st.dataframe(lb_w.style.format({"Điểm Writing (TB)": "{:.2f}"}).background_gradient(cmap="Oranges"), use_container_width=True)
+            else: st.info("Chưa có dữ liệu.")
 
-        lb_s, lb_r = get_leaderboard(user['class'])
+    # --- MODULE 5: WRITING (NEW & POLISHED) ---
+    elif menu == "✍️ Writing":
+        st.title("✍️ Luyện Tập Writing (Task 2)")
         
-        col1, col2 = st.columns(2)
-        with col1:
-            st.subheader("🎤 Speaking (Điểm TB)")
-            if lb_s is not None and not lb_s.empty:
-                lb_s.index = range(1, len(lb_s) + 1)
-                st.dataframe(lb_s.style.format({"Điểm Speaking (TB)": "{:.2f}"}), use_container_width=True)
-            else:
-                st.info("Chưa có dữ liệu.")
+        lesson_w = st.selectbox("Chọn bài viết:", WRITING_MENU)
+        
+        # Chỉ lớp ELITE mới thấy bài này (ví dụ)
+        if "Lesson 3" in lesson_w:
+            data_w = WRITING_CONTENT["Lesson 3: Education & Society"]
+            st.info(f"### TOPIC: {data_w['question']}")
+            
+            # --- GIAI ĐOẠN 1: OUTLINE CHECK ---
+            if st.session_state['writing_step'] == 'outline':
+                st.subheader("BƯỚC 1: Lập Dàn Ý (Outline Logic Check)")
+                st.markdown("Hệ thống sẽ kiểm tra **Logic, Mạch lạc** và **Task Response**.")
                 
-        with col2:
-            st.subheader("📚 Reading (Điểm Max)")
-            if lb_r is not None and not lb_r.empty:
-                lb_r.index = range(1, len(lb_r) + 1)
-                st.dataframe(lb_r.style.format({"Điểm Reading (Max)": "{:.1f}"}), use_container_width=True)
-            else:
-                st.info("Chưa có dữ liệu.")
+                with st.form("outline_form"):
+                    intro = st.text_area("Introduction:", height=80, placeholder="Paraphrase topic + Thesis statement")
+                    body1 = st.text_area("Body 1 (PEER / What-Why-How):", height=150, placeholder="Main Idea 1...")
+                    body2 = st.text_area("Body 2 (PEER / What-Why-How):", height=150, placeholder="Main Idea 2...")
+                    conc = st.text_area("Conclusion:", height=80, placeholder="Restate opinion + Summary")
+                    
+                    if st.form_submit_button("🔍 Kiểm Tra Outline"):
+                        if intro and body1 and body2 and conc:
+                            with st.spinner("AI đang soi lỗi logic (Fallacies Check)..."):
+                                prompt = f"""
+                                Role: Strict IELTS Writing Logic Coach.
+                                Task: Evaluate this Task 2 Outline.
+                                Topic: {data_w['question']}
+                                Input: Intro: {intro} | B1: {body1} | B2: {body2} | Conc: {conc}
+                                
+                                CHECKLIST (Common Errors):
+                                1. Logical Fallacies (False Cause, Overgeneralization, Slippery Slope, Either/Or, Equivocation).
+                                2. Coherence (Unclear arguments, Listing ideas without explanation, Topic Sentence mismatch).
+                                3. Task Response (Partial address, Irrelevant ideas).
+                                4. Structure: Check for PEER (Point-Explanation-Example-Result) or What-Why-How flow.
+                                
+                                OUTPUT FORMAT (Vietnamese JSON):
+                                {{
+                                    "score": [Integer 0-10],
+                                    "feedback": "[Specific feedback on logic & structure. Be sharp & direct.]",
+                                    "collocations": "[List 5-7 academic collocations relevant to this specific outline to help writing]"
+                                }}
+                                """
+                                res = call_gemini(prompt, expect_json=True)
+                                if res:
+                                    try:
+                                        eval_data = json.loads(res)
+                                        st.session_state['writing_outline_score'] = eval_data['score']
+                                        st.session_state['writing_feedback'] = eval_data['feedback']
+                                        st.session_state['writing_collocations'] = eval_data['collocations']
+                                        
+                                        if eval_data['score'] >= 8:
+                                            st.success(f"✅ Outline Đạt: {eval_data['score']}/10")
+                                            st.session_state['writing_step'] = 'writing'
+                                            st.rerun()
+                                        else:
+                                            st.error(f"⛔ Outline Chưa Đạt: {eval_data['score']}/10")
+                                            st.markdown(eval_data['feedback'])
+                                            st.warning("Hãy sửa lại Outline để đảm bảo logic trước khi viết bài!")
+                                    except: st.error("Lỗi AI. Vui lòng thử lại.")
+                        else: st.warning("Vui lòng điền đủ 4 phần.")
 
+            # --- GIAI ĐOẠN 2: VIẾT BÀI ---
+            elif st.session_state['writing_step'] == 'writing':
+                st.subheader("BƯỚC 2: Viết Bài (Essay Writing)")
+                
+                with st.expander("💡 Gợi ý từ vựng (Từ Outline của bạn)", expanded=True):
+                    st.info(st.session_state.get('writing_collocations', ''))
+                
+                # Timer JS
+                timer_html = f"""
+                <div style="font-size: 20px; font-weight: bold; color: #d35400;">
+                    ⏳ Thời gian: <span id="timer_w">40:00</span>
+                </div>
+                <script>
+                var time = {data_w['time']} * 60;
+                setInterval(function() {{
+                    var m = Math.floor(time / 60);
+                    var s = time % 60;
+                    document.getElementById("timer_w").innerHTML = m + ":" + (s < 10 ? "0" : "") + s;
+                    time--;
+                }}, 1000);
+                </script>
+                """
+                components.html(timer_html, height=50)
+                
+                essay = st.text_area("Bài làm (Min 250 words):", height=400)
+                
+                if st.button("📤 Nộp Bài"):
+                    if len(essay.split()) < 200:
+                        st.warning("Bài viết còn ngắn. Hãy cố gắng viết đủ 250 từ.")
+                    else:
+                        with st.spinner("Đang chấm điểm theo Band Descriptors (4-9)..."):
+                            prompt = f"""
+                            Role: Professional IELTS Examiner.
+                            Task: Grade Task 2 Essay.
+                            Topic: {data_w['question']}
+                            Essay: {essay}
+                            
+                            RUBRIC (Strict Adherence):
+                            - **Band 4 (Limited):** Ideas irrelevant/repetitive. No clear progression. Vocab basic/repetitive. Grammar limited/frequent errors.
+                            - **Band 5 (Modest):** Addresses task but limited detail. Mechanical cohesion. Simple vocab accurate but limited range. Frequent grammar errors.
+                            - **Band 6 (Competent):** Relevant overview. Coherent but mechanical cohesive devices. Vocab adequate but some inaccuracy. Mix of simple/complex sentences.
+                            - **Band 7 (Good):** Clear position throughout. Logically organised. Flexible vocab/collocations. Frequent error-free sentences.
+                            - **Band 8 (Very Good):** Sufficiently developed ideas. Skilful paragraphing. Precise vocab (uncommon items). Flexible/accurate grammar.
+                            - **Band 9 (Expert):** Fully satisfied. Effortless cohesion. Sophisticated lexical control. Grammatically accurate.
+                            
+                            CONSTRAINT: Component scores (TR, CC, LR, GRA) MUST be INTEGERS (e.g. 6, 7, 8). Overall can be .5.
+                            
+                            OUTPUT JSON:
+                            {{
+                                "TR": [int], "CC": [int], "LR": [int], "GRA": [int],
+                                "Overall": [float],
+                                "Feedback": "[Detailed critique in VIETNAMESE. Start with Strengths, then Weaknesses. Suggest specific improvements.]"
+                            }}
+                            """
+                            res = call_gemini(prompt, expect_json=True)
+                            if res:
+                                try:
+                                    grade = json.loads(res)
+                                    st.session_state['writing_result'] = grade
+                                    st.session_state['writing_step'] = 'finished'
+                                    
+                                    crit = json.dumps({"TR": grade['TR'], "CC": grade['CC'], "LR": grade['LR'], "GRA": grade['GRA']})
+                                    save_writing_log(user['name'], user['class'], lesson_w, "Education", grade['Overall'], crit, grade['Feedback'])
+                                    st.rerun()
+                                except: st.error("Lỗi chấm bài.")
+
+            # --- GIAI ĐOẠN 3: KẾT QUẢ ---
+            elif st.session_state['writing_step'] == 'finished':
+                res = st.session_state['writing_result']
+                st.balloons()
+                st.success(f"🏆 OVERALL BAND: {res['Overall']}")
+                c1, c2, c3, c4 = st.columns(4)
+                c1.metric("Task Response", res['TR'])
+                c2.metric("Coherence", res['CC'])
+                c3.metric("Lexical", res['LR'])
+                c4.metric("Grammar", res['GRA'])
+                
+                with st.container(border=True):
+                    st.markdown("### 📝 Nhận xét chi tiết")
+                    st.markdown(res['Feedback'])
+                
+                if st.button("Viết lại (Resubmit)"):
+                    st.session_state['writing_step'] = 'outline'
+                    st.rerun()
+        else: st.warning("Bài này chưa mở.")
+    
     # --- MODULE 1: SPEAKING (ĐÃ GIỚI HẠN 5 LẦN & FORMAT MỚI) ---
     if menu == "🗣️ Speaking":
         st.title("Luyện Tập Speaking")
