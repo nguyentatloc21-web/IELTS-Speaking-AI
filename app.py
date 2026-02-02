@@ -258,13 +258,77 @@ WRITING_MENU = ["Lesson 3: Education & Society"]
 # ================= 2. HỆ THỐNG & API =================
 st.set_page_config(page_title="Mr. Tat Loc IELTS Portal", page_icon="🎓", layout="wide")
 
-st.markdown("""
-    <style>
-    .main {background-color: #ffffff; font-family: 'Segoe UI', sans-serif;}
-    h1 {color: #003366; font-size: 26px; font-weight: 700;}
-    h2 {color: #004080; font-size: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 25px;}
-    .stButton button {background-color: #004080; color: white; border-radius: 6px; font-weight: 600; padding: 0.5rem 1rem;}
-    .stButton button:hover {background-color: #002244;}
+    st.markdown("""
+        <style>
+    /* 1. Cài đặt Font chữ chung cho toàn bộ ứng dụng */
+    html, body, [class*="css"] {
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        color: #333333; /* Màu chữ đen xám dịu mắt hơn đen tuyền */
+    }
+
+    /* 2. H1: Tiêu đề trang (To nhất, Đậm nhất) */
+    h1 {
+        color: #003366; 
+        font-size: 32px !important; /* Tăng lên 32px để tách biệt hẳn */
+        font-weight: 800;
+        margin-bottom: 20px;
+    }
+
+    /* 3. H2: Tiêu đề phần (Có gạch chân để ngăn cách) */
+    h2 {
+        color: #004080;
+        font-size: 24px !important;
+        font-weight: 700;
+        border-bottom: 2px solid #e0e0e0; /* Gạch chân mờ hơn cho tinh tế */
+        padding-bottom: 8px;
+        margin-top: 30px;
+        margin-bottom: 15px;
+    }
+
+    /* 4. H3: Tiêu đề con (Dùng cho các mục nhỏ trong Feedback) */
+    h3 {
+        color: #0059b3;
+        font-size: 20px !important;
+        font-weight: 600;
+        margin-top: 20px;
+        margin-bottom: 10px;
+    }
+    
+    /* 5. H4: Tiêu đề nhỏ nhất (Dùng cho Note hoặc Label) */
+    h4 {
+        color: #444444;
+        font-size: 18px !important;
+        font-weight: 600;
+        font-style: italic;
+    }
+
+    /* 6. Đoạn văn thường & Danh sách (Dễ đọc) */
+    p, li, .stMarkdown {
+        font-size: 16px !important;
+        line-height: 1.6; /* Tăng khoảng cách dòng để không bị rối mắt */
+    }
+    
+    /* 7. In đậm (Làm nổi bật từ khóa) */
+    strong {
+        color: #003366; /* In đậm sẽ có màu xanh đậm thay vì đen */
+        font-weight: 700;
+    }
+
+    /* 8. Nút bấm (Button) */
+    .stButton button {
+        background-color: #004080; 
+        color: white; 
+        border-radius: 8px; 
+        font-weight: 600; 
+        padding: 0.6rem 1.2rem;
+        border: none;
+        transition: all 0.3s ease;
+    }
+    .stButton button:hover {
+        background-color: #002244;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        transform: translateY(-2px); /* Hiệu ứng nhấn nhẹ */
+    }
     
     /* SCROLL CONTAINER (Khung cuộn độc lập) */
     .scroll-container {
