@@ -564,7 +564,7 @@ else:
                             -   **Cách sửa:** [Suggest academic fix]
 
                             ### 3. GỢI Ý NÂNG CẤP
-                            (Vocab or flow adjustments).
+                            (Vocab or flow adjustments. Suggest 5-10 academic collocations based on ideas from outline).
                         """
                         
                         res = call_gemini(prompt)
@@ -583,19 +583,41 @@ else:
                     st.markdown(st.session_state['writing_feedback_data'])
 
             # --- PHẦN 2: VIẾT BÀI (LUÔN HIỂN THỊ) ---
-            st.subheader("📝 BƯỚC 2: Viết Bài (Essay Writing)")
-            st.caption("Hãy nhìn Dàn ý và Nhận xét ở trên để viết bài hoàn chỉnh.")
+    # Chọn chế độ làm bài
+            mode_w = st.radio("Chọn chế độ:", ["-- Chọn chế độ --", "🟢 Luyện Tập (Không giới hạn)", "🔴 Thi Thử (40 Phút)"], horizontal=True, key="w_mode_select")
             
-            # Timer JS
-            timer_html = f"""<div style="font-size:20px; font-weight:bold; color:#d35400;">⏳ <span id="timer_w">40:00</span></div><script>var time={data_w['time']*60};setInterval(function(){{var m=Math.floor(time/60),s=time%60;document.getElementById("timer_w").innerHTML=m+":"+(s<10?"0":"")+s;time--;}},1000);</script>"""
-            components.html(timer_html, height=40)
-            
-            essay = st.text_area("Bài làm (Min 250 words):", height=400, key="essay_input")
-            
-            if st.button("📤 Nộp Bài Chấm Điểm"):
-                if len(essay.split()) < 50: st.warning("Bài viết quá ngắn.")
+            if mode_w != "-- Chọn chế độ --":
+                # Hiển thị khu vực viết bài
+                with st.expander("💡 Xem lại Gợi ý Từ vựng & Outline", expanded=True):
+                     st.info(f"Collocations: {st.session_state.get('writing_collocations', 'Chưa có dữ liệu từ bước 1')}")
+
+                # Đồng hồ (Chỉ hiện khi chọn Thi Thử)
+                if "Thi Thử" in mode_w:
+                     timer_html = f"""
+                    <div style="font-size: 24px; font-weight: bold; color: #d35400; font-family: 'Segoe UI', sans-serif; margin-bottom: 10px;">
+                        ⏳ Thời gian: <span id="timer_w">40:00</span>
+                    </div>
+                    <script>
+                    var time = {data_w['time']} * 60;
+                    setInterval(function() {{
+                        var m = Math.floor(time / 60);
+                        var s = time % 60;
+                        document.getElementById("timer_w").innerHTML = m + ":" + (s < 10 ? "0" : "") + s;
+                        time--;
+                    }}, 1000);
+                    </script>
+                    """
+                     components.html(timer_html, height=50)
                 else:
-                    with st.spinner("Đang chấm điểm theo Band Descriptors (4-9)..."):
+                     st.success("🟢 Chế độ Luyện Tập")
+
+                essay = st.text_area("Bài làm (Min 250 words):", height=400, key="essay_input")
+                
+                if st.button("📤 Nộp Bài Chấm Điểm"):
+                    if len(essay.split()) < 50: st.warning("Bài viết quá ngắn.")
+                    else:
+                        with st.spinner("Đang chấm điểm theo Band Descriptors (4-9)..."):
+                            # PROMPT CHẤM BÀI
                         prompt = f"""
                         ## ROLE:
                         You are a strict, Senior IELTS Writing Examiner (IDP/BC certified).
