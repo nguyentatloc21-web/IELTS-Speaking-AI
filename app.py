@@ -279,7 +279,7 @@ st.markdown("""
     
     /* READING TEXT AREA */
     .reading-text {
-        font-size: 18px; /* Tăng nhẹ size bài đọc cho dễ nhìn */
+        font-size: 16px; /* Tăng nhẹ size bài đọc cho dễ nhìn */
         line-height: 1.8;
         color: #2c3e50;
         text-align: justify;
