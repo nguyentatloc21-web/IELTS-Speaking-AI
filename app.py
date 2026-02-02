@@ -402,7 +402,7 @@ else:
         st.write(f"👤 **{user['name']}**")
         st.caption(f"Lớp: {user['class']} | Level: {user['level']['level']}")
         st.divider()
-        menu = st.radio("CHỌN KỸ NĂNG:", ["🏆 Bảng Xếp Hạng", "🗣️ Speaking", "📖 Reading", "🎧 Listening"])
+        menu = st.radio("CHỌN KỸ NĂNG:", ["🏆 Bảng Xếp Hạng", "🗣️ Speaking", "📖 Reading", "🎧 Listening", "✍️ Writing"])
         st.divider()
         if st.button("Đăng xuất"): logout()
 
