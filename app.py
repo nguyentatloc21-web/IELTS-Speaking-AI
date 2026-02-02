@@ -473,11 +473,12 @@ else:
         else:
             st.info("Bài học này chưa cập nhật.")
 
-    # --- MODULE 2: READING ---
+    # --- MODULE 2: READING (SPLIT VIEW & REALTIME TIMER) ---
     elif menu == "📖 Reading":
-        st.title("📖 Luyện Reading")
-        lesson_choice = st.selectbox("Chọn bài:", READING_MENU)
+        st.title("📖 Luyện Reading & Từ Vựng")
+        lesson_choice = st.selectbox("Chọn bài đọc:", READING_MENU)
         
+        # Reset session khi đổi bài
         if 'current_reading_lesson' not in st.session_state or st.session_state['current_reading_lesson'] != lesson_choice:
             st.session_state['current_reading_lesson'] = lesson_choice
             st.session_state['reading_session'] = {'status': 'intro', 'mode': None, 'end_time': None}
@@ -487,115 +488,182 @@ else:
         if "Marine Chronometer" in lesson_choice:
             data = READING_CONTENT["Lesson 2: Marine Chronometer"]
             
-            tab1, tab2 = st.tabs(["Làm Bài Đọc Hiểu", "Bài Tập Từ Vựng"])
+            tab1, tab2 = st.tabs(["Làm Bài Đọc Hiểu", "Bài Tập Từ Vựng AI"])
             
+            # TAB 1: BÀI ĐỌC CHÍNH (Split View)
             with tab1:
-                # TRẠNG THÁI 1: INTRO
+                # --- TRẠNG THÁI 1: GIỚI THIỆU & CHỌN CHẾ ĐỘ ---
                 if st.session_state['reading_session']['status'] == 'intro':
                     st.info(f"### {data['title']}")
                     
                     if 'reading_intro_text' not in st.session_state:
                         with st.spinner("AI đang tạo giới thiệu..."):
                             intro_prompt = f"""
-                            Summarize 3 key takeaways knowledge from text "{data['title']}" in bullet points.
-                            Tone: Academic yet practical. Language: Vietnamese.
-                            Text snippet: {data['text'][:500]}...
+                            Bạn là một giáo viên IELTS vui tính. Hãy giới thiệu 3 điều thú vị nhất về chủ đề "{data['title']}" dựa trên nội dung bài đọc.
+                            
+                            YÊU CẦU:
+                            1. **Văn phong:** Đời thường, gây tò mò, không dùng từ ngữ học thuật khô khan.
+                            2. **Hình thức:** Trả về trực tiếp 3 gạch đầu dòng (bullet points) không dùngicon.
+                            3. **CẤM:** Không được dùng các câu dẫn nhập như "Dựa trên bài đọc...", "Đây là tóm tắt...", "Chào bạn...". Hãy vào thẳng nội dung kiến thức luôn.
+                            
+                            Nội dung bài đọc (trích đoạn): {data['text'][:1000]}...
                             """
                             st.session_state['reading_intro_text'] = call_gemini(intro_prompt)
                     
                     if st.session_state.get('reading_intro_text'):
-                        st.markdown(f"**Kiến thức thú vị:**\n\n{st.session_state['reading_intro_text']}")
+                        st.markdown(f"**🌟 Kiến thức thú vị:**\n\n{st.session_state['reading_intro_text']}")
                     
                     st.markdown("---")
-                    st.write("**Thông tin bài thi:**")
+                    st.write("📊 **Thông tin bài thi:**")
                     col_info1, col_info2 = st.columns(2)
                     col_info1.write("- **Dạng bài:** Fill in the blanks")
                     col_info2.write("- **Số lượng:** 6 câu hỏi")
                     
                     c1, c2 = st.columns(2)
-                    if c1.button("🟢 Luyện Tập (Không giới hạn)"):
+                    if c1.button("🟢 Luyện Tập (Không giới hạn thời gian)"):
                         st.session_state['reading_session']['status'] = 'doing'; st.session_state['reading_session']['mode'] = 'practice'; st.rerun()
                     if c2.button("🔴 Luyện Thi (20 Phút)"):
                         st.session_state['reading_session']['status'] = 'doing'; st.session_state['reading_session']['mode'] = 'exam'
                         st.session_state['reading_session']['end_time'] = datetime.now() + timedelta(minutes=20); st.rerun()
 
-                # TRẠNG THÁI 2: DOING
+                # --- TRẠNG THÁI 2: ĐANG LÀM BÀI (SPLIT VIEW) ---
                 elif st.session_state['reading_session']['status'] == 'doing':
+                    # Xử lý Timer (Javascript Realtime Countdown)
+                    timer_html = ""
                     if st.session_state['reading_session']['mode'] == 'exam':
-                        rem = (st.session_state['reading_session']['end_time'] - datetime.now()).total_seconds()
-                        if rem > 0:
-                            st.markdown(f"""<div style="font-size:20px; font-weight:bold; color:#d35400; font-family:'Segoe UI'">⏳ Còn lại: {int(rem//60)}:{int(rem%60):02d}</div>""", unsafe_allow_html=True)
-                            st.markdown(f"""<meta http-equiv="refresh" content="1">""", unsafe_allow_html=True) # Refresh nhẹ để update giờ
-                        else: st.error("HẾT GIỜ!"); st.stop()
-                    else: st.success("🟢 Chế độ Luyện Tập")
+                        end_time = st.session_state['reading_session']['end_time']
+                        remaining_seconds = (end_time - datetime.now()).total_seconds()
+                        
+                        if remaining_seconds > 0:
+                            # Javascript để đếm ngược mượt mà không cần reload trang
+                            timer_html = f"""
+                            <div style="font-size: 20px; font-weight: bold; color: #d35400; margin-bottom: 10px; font-family: 'Segoe UI', sans-serif;">
+                                ⏳ Thời gian còn lại: <span id="timer"></span>
+                            </div>
+                            <script>
+                            var timeLeft = {int(remaining_seconds)};
+                            var timerElement = document.getElementById("timer");
+                            
+                            var countdown = setInterval(function() {{
+                                var minutes = Math.floor(timeLeft / 60);
+                                var seconds = timeLeft % 60;
+                                timerElement.innerHTML = minutes + "m " + (seconds < 10 ? "0" : "") + seconds + "s";
+                                
+                                timeLeft -= 1;
+                                if (timeLeft < 0) {{
+                                    clearInterval(countdown);
+                                    timerElement.innerHTML = "HẾT GIỜ!";
+                                    alert("Đã hết giờ làm bài! Vui lòng nộp bài.");
+                                }}
+                            }}, 1000);
+                            </script>
+                            """
+                            st.components.v1.html(timer_html, height=50)
+                        else:
+                            st.error("🛑 ĐÃ HẾT GIỜ! Vui lòng nộp bài ngay.")
+                    else:
+                        st.success("🟢 Chế độ Luyện Tập")
 
-                    c_text, c_quiz = st.columns([1, 1], gap="medium")
+                    # GIAO DIỆN 2 CỘT (SPLIT SCREEN)
+                    col_text, col_quiz = st.columns([1, 1], gap="medium")
                     
-                    with c_text:
+                    # BÊN TRÁI: BÀI ĐỌC (Có cuộn riêng & Highlight)
+                    with col_text:
                         st.subheader("📄 Bài Đọc")
-                        with st.expander("🖍️ Highlight (Nhập từ)", expanded=True):
-                            hl = st.text_input("Nhập từ cần tô màu:", key="hl")
-                            c_h1, c_h2 = st.columns(2)
-                            if c_h1.button("Tô màu"): st.session_state['reading_highlight'] = hl
-                            if c_h2.button("Xóa"): st.session_state['reading_highlight'] = ""
+                        
+                        # --- CÔNG CỤ HIGHLIGHT (STABLE VERSION) ---
+                        with st.expander("🖍️ Công cụ Highlight", expanded=True):
+                            hl_text = st.text_input("Nhập từ/cụm từ muốn highlight (VD: longitude)", key="hl_input")
+                            col_h1, col_h2 = st.columns(2)
+                            with col_h1:
+                                if st.button("Tô màu"):
+                                    if hl_text:
+                                        st.session_state['reading_highlight'] = hl_text
+                            with col_h2:
+                                if st.button("Xóa"):
+                                    st.session_state['reading_highlight'] = ""
 
-                        # Xử lý Text & Title
+                        # Hiển thị bài đọc (Có tiêu đề H2)
                         display_text = data['text']
-                        if "### Timekeeper" in display_text: # Xóa tiêu đề markdown cũ nếu có để tránh lỗi format
-                            display_text = display_text.replace("### Timekeeper: Invention of Marine Chronometer", "")
+                        # Thêm tiêu đề vào nội dung hiển thị (nếu chưa có)
+                        if "### Timekeeper" in display_text:
+                             display_text = display_text.replace("### Timekeeper: Invention of Marine Chronometer", "")
                         
                         # Thêm tiêu đề HTML chuẩn
                         html_content = f"<h2>{data['title']}</h2>" + display_text.replace("\n", "<br>")
 
+                        # Xử lý highlight
                         if st.session_state['reading_highlight']:
-                            ptn = re.compile(re.escape(st.session_state['reading_highlight']), re.IGNORECASE)
-                            html_content = ptn.sub(lambda m: f"<span class='highlighted'>{m.group(0)}</span>", html_content)
+                            target = st.session_state['reading_highlight']
+                            # Dùng regex để highlight không phân biệt hoa thường
+                            pattern = re.compile(re.escape(target), re.IGNORECASE)
+                            html_content = pattern.sub(lambda m: f"<span class='highlighted'>{m.group(0)}</span>", html_content)
                         
-                        st.markdown(f"<div class='scroll-container'><div class='reading-text'>{html_content}</div></div>", unsafe_allow_html=True)
+                        # Nhúng bài đọc vào khung cuộn (scroll-container)
+                        st.markdown(f"""
+                        <div class="scroll-container">
+                            <div class="reading-text">
+                                {html_content}
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
 
-                    with c_quiz:
+                    # BÊN PHẢI: CÂU HỎI (Trong Form để không reload trang làm mất highlight)
+                    with col_quiz:
                         st.subheader("📝 Câu Hỏi")
-                        with st.container(height=600):
+                        with st.container(height=600): 
                             st.markdown("**Questions 1-6: Fill in the blanks (NO MORE THAN TWO WORDS)**")
-                            with st.form("exam"):
-                                ans = {}
+                            
+                            with st.form("read_exam_form"):
+                                user_answers = {}
                                 for q in data['questions_fill']:
-                                    st.markdown(f"<div class='question-text'>{q['q']}</div>", unsafe_allow_html=True)
-                                    ans[q['id']] = st.text_input(f"Answer {q['id']}", label_visibility="collapsed")
-                                    st.write("") # Spacer
+                                    user_answers[q['id']] = st.text_input(q['q'])
                                 
-                                if st.form_submit_button("NỘP BÀI"):
+                                # Nút nộp bài (Cho cả 2 chế độ)
+                                submitted = st.form_submit_button("NỘP BÀI")
+                                
+                                if submitted:
                                     st.session_state['reading_session']['status'] = 'result'
-                                    st.session_state['reading_session']['user_answers'] = ans
+                                    st.session_state['reading_session']['user_answers'] = user_answers
                                     st.rerun()
 
-                # TRẠNG THÁI 3: KẾT QUẢ
+                # --- TRẠNG THÁI 3: KẾT QUẢ & GIẢI THÍCH ---
                 elif st.session_state['reading_session']['status'] == 'result':
-                    st.subheader("📊 Kết Quả")
-                    user_ans = st.session_state['reading_session']['user_answers']
+                    st.subheader("📊 Kết Quả Bài Làm")
+                    user_answers = st.session_state['reading_session']['user_answers']
                     score = 0
                     
-                    c_l, c_r = st.columns([1, 1])
-                    with c_l:
-                        with st.expander("Xem lại bài đọc", expanded=False): st.markdown(data['text'])
+                    col_res_L, col_res_R = st.columns([1, 1])
                     
-                    with c_r:
+                    # Hiển thị lại bài đọc để đối chiếu
+                    with col_res_L:
+                        with st.expander("Xem lại bài đọc", expanded=False):
+                            st.markdown(data['text'])
+                    
+                    with col_res_R:
                         for q in data['questions_fill']:
-                            u = user_ans.get(q['id'], "").strip().lower()
-                            c = q['a'].lower()
-                            ok = u == c
-                            if ok: score += 1
+                            u_ans = user_answers.get(q['id'], "").strip().lower()
+                            c_ans = q['a'].lower()
                             
-                            icon = "✅" if ok else "❌"
-                            st.markdown(f"**{q['q']}**")
-                            st.markdown(f"{icon} Bạn: **{u}** | Đáp án: **{c}**")
-                            st.markdown(f"<div class='explanation-box'>💡 {q['exp']}</div>", unsafe_allow_html=True)
+                            is_correct = u_ans == c_ans
+                            if is_correct: score += 1
+                            
+                            if is_correct:
+                                st.success(f"✅ {q['q']} -> Bạn trả lời: {u_ans}")
+                            else:
+                                st.error(f"❌ {q['q']}")
+                                st.markdown(f"**Bạn trả lời:** {u_ans} | **Đáp án:** {q['a']}")
+                            
+                            # Luôn hiện giải thích
+                            st.markdown(f"<div class='explanation-box'>💡 <b>Giải thích:</b> {q['exp']}</div>", unsafe_allow_html=True)
                             st.write("---")
-                        
+
                         st.success(f"🏆 Tổng điểm: {score}/{len(data['questions_fill'])}")
+                        
+                        # Lưu điểm
                         save_reading_log(user['name'], user['class'], lesson_choice, score, len(data['questions_fill']), st.session_state['reading_session']['mode'])
                         
-                        if st.button("Làm lại"):
+                        if st.button("Làm lại bài này"):
                             st.session_state['reading_session'] = {'status': 'intro', 'mode': None, 'end_time': None}
                             st.rerun()
 
