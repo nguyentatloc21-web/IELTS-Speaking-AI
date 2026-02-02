@@ -452,7 +452,7 @@ else:
                             with st.spinner("AI đang soi lỗi logic (Fallacies Check)..."):
                                 prompt = f"""
                                 Role: Strict IELTS Writing Logic Coach.
-                                Task: Evaluate this Task 2 Outline.
+                                Task: Evaluate this Task 2 Outline. Output in Vietnamese .
                                 Topic: {data_w['question']}
                                 Input: Intro: {intro} | B1: {body1} | B2: {body2} | Conc: {conc}
                                 
@@ -492,7 +492,7 @@ else:
             elif st.session_state['writing_step'] == 'writing':
                 st.subheader("BƯỚC 2: Viết Bài (Essay Writing)")
                 
-                with st.expander("💡 Gợi ý từ vựng (Từ Outline của bạn)", expanded=True):
+                with st.expander("Gợi ý từ vựng (Từ Outline)", expanded=True):
                     st.info(st.session_state.get('writing_collocations', ''))
                 
                 # Timer JS
@@ -520,7 +520,7 @@ else:
                     else:
                         with st.spinner("Đang chấm điểm theo Band Descriptors (4-9)..."):
                             prompt = f"""
-                            Role: Professional IELTS Examiner.
+                            Role: Professional IELTS Examiner, Output in Vietnamese.
                             Task: Grade Task 2 Essay.
                             Topic: {data_w['question']}
                             Essay: {essay}
