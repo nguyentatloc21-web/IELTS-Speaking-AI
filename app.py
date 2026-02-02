@@ -79,7 +79,8 @@ def save_speaking_log(student, class_code, lesson, question, full_feedback):
     except Exception as e:
         print(f"Save Error: {e}")
 
-def save_reading_log(student, class_code, lesson, score, total):
+# --- ĐÃ SỬA LẠI HÀM NÀY ĐỂ NHẬN THAM SỐ MODE ---
+def save_reading_log(student, class_code, lesson, score, total, mode="Practice"):
     try:
         sheet = connect_gsheet()
         if sheet:
@@ -87,10 +88,10 @@ def save_reading_log(student, class_code, lesson, score, total):
                 ws = sheet.worksheet("Reading_Logs")
             except:
                 ws = sheet.add_worksheet(title="Reading_Logs", rows="1000", cols="10")
-                ws.append_row(["Timestamp", "Student", "Class", "Lesson", "Score", "Total", "Percentage"])
+                ws.append_row(["Timestamp", "Student", "Class", "Lesson", "Score", "Total", "Percentage", "Mode"])
             
             percentage = round((score / total) * 100, 1) if total > 0 else 0
-            ws.append_row([str(datetime.now()), student, class_code, lesson, score, total, percentage])
+            ws.append_row([str(datetime.now()), student, class_code, lesson, score, total, percentage, mode])
             st.toast("✅ Đã lưu kết quả Reading!", icon="💾")
     except: pass
 
@@ -333,6 +334,8 @@ def call_gemini(prompt, expect_json=False):
 # --- QUẢN LÝ SESSION STATE ---
 if 'speaking_attempts' not in st.session_state: st.session_state['speaking_attempts'] = {}
 if 'generated_quiz' not in st.session_state: st.session_state['generated_quiz'] = None
+if 'reading_session' not in st.session_state: st.session_state['reading_session'] = {'status': 'intro', 'mode': None, 'end_time': None}
+if 'reading_highlight' not in st.session_state: st.session_state['reading_highlight'] = ""
 
 # ================= 3. LOGIC ĐĂNG NHẬP =================
 def login():
@@ -502,7 +505,7 @@ else:
                             Bạn là một giáo viên IELTS. Hãy giới thiệu 3 điều thú vị nhất về chủ đề "{data['title']}" dựa trên nội dung bài đọc.
                             
                             YÊU CẦU:
-                            1. **Văn phong:** Đời thường, đơn giản hóa, dễ hiểu, gây tò mò, không dùng thuật ngữ phức tạp, không dùng từ trong dấu ngoặc kép.
+                            1. **Văn phong:** Đời thường, đơn giản hóa, dễ hiểu, không dùng thuật ngữ phức tạp, không dùng từ trong dấu ngoặc kép.
                             2. **Hình thức:** Trả về trực tiếp 3 gạch đầu dòng (bullet points) không dùng icon.
                             3. **CẤM:** Không được dùng các câu dẫn nhập như "Dựa trên bài đọc...", "Đây là tóm tắt...", "Chào bạn...". Hãy vào thẳng nội dung kiến thức luôn.
                             
