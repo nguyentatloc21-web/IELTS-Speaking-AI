@@ -233,17 +233,23 @@ Most chronometer forerunners of that particular generation were English, but tha
     }
 }
 
+# WRITING CONTENT (Chỉ lớp ELITE)
 WRITING_CONTENT = {
     "Lesson 3: Education & Society": {
         "task_type": "Task 2",
         "time": 40,
         "question": """
-        **Some people think that parents should teach children how to be good members of society. Others, however, believe that school is the place to learn this.**
-        
-        Discuss both views and give your opinion.
-        Give reasons for your answer and include any relevant examples from your own knowledge or experience.
-        Write at least 250 words.
-        """
+### 📝 IELTS Writing Task 2
+
+**Some people think that parents should teach children how to be good members of society. Others, however, believe that school is the place to learn this.**
+
+**Instructions:**
+* Discuss both these views and give your own opinion.
+* Give reasons for your answer and include any relevant examples from your own knowledge or experience.
+
+---
+*Write at least 250 words.*
+"""
     }
 }
 SPEAKING_MENU = list(SPEAKING_CONTENT.keys()) + [f"Lesson {i}: (Sắp ra mắt)" for i in range(3, 11)]
