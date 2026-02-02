@@ -575,18 +575,50 @@ else:
 
                 # --- TRẠNG THÁI 2: DOING ---
                 elif st.session_state['reading_session']['status'] == 'doing':
+                    # Xử lý Timer (Javascript Realtime Countdown)
+                    timer_html = ""
                     if st.session_state['reading_session']['mode'] == 'exam':
-                        rem = (st.session_state['reading_session']['end_time'] - datetime.now()).total_seconds()
-                        if rem > 0:
-                            st.markdown(f"""<div style="font-size:20px; font-weight:bold; color:#d35400; font-family:'Segoe UI'">⏳ Còn lại: {int(rem//60)}:{int(rem%60):02d}</div>""", unsafe_allow_html=True)
-                            st.markdown(f"""<meta http-equiv="refresh" content="1">""", unsafe_allow_html=True) 
-                        else: st.error("HẾT GIỜ!"); st.stop()
-                    else: st.success("🟢 Chế độ Luyện Tập")
+                        end_time = st.session_state['reading_session']['end_time']
+                        remaining_seconds = (end_time - datetime.now()).total_seconds()
+                        
+                        if remaining_seconds > 0:
+                            # Javascript để đếm ngược mượt mà không cần reload trang
+                            timer_html = f"""
+                            <div style="font-size: 20px; font-weight: bold; color: #d35400; margin-bottom: 10px; font-family: 'Segoe UI', sans-serif;">
+                                ⏳ Thời gian còn lại: <span id="timer"></span>
+                            </div>
+                            <script>
+                            var timeLeft = {int(remaining_seconds)};
+                            var timerElement = document.getElementById("timer");
+                            
+                            var countdown = setInterval(function() {{
+                                var minutes = Math.floor(timeLeft / 60);
+                                var seconds = timeLeft % 60;
+                                timerElement.innerHTML = minutes + "m " + (seconds < 10 ? "0" : "") + seconds + "s";
+                                
+                                timeLeft -= 1;
+                                if (timeLeft < 0) {{
+                                    clearInterval(countdown);
+                                    timerElement.innerHTML = "HẾT GIỜ!";
+                                    alert("Đã hết giờ làm bài! Vui lòng nộp bài.");
+                                }}
+                            }}, 1000);
+                            </script>
+                            """
+                            st.components.v1.html(timer_html, height=50)
+                        else:
+                            st.error("🛑 ĐÃ HẾT GIỜ! Vui lòng nộp bài ngay.")
+                    else:
+                        st.success("🟢 Chế độ Luyện Tập (Thoải mái thời gian)")
 
-                    c_text, c_quiz = st.columns([1, 1], gap="medium")
+                    # GIAO DIỆN 2 CỘT (SPLIT SCREEN)
+                    col_text, col_quiz = st.columns([1, 1], gap="medium")
                     
-                    with c_text:
+                    # BÊN TRÁI: BÀI ĐỌC (Có cuộn riêng & Highlight)
+                    with col_text:
                         st.subheader("📄 Bài Đọc")
+                        
+                        # --- CÔNG CỤ HIGHLIGHT (STABLE VERSION) ---
                         with st.expander("🖍️ Highlight (Nhập từ)", expanded=True):
                             hl = st.text_input("Nhập từ cần tô màu:", key="hl")
                             c_h1, c_h2 = st.columns(2)
@@ -607,7 +639,7 @@ else:
                         st.subheader("📝 Câu Hỏi")
                         with st.container(height=600):
                             st.markdown("**Questions 1-6: Fill in the blanks (NO MORE THAN TWO WORDS)**")
-                            with st.form("read_exam_form"):
+                            with st.form("exam"):
                                 ans = {}
                                 for q in data['questions_fill']:
                                     # --- SỬA Ở ĐÂY: DÙNG CLASS question-text ---
@@ -615,6 +647,7 @@ else:
                                     ans[q['id']] = st.text_input(f"Answer {q['id']}", label_visibility="collapsed")
                                     st.write("")
                                 
+                                # Nút nộp bài (Cho cả 2 chế độ)
                                 if st.form_submit_button("NỘP BÀI"):
                                     st.session_state['reading_session']['status'] = 'result'
                                     st.session_state['reading_session']['user_answers'] = ans
