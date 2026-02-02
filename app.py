@@ -239,12 +239,17 @@ WRITING_CONTENT = {
         "task_type": "Task 2",
         "time": 40,
         "question": """
-        **Some people think that parents should teach children how to be good members of society. Others, however, believe that school is the place to learn this.**
-        
-        Discuss both views and give your opinion.
-        Give reasons for your answer and include any relevant examples from your own knowledge or experience.
-        Write at least 250 words.
-        """
+### 📝 IELTS Writing Task 2
+
+**Topic:**
+> **Some people think that parents should teach children how to be good members of society. Others, however, believe that school is the place to learn this.**
+
+**Instructions:**
+* Discuss both these views and give your own opinion.
+* Give reasons for your answer and include any relevant examples from your own knowledge or experience.
+
+_Write at least 250 words._
+"""
     }
 }
 SPEAKING_MENU = list(SPEAKING_CONTENT.keys()) + [f"Lesson {i}: (Sắp ra mắt)" for i in range(3, 11)]
@@ -438,72 +443,51 @@ else:
             
 # --- PHẦN 1: CHECKLIST & OUTLINE ---
             
-            # Cập nhật nội dung Expander với kiến thức đầy đủ & chi tiết
-            with st.expander("📚 CẨM NANG: CÁC LỖI TƯ DUY & CẤU TRÚC LOGIC (Đọc kỹ trước khi viết)", expanded=False):
+            # --- PHẦN 1: CHECKLIST & OUTLINE ---
+            
+            # Cập nhật nội dung Expander bằng Markdown thuần
+            with st.expander("CÁC LỖI TƯ DUY & CẤU TRÚC LOGIC (Đọc kỹ trước khi viết)", expanded=False):
                 st.markdown("""
-                <style>
-                    .checklist-box { background-color: #f8f9fa; padding: 20px; border-radius: 10px; border: 1px solid #e9ecef; }
-                    .error-title { color: #d9534f; font-weight: bold; font-size: 1.1em; }
-                    .correct-title { color: #28a745; font-weight: bold; }
-                    .concept-box { margin-bottom: 15px; padding-left: 15px; border-left: 4px solid #d9534f; }
-                    .structure-box { margin-bottom: 15px; padding-left: 15px; border-left: 4px solid #007bff; }
-                    .example-wrong { color: #d9534f; font-style: italic; }
-                    .example-right { color: #28a745; font-weight: 500; }
-                </style>
+                ### 1. CÁC LỖI TƯ DUY LOGIC CẦN TRÁNH
+                *Đây là các lỗi "kinh điển" của người Việt, cần loại bỏ ngay để đạt điểm cao:*
 
-                <div class='checklist-box'>
-                    
-                    <h4>1. CÁC LỖI TƯ DUY LOGIC CẦN TRÁNH (LOGICAL FALLACIES)</h4>
-                    <p><i>Các lỗi phổ biến do ảnh hưởng của tư duy dịch hoặc văn hóa giao tiếp hàng ngày:</i></p>
+                **⚠️ Hasty Generalization (Khái quát hóa vội vã)**
+                * **Bản chất:** Dùng từ tuyệt đối (*All, Always, Nobody*) dựa trên quan sát hẹp.
+                * ❌ **Sai:** "Graduates **always** find it hard to get a job." *(Sinh viên luôn thất nghiệp -> Sai)*
+                * ✅ **Sửa (Hedging):** "It can be challenging for **many** fresh graduates to secure employment."
 
-                    <div class='concept-box'>
-                        <span class='error-title'>⚠️ Hasty Generalization (Khái quát hóa vội vã)</span><br>
-                        <b>Bản chất:</b> Dùng từ tuyệt đối (<i>All, Always, Everyone, Nobody</i>) dựa trên quan sát hẹp/định kiến.<br>
-                        <span class='example-wrong'>❌ Sai: "Graduates always find it hard to get a job." (Sinh viên luôn khó tìm việc).</span><br>
-                        <b>Khắc phục (Hedging):</b> Dùng ngôn ngữ rào đón (giảm nhẹ).<br>
-                        <span class='example-right'>✅ Sửa: "It can be challenging for <u>many</u> fresh graduates to secure employment."</span>
-                    </div>
+                **⚠️ Slippery Slope (Trượt dốc phi logic)**
+                * **Bản chất:** Suy diễn hậu quả cực đoan, "drama hóa" vấn đề mà thiếu căn cứ.
+                * ❌ **Sai:** "Playing video games → Drop out → Criminal." *(Chơi game là thành tội phạm ngay).*
+                * ✅ **Sửa:** "Excessive gaming may **negatively impact academic performance** due to a lack of focus."
 
-                    <div class='concept-box'>
-                        <span class='error-title'>⚠️ Slippery Slope (Trượt dốc phi logic)</span><br>
-                        <b>Bản chất:</b> Suy diễn hậu quả cực đoan từ nguyên nhân ban đầu mà thiếu mắt xích trung gian (Drama hóa).<br>
-                        <span class='example-wrong'>❌ Sai: "Playing video games -> Drop out of school -> Become a criminal."</span><br>
-                        <b>Khắc phục:</b> Chỉ đề cập hệ quả trực tiếp & khả thi.<br>
-                        <span class='example-right'>✅ Sửa: "Excessive gaming may <u>negatively impact academic performance</u> due to a lack of focus."</span>
-                    </div>
+                **⚠️ Circular Reasoning (Lập luận luẩn quẩn)**
+                * **Bản chất:** Giải thích vấn đề bằng cách lặp lại chính nó (A xấu vì A có hại).
+                * ❌ **Sai:** "Air pollution is harmful because it has bad effects." *(Harmful = Bad effects).*
+                * ✅ **Sửa (Cơ chế):** "Air pollution is detrimental as it **directly contributes to respiratory diseases** such as asthma."
 
-                    <div class='concept-box'>
-                        <span class='error-title'>⚠️ Circular Reasoning (Lập luận luẩn quẩn)</span><br>
-                        <b>Bản chất:</b> Giải thích vấn đề bằng cách lặp lại nó với từ khác (A xấu vì A có hại).<br>
-                        <span class='example-wrong'>❌ Sai: "Air pollution is harmful because it has bad effects." (Harmful = Bad effects).</span><br>
-                        <b>Khắc phục:</b> Giải thích cơ chế (Tại sao/Như thế nào?).<br>
-                        <span class='example-right'>✅ Sửa: "Air pollution is detrimental as it <u>directly contributes to respiratory diseases</u> such as asthma."</span>
-                    </div>
+                ---
 
-                    <hr>
+                ### 2. CẤU TRÚC ĐOẠN VĂN (MÔ HÌNH P.E.E.R)
+                *Mỗi đoạn thân bài cần tuân thủ thứ tự sau để đảm bảo logic:*
 
-                    <h4>2. TIÊU CHUẨN CẤU TRÚC ĐOẠN VĂN (MÔ HÌNH P.E.E.R)</h4>
-                    <div class='structure-box' style='border-left-color: #17a2b8;'>
-                        <ul>
-                            <li><b>P - Point (Topic Sentence):</b> Nêu luận điểm chính trực tiếp, ngắn gọn. Tránh mở bài vòng vo.</li>
-                            <li><b>E - Explanation (Elaboration):</b> Giải thích TẠI SAO đúng? (Phần quan trọng nhất thể hiện Critical Thinking).</li>
-                            <li><b>E - Example (Evidence):</b> Ví dụ cụ thể, điển hình (Không lấy ví dụ cá nhân kiểu "em trai tôi").</li>
-                            <li><b>R - Result/Link:</b> Câu chốt, khẳng định lại ý nghĩa đối với đề bài.</li>
-                        </ul>
-                    </div>
+                * **P - Point (Topic Sentence):** Câu chủ đề nêu luận điểm chính trực tiếp, ngắn gọn.
+                * **E - Explanation (Why/How):** Giải thích **TẠI SAO** đúng? (Phần quan trọng nhất).
+                * **E - Example (Evidence):** Ví dụ cụ thể, điển hình (Tránh lấy ví dụ cá nhân như "em trai tôi").
+                * **R - Result/Link:** Câu chốt, khẳng định lại ý nghĩa đối với đề bài.
 
-                    <hr>
+                ---
 
-                    <h4>3. TÍNH MẠCH LẠC & PHÁT TRIỂN Ý</h4>
-                    <div class='structure-box'>
-                        <b>Depth over Breadth (Chiều sâu > Chiều rộng):</b><br>
-                        Tránh liệt kê (Firstly, Secondly, Thirdly...) mà viết sơ sài. Chỉ chọn 1-2 ý đắt giá và phân tích sâu theo P.E.E.R.<br><br>
-                        <b>Linear Thinking (Tư duy tuyến tính):</b><br>
-                        Dòng chảy thông tin phải đi thẳng: <b>A → B → C</b>. Tránh nhảy cóc từ A sang D hoặc viết đường vòng.
-                    </div>
+                ### 3. TÍNH MẠCH LẠC & PHÁT TRIỂN Ý
+                
+                **Chiều sâu > Chiều rộng**
+                * Đừng liệt kê (*Firstly, Secondly, Thirdly...*) mà mỗi ý chỉ viết 1 câu.
+                * **Giải pháp:** Chỉ chọn **1-2 ý đắt giá nhất** và phân tích sâu theo mô hình P.E.E.R.
 
-                </div>
-                """, unsafe_allow_html=True)
+                **Tư duy tuyến tính**
+                * Dòng chảy thông tin phải đi thẳng: **A → B → C**.
+                * Tránh tư duy "nhảy cóc" từ A sang D hoặc viết đường vòng.
+                """)
 
             st.subheader("📝 BƯỚC 1: Lập Dàn Ý (Outline Logic Check)")
         
