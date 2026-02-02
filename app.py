@@ -233,24 +233,17 @@ Most chronometer forerunners of that particular generation were English, but tha
     }
 }
 
-# WRITING CONTENT (Chỉ lớp ELITE)
 WRITING_CONTENT = {
     "Lesson 3: Education & Society": {
         "task_type": "Task 2",
         "time": 40,
         "question": """
-### 📝 IELTS Writing Task 2
-
-**Topic:**
-> **Some people think that parents should teach children how to be good members of society. Others, however, believe that school is the place to learn this.**
-
-**Instructions:**
-* Discuss both these views and give your own opinion.
-* Give reasons for your answer and include any relevant examples from your own knowledge or experience.
-
----
-*Write at least 250 words.*
-"""
+        **Some people think that parents should teach children how to be good members of society. Others, however, believe that school is the place to learn this.**
+        
+        Discuss both views and give your opinion.
+        Give reasons for your answer and include any relevant examples from your own knowledge or experience.
+        Write at least 250 words.
+        """
     }
 }
 SPEAKING_MENU = list(SPEAKING_CONTENT.keys()) + [f"Lesson {i}: (Sắp ra mắt)" for i in range(3, 11)]
@@ -447,7 +440,7 @@ else:
             # --- PHẦN 1: CHECKLIST & OUTLINE ---
             
             # Cập nhật nội dung Expander bằng Markdown thuần (Full nội dung, ít icon)
-            with st.expander("📚 CÁC LỖI TƯ DUY & CẤU TRÚC LOGIC (Đọc kỹ trước khi viết)", expanded=False):
+            with st.expander("📚 **CÁC LỖI TƯ DUY & CẤU TRÚC LOGIC (Đọc kỹ trước khi viết)**", expanded=False):
                 st.markdown("""
                 ### 1. CÁC LỖI TƯ DUY LOGIC CẦN TRÁNH 
                 Đây là các lỗi lập luận phổ biến do ảnh hưởng của tư duy dịch từ tiếng Việt hoặc văn hóa giao tiếp hàng ngày, cần loại bỏ trong văn viết học thuật:
@@ -494,7 +487,7 @@ else:
                 * Tránh tư duy đường vòng hoặc nhảy cóc (nhắc đến kết quả D mà không giải thích quá trình B và C).
                 """)
 
-            st.subheader("📝 BƯỚC 1: Lập Dàn Ý (Outline Logic Check)")
+            st.subheader("📝 STEP 1: OUTLINE")
         
             
             with st.form("outline_form"):
@@ -602,7 +595,7 @@ else:
 
                 essay = st.text_area("Bài làm (Min 250 words):", height=400, key="essay_input")
                 
-                if st.button("📤 Nộp Bài Chấm Điểm"):
+                if st.button("Nộp Bài Chấm Điểm"):
                     if len(essay.split()) < 50: st.warning("Bài viết quá ngắn.")
                     else:
                         with st.spinner("Đang chấm điểm theo Band Descriptors (4-9)..."):
