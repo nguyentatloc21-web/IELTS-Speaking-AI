@@ -502,7 +502,7 @@ else:
                             Bạn là một giáo viên IELTS. Hãy giới thiệu 3 điều thú vị nhất về chủ đề "{data['title']}" dựa trên nội dung bài đọc.
                             
                             YÊU CẦU:
-                            1. **Văn phong:** Đời thường, đơn giản hóa, dễ hiểu, gây tò mò, không dùng thuật ngữ phức tạp.
+                            1. **Văn phong:** Đời thường, đơn giản hóa, dễ hiểu, gây tò mò, không dùng thuật ngữ phức tạp, không dùng từ trong dấu ngoặc kép.
                             2. **Hình thức:** Trả về trực tiếp 3 gạch đầu dòng (bullet points) không dùng icon.
                             3. **CẤM:** Không được dùng các câu dẫn nhập như "Dựa trên bài đọc...", "Đây là tóm tắt...", "Chào bạn...". Hãy vào thẳng nội dung kiến thức luôn.
                             
