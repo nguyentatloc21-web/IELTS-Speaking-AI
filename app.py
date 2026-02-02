@@ -499,11 +499,11 @@ else:
                     if 'reading_intro_text' not in st.session_state:
                         with st.spinner("AI đang tạo giới thiệu..."):
                             intro_prompt = f"""
-                            Bạn là một giáo viên IELTS vui tính. Hãy giới thiệu 3 điều thú vị nhất về chủ đề "{data['title']}" dựa trên nội dung bài đọc.
+                            Bạn là một giáo viên IELTS. Hãy giới thiệu 3 điều thú vị nhất về chủ đề "{data['title']}" dựa trên nội dung bài đọc.
                             
                             YÊU CẦU:
-                            1. **Văn phong:** Đời thường, gây tò mò, không dùng từ ngữ học thuật khô khan.
-                            2. **Hình thức:** Trả về trực tiếp 3 gạch đầu dòng (bullet points) không dùngicon.
+                            1. **Văn phong:** Đời thường, đơn giản hóa, dễ hiểu, gây tò mò.
+                            2. **Hình thức:** Trả về trực tiếp 3 gạch đầu dòng (bullet points) không dùng icon.
                             3. **CẤM:** Không được dùng các câu dẫn nhập như "Dựa trên bài đọc...", "Đây là tóm tắt...", "Chào bạn...". Hãy vào thẳng nội dung kiến thức luôn.
                             
                             Nội dung bài đọc (trích đoạn): {data['text'][:1000]}...
@@ -511,10 +511,10 @@ else:
                             st.session_state['reading_intro_text'] = call_gemini(intro_prompt)
                     
                     if st.session_state.get('reading_intro_text'):
-                        st.markdown(f"**🌟 Kiến thức thú vị:**\n\n{st.session_state['reading_intro_text']}")
+                        st.markdown(f"**Giới thiệu về bài đọc:**\n\n{st.session_state['reading_intro_text']}")
                     
-                    st.markdown("---")
-                    st.write("📊 **Thông tin bài thi:**")
+                    
+                    st.write("**Thông tin bài thi:**")
                     col_info1, col_info2 = st.columns(2)
                     col_info1.write("- **Dạng bài:** Fill in the blanks")
                     col_info2.write("- **Số lượng:** 6 câu hỏi")
