@@ -546,7 +546,7 @@ else:
                     if 'reading_intro_text' not in st.session_state:
                         with st.spinner("AI đang tạo giới thiệu..."):
                             intro_prompt = f"""
-                            Bạn là một giáo viên IELTS. Hãy giới thiệu 3 điều thú vị nhất về chủ đề "{data['title']}" dựa trên nội dung bài đọc, và liên quan gì đến nội dung bài đọc sắp tới.
+                            Bạn là một giáo viên IELTS. Hãy giới thiệu 3 điều thú vị nhất về chủ đề "{data['title']}" dựa trên nội dung bài đọc, và khuyến khích học viên làm bài đọc để hiểu thêm.
                             
                             YÊU CẦU:
                             1. **Văn phong:** Đời thường, đơn giản hóa, dễ hiểu, không dùng thuật ngữ phức tạp, không dùng từ trong dấu ngoặc kép.
@@ -565,7 +565,7 @@ else:
                     col_info1, col_info2 = st.columns(2)
                     col_info1.write("- **Dạng bài:** Fill in the blanks")
                     col_info2.write("- **Số lượng:** 6 câu hỏi")
-                    
+                    st.markdown("---")
                     c1, c2 = st.columns(2)
                     if c1.button("🟢 Luyện Tập (Không giới hạn thời gian)"):
                         st.session_state['reading_session']['status'] = 'doing'; st.session_state['reading_session']['mode'] = 'practice'; st.rerun()
