@@ -436,145 +436,231 @@ else:
             data_w = WRITING_CONTENT["Lesson 3: Education & Society"]
             st.info(f"### TOPIC: {data_w['question']}")
             
-            # --- GIAI ĐOẠN 1: OUTLINE CHECK ---
-            if st.session_state['writing_step'] == 'outline':
-                st.subheader("BƯỚC 1: Lập Dàn Ý (Outline Logic Check)")
-                st.markdown("Hệ thống sẽ kiểm tra **Logic, Mạch lạc** và **Task Response**.")
-                
-                with st.form("outline_form"):
-                    intro = st.text_area("Introduction:", height=80, placeholder="Paraphrase topic + Thesis statement")
-                    body1 = st.text_area("Body 1 (PEER / What-Why-How):", height=150, placeholder="Main Idea 1...")
-                    body2 = st.text_area("Body 2 (PEER / What-Why-How):", height=150, placeholder="Main Idea 2...")
-                    conc = st.text_area("Conclusion:", height=80, placeholder="Restate opinion + Summary")
+# --- PHẦN 1: CHECKLIST & OUTLINE ---
+            
+            # Cập nhật nội dung Expander với kiến thức đầy đủ & chi tiết
+            with st.expander("📚 CẨM NANG: CÁC LỖI TƯ DUY & CẤU TRÚC LOGIC (Đọc kỹ trước khi viết)", expanded=False):
+                st.markdown("""
+                <style>
+                    .checklist-box { background-color: #f8f9fa; padding: 20px; border-radius: 10px; border: 1px solid #e9ecef; }
+                    .error-title { color: #d9534f; font-weight: bold; font-size: 1.1em; }
+                    .correct-title { color: #28a745; font-weight: bold; }
+                    .concept-box { margin-bottom: 15px; padding-left: 15px; border-left: 4px solid #d9534f; }
+                    .structure-box { margin-bottom: 15px; padding-left: 15px; border-left: 4px solid #007bff; }
+                    .example-wrong { color: #d9534f; font-style: italic; }
+                    .example-right { color: #28a745; font-weight: 500; }
+                </style>
+
+                <div class='checklist-box'>
                     
-                    if st.form_submit_button("🔍 Kiểm Tra Outline"):
-                        if intro and body1 and body2 and conc:
-                            with st.spinner("Đang kiểm tra logic"):
-                                prompt = f"""
-                                Role: Strict IELTS Writing Logic Coach.
-                                Task: Evaluate this Task 2 Outline. Output in Vietnamese .
-                                Topic: {data_w['question']}
-                                Input: Intro: {intro} | B1: {body1} | B2: {body2} | Conc: {conc}
-                                
-                                CHECKLIST (Common Errors):
-                                1. Logical Fallacies (False Cause, Overgeneralization, Slippery Slope, Either/Or, Equivocation).
-                                2. Coherence (Unclear arguments, Listing ideas without explanation, Topic Sentence mismatch).
-                                3. Task Response (Partial address, Irrelevant ideas).
-                                4. Structure: Check for PEER (Point-Explanation-Example-Result) or What-Why-How flow.
-                                
-                                OUTPUT FORMAT (Vietnamese JSON):
-                                {{
-                                    "score": [Integer 0-10],
-                                    "feedback": "[Specific feedback on logic & structure. Be sharp & direct.]",
-                                    "collocations": "[List 5-7 academic collocations relevant to this specific outline to help writing]"
-                                }}
-                                """
-                                res = call_gemini(prompt, expect_json=True)
-                                if res:
-                                    try:
-                                        eval_data = json.loads(res)
-                                        st.session_state['writing_outline_score'] = eval_data['score']
-                                        st.session_state['writing_feedback'] = eval_data['feedback']
-                                        st.session_state['writing_collocations'] = eval_data['collocations']
-                                        
-                                        if eval_data['score'] >= 5:
-                                            st.success(f"✅ Outline Đạt: {eval_data['score']}/10")
-                                            st.session_state['writing_step'] = 'writing'
-                                            st.rerun()
-                                        else:
-                                            st.error(f"⛔ Outline Chưa Đạt: {eval_data['score']}/10")
-                                            st.markdown(eval_data['feedback'])
-                                            st.warning("Hãy sửa lại Outline để đảm bảo logic trước khi viết bài!")
-                                    except: st.error("Lỗi AI. Vui lòng thử lại.")
-                        else: st.warning("Vui lòng điền đủ 4 phần.")
+                    <h4>1. CÁC LỖI TƯ DUY LOGIC CẦN TRÁNH (LOGICAL FALLACIES)</h4>
+                    <p><i>Các lỗi phổ biến do ảnh hưởng của tư duy dịch hoặc văn hóa giao tiếp hàng ngày:</i></p>
 
-            # --- GIAI ĐOẠN 2: VIẾT BÀI ---
-            elif st.session_state['writing_step'] == 'writing':
-                st.subheader("BƯỚC 2: Viết Bài (Essay Writing)")
-                
-                with st.expander("Gợi ý từ vựng (Từ Outline)", expanded=True):
-                    st.info(st.session_state.get('writing_collocations', ''))
-                
-                # Timer JS
-                timer_html = f"""
-                <div style="font-size: 20px; font-weight: bold; color: #d35400;">
-                    ⏳ Thời gian: <span id="timer_w">40:00</span>
+                    <div class='concept-box'>
+                        <span class='error-title'>⚠️ Hasty Generalization (Khái quát hóa vội vã)</span><br>
+                        <b>Bản chất:</b> Dùng từ tuyệt đối (<i>All, Always, Everyone, Nobody</i>) dựa trên quan sát hẹp/định kiến.<br>
+                        <span class='example-wrong'>❌ Sai: "Graduates always find it hard to get a job." (Sinh viên luôn khó tìm việc).</span><br>
+                        <b>Khắc phục (Hedging):</b> Dùng ngôn ngữ rào đón (giảm nhẹ).<br>
+                        <span class='example-right'>✅ Sửa: "It can be challenging for <u>many</u> fresh graduates to secure employment."</span>
+                    </div>
+
+                    <div class='concept-box'>
+                        <span class='error-title'>⚠️ Slippery Slope (Trượt dốc phi logic)</span><br>
+                        <b>Bản chất:</b> Suy diễn hậu quả cực đoan từ nguyên nhân ban đầu mà thiếu mắt xích trung gian (Drama hóa).<br>
+                        <span class='example-wrong'>❌ Sai: "Playing video games -> Drop out of school -> Become a criminal."</span><br>
+                        <b>Khắc phục:</b> Chỉ đề cập hệ quả trực tiếp & khả thi.<br>
+                        <span class='example-right'>✅ Sửa: "Excessive gaming may <u>negatively impact academic performance</u> due to a lack of focus."</span>
+                    </div>
+
+                    <div class='concept-box'>
+                        <span class='error-title'>⚠️ Circular Reasoning (Lập luận luẩn quẩn)</span><br>
+                        <b>Bản chất:</b> Giải thích vấn đề bằng cách lặp lại nó với từ khác (A xấu vì A có hại).<br>
+                        <span class='example-wrong'>❌ Sai: "Air pollution is harmful because it has bad effects." (Harmful = Bad effects).</span><br>
+                        <b>Khắc phục:</b> Giải thích cơ chế (Tại sao/Như thế nào?).<br>
+                        <span class='example-right'>✅ Sửa: "Air pollution is detrimental as it <u>directly contributes to respiratory diseases</u> such as asthma."</span>
+                    </div>
+
+                    <hr>
+
+                    <h4>2. TIÊU CHUẨN CẤU TRÚC ĐOẠN VĂN (MÔ HÌNH P.E.E.R)</h4>
+                    <div class='structure-box' style='border-left-color: #17a2b8;'>
+                        <ul>
+                            <li><b>P - Point (Topic Sentence):</b> Nêu luận điểm chính trực tiếp, ngắn gọn. Tránh mở bài vòng vo.</li>
+                            <li><b>E - Explanation (Elaboration):</b> Giải thích TẠI SAO đúng? (Phần quan trọng nhất thể hiện Critical Thinking).</li>
+                            <li><b>E - Example (Evidence):</b> Ví dụ cụ thể, điển hình (Không lấy ví dụ cá nhân kiểu "em trai tôi").</li>
+                            <li><b>R - Result/Link:</b> Câu chốt, khẳng định lại ý nghĩa đối với đề bài.</li>
+                        </ul>
+                    </div>
+
+                    <hr>
+
+                    <h4>3. TÍNH MẠCH LẠC & PHÁT TRIỂN Ý</h4>
+                    <div class='structure-box'>
+                        <b>Depth over Breadth (Chiều sâu > Chiều rộng):</b><br>
+                        Tránh liệt kê (Firstly, Secondly, Thirdly...) mà viết sơ sài. Chỉ chọn 1-2 ý đắt giá và phân tích sâu theo P.E.E.R.<br><br>
+                        <b>Linear Thinking (Tư duy tuyến tính):</b><br>
+                        Dòng chảy thông tin phải đi thẳng: <b>A → B → C</b>. Tránh nhảy cóc từ A sang D hoặc viết đường vòng.
+                    </div>
+
                 </div>
-                <script>
-                var time = {data_w['time']} * 60;
-                setInterval(function() {{
-                    var m = Math.floor(time / 60);
-                    var s = time % 60;
-                    document.getElementById("timer_w").innerHTML = m + ":" + (s < 10 ? "0" : "") + s;
-                    time--;
-                }}, 1000);
-                </script>
-                """
-                components.html(timer_html, height=50)
-                
-                essay = st.text_area("Bài làm (Min 250 words):", height=400)
-                
-                if st.button("📤 Nộp Bài"):
-                    if len(essay.split()) < 200:
-                        st.warning("Bài viết còn ngắn. Hãy cố gắng viết đủ 250 từ.")
-                    else:
-                        with st.spinner("Đang chấm điểm theo Band Descriptors (4-9)..."):
-                            prompt = f"""
-                            Role: Professional IELTS Examiner (Friendly but Strict on Rubric) Output in Vietnamese.
-                            Task: Grade & Correct Essay. Topic: {data_w['question']}. Essay: {essay}
-                            
-                            **CRITICAL INSTRUCTION:**
-                            - DO NOT provide general feedback (e.g., "Grammar is weak").
-                            - YOU MUST QUOTE the exact mistake and REWRITE it.
-                            - Structure feedback exactly as below.
-                            
-                            RUBRIC (Strict Adherence):
-                            - **Band 4 (Limited):** Ideas irrelevant/repetitive. No clear progression. Vocab basic/repetitive. Grammar limited/frequent errors.
-                            - **Band 5 (Modest):** Addresses task but limited detail. Mechanical cohesion. Simple vocab accurate but limited range. Frequent grammar errors.
-                            - **Band 6 (Competent):** Relevant overview. Coherent but mechanical cohesive devices. Vocab adequate but some inaccuracy. Mix of simple/complex sentences.
-                            - **Band 7 (Good):** Clear position throughout. Logically organised. Flexible vocab/collocations. Frequent error-free sentences.
-                            - **Band 8 (Very Good):** Sufficiently developed ideas. Skilful paragraphing. Precise vocab (uncommon items). Flexible/accurate grammar.
-                            - **Band 9 (Expert):** Fully satisfied. Effortless cohesion. Sophisticated lexical control. Grammatically accurate.
-                            
-                            CONSTRAINT: Component scores (TR, CC, LR, GRA) MUST be INTEGERS (e.g. 6, 7, 8). Overall can be .5.
-                            
-                            OUTPUT JSON:
-                            {{
-                                "TR": [int], "CC": [int], "LR": [int], "GRA": [int],
-                                "Overall": [float],
-                                "Feedback": "[Detailed critique in VIETNAMESE. Start with Strengths, then Weaknesses. Suggest specific improvements.]"
-                            }}
-                            """
-                            res = call_gemini(prompt, expect_json=True)
-                            if res:
-                                try:
-                                    grade = json.loads(res)
-                                    st.session_state['writing_result'] = grade
-                                    st.session_state['writing_step'] = 'finished'
-                                    
-                                    crit = json.dumps({"TR": grade['TR'], "CC": grade['CC'], "LR": grade['LR'], "GRA": grade['GRA']})
-                                    save_writing_log(user['name'], user['class'], lesson_w, "Education", grade['Overall'], crit, grade['Feedback'])
-                                    st.rerun()
-                                except: st.error("Lỗi chấm bài.")
+                """, unsafe_allow_html=True)
 
-            # --- GIAI ĐOẠN 3: KẾT QUẢ ---
-            elif st.session_state['writing_step'] == 'finished':
-                res = st.session_state['writing_result']
-                st.balloons()
-                st.success(f"🏆 OVERALL BAND: {res['Overall']}")
-                c1, c2, c3, c4 = st.columns(4)
-                c1.metric("Task Response", res['TR'])
-                c2.metric("Coherence", res['CC'])
-                c3.metric("Lexical", res['LR'])
-                c4.metric("Grammar", res['GRA'])
+            st.subheader("📝 BƯỚC 1: Lập Dàn Ý (Outline Logic Check)")
+        
+            
+            with st.form("outline_form"):
+                intro = st.text_area("Introduction:", height=80, placeholder="Paraphrase topic + Thesis statement (Quan điểm của bạn)")
+                body1 = st.text_area("Body 1 (PEER Structure):", height=150, placeholder="Point (Luận điểm 1) --> Explanation (Tại sao?) --> Example --> Result")
+                body2 = st.text_area("Body 2 (PEER Structure):", height=150, placeholder="Point (Luận điểm 2) --> Explanation (Tại sao?) --> Example --> Result")
+                conc = st.text_area("Conclusion:", height=80, placeholder="Restate opinion + Summary (Tóm tắt)")
                 
+                check_outline = st.form_submit_button("🔍 Kiểm Tra Logic Outline")
+            
+            # Xử lý Check Outline
+            if check_outline:
+                if intro and body1 and body2 and conc:
+                    with st.spinner("Đang phân tích..."):
+                        
+                        # Prompt giữ nguyên sự nghiêm khắc để khớp với checklist
+                        prompt = f"""
+                        ## ROLE:
+                        You are a strict, high-level IELTS Writing Examiner and Logic Instructor. Your goal is to critique student outlines with a focus on **Critical Thinking** and **Academic Rigor**.
+
+                        ## INPUT DATA:
+                        - **Topic:** {data_w['question']}
+                        - **Intro:** {intro}
+                        - **Body 1:** {body1}
+                        - **Body 2:** {body2}
+                        - **Conclusion:** {conc}
+
+                        ## EVALUATION CRITERIA (MATCHING THE STUDENT CHECKLIST):
+                        Evaluate based on these specific academic standards:
+
+                        1.  **LOGICAL FALLACIES (LỖI TƯ DUY):**
+                            -   *Hasty Generalization:* Using absolute terms (All, Always) vs Hedging.
+                            -   *Slippery Slope:* Extreme consequences without intermediate steps.
+                            -   *Circular Reasoning:* Explaining X by repeating X.
+                            -   *Non-Linear Thinking:* Jumping ideas (A->D).
+
+                        2.  **STRUCTURE (PEER MODEL):**
+                            -   *P-E-E-R:* Point -> Explanation (Why/How) -> Example -> Result.
+                            -   *Depth over Breadth:* Is the explanation deep enough or just listing ideas?
+
+                        ## REQUIREMENTS:
+                        1.  **NO SCORE:** Qualitative feedback only.
+                        2.  **LANGUAGE:** Vietnamese (Tiếng Việt).
+                        3.  **TONE:** Constructive but SHARP.
+                        4.  **OUTPUT FORMAT (Markdown):**
+                            
+                            ### 1. NHẬN XÉT TỔNG QUAN
+                            (Summary of logical flow).
+
+                            ### 2. PHÂN TÍCH CHI TIẾT LỖI
+                            (Analyze strict logic. If error found, use format):
+                            
+                            **[Vị trí: Mở bài / Thân bài...]**
+                            -   **Lỗi (Error Name):** [e.g., Circular Reasoning]
+                            -   **Tại sao sai:** [Explain specifically]
+                            -   **Cách sửa:** [Suggest academic fix]
+
+                            ### 3. GỢI Ý NÂNG CẤP
+                            (Vocab or flow adjustments).
+                        """
+                        
+                        res = call_gemini(prompt)
+                        
+                        if res:
+                            st.session_state['writing_feedback_data'] = res
+                            st.rerun()
+                else:
+                    st.warning("⚠️ Vui lòng điền đầy đủ cả 4 phần.")
+
+            # Hiển thị Feedback
+            if st.session_state.get('writing_feedback_data'):
+                st.divider()
+                st.markdown("### 💡 KẾT QUẢ PHÂN TÍCH DÀN Ý")
                 with st.container(border=True):
-                    st.markdown("### 📝 Nhận xét chi tiết")
-                    st.markdown(res['Feedback'])
-                
-                if st.button("Viết lại (Resubmit)"):
-                    st.session_state['writing_step'] = 'outline'
-                    st.rerun()
+                    st.markdown(st.session_state['writing_feedback_data'])
+
+            # --- PHẦN 2: VIẾT BÀI (LUÔN HIỂN THỊ) ---
+            st.subheader("📝 BƯỚC 2: Viết Bài (Essay Writing)")
+            st.caption("Hãy nhìn Dàn ý và Nhận xét ở trên để viết bài hoàn chỉnh.")
+            
+            # Timer JS
+            timer_html = f"""<div style="font-size:20px; font-weight:bold; color:#d35400;">⏳ <span id="timer_w">40:00</span></div><script>var time={data_w['time']*60};setInterval(function(){{var m=Math.floor(time/60),s=time%60;document.getElementById("timer_w").innerHTML=m+":"+(s<10?"0":"")+s;time--;}},1000);</script>"""
+            components.html(timer_html, height=40)
+            
+            essay = st.text_area("Bài làm (Min 250 words):", height=400, key="essay_input")
+            
+            if st.button("📤 Nộp Bài Chấm Điểm"):
+                if len(essay.split()) < 50: st.warning("Bài viết quá ngắn.")
+                else:
+                    with st.spinner("Đang chấm điểm theo Band Descriptors (4-9)..."):
+                        prompt = f"""
+                        ## ROLE:
+                        You are a strict, Senior IELTS Writing Examiner (IDP/BC certified).
+                        
+                        ## TASK:
+                        Assess the following Task 2 Essay based on the official IELTS Writing Band Descriptors.
+                        
+                        **INPUT DATA:**
+                        - **Topic:** {data_w['question']}
+                        - **Student Essay:** {essay}
+
+                        ## 🛡️ GRADING RUBRIC (STRICT DIFFERENTIATORS):
+                        You must evaluate based on these specific distinctions between bands:
+
+                        **1. Task Response (TR):**
+                        - **Band 4:** Response is irrelevant or minimal; main ideas are difficult to identify or repetitive.
+                        - **Band 5:** Addresses the task but usually only partially; ideas are limited/undeveloped; no clear conclusions.
+                        - **Band 6:** Addresses all parts; main ideas are relevant but may be insufficiently developed or unclear.
+                        - **Band 7:** Addresses all parts; presents a clear position throughout; extends and supports main ideas.
+                        - **Band 8+:** Sufficiently addresses all parts; well-developed response with relevant, extended, and supported ideas.
+
+                        **2. Coherence & Cohesion (CC):**
+                        - **Band 4:** No clear progression; basic or repetitive cohesive devices.
+                        - **Band 5:** Some organization but lacks overall progression; cohesive devices are inadequate, inaccurate, or overused.
+                        - **Band 6:** Arranges information coherently; uses cohesive devices effectively but they may sound **mechanical/faulty**.
+                        - **Band 7:** Logically organizes information; uses a range of cohesive devices appropriately (**natural flow**).
+                        - **Band 8+:** Sequences information and ideas logically; manages all aspects of cohesion well.
+
+                        **3. Lexical Resource (LR):**
+                        - **Band 4:** Basic vocabulary; used repetitively; inappropriate choices.
+                        - **Band 5:** Limited range; minimally adequate for the task; noticeable errors in spelling/formation that **may cause difficulty for the reader**.
+                        - **Band 6:** Adequate range; attempts less common items but with some inaccuracy; errors do not impede communication.
+                        - **Band 7:** Sufficient range to allow flexibility; uses **less common lexical items** with awareness of style/collocation.
+                        - **Band 8+:** Wide range; fluent and flexible; skilful use of uncommon items.
+
+                        **4. Grammatical Range & Accuracy (GRA) - *CRITICAL*:**
+                        - **Band 4:** Very limited range of structures; rare use of subordinate clauses; errors are frequent and cause strain.
+                        - **Band 5:** Attempts complex sentences but these tend to be faulty; grammatical errors are frequent and **may cause some difficulty for the reader**.
+                        - **Band 6:** Mix of simple and complex forms; errors occur but **rarely impede communication**.
+                        - **Band 7:** Uses a variety of complex structures; produces **frequent error-free sentences**.
+                        - **Band 8+:** Wide range of structures; the majority of sentences are error-free.
+
+                        ## 📝 OUTPUT REQUIREMENTS:
+                        1.  **SCORING:** Component scores (TR, CC, LR, GRA) must be INTEGERS (e.g., 4, 5, 6). Overall can be .5.
+                        2.  **FEEDBACK FORMAT:** Return a valid JSON object strictly following this structure (Language: Vietnamese):
+
+                        {{
+                            "TR": [int], "CC": [int], "LR": [int], "GRA": [int],
+                            "Overall": [float],
+                            "Feedback": "### 🎯 KẾT QUẢ: Band [Overall]\\n\\n### 📊 CHI TIẾT ĐIỂM SỐ:\\n- **Task Response ([TR]):** [Brief explanation why based on rubric]\\n- **Coherence ([CC]):** [Brief explanation]\\n- **Lexical ([LR]):** [Brief explanation]\\n- **Grammar ([GRA]):** [Brief explanation]\\n\\n### 🛠️ SỬA LỖI CHI TIẾT (QUAN TRỌNG):\\n\\n**1. Cải thiện Từ vựng & Ngữ pháp:**\\n* ❌ **Lỗi:** [Quote exact mistake]\\n* ✅ **Sửa:** [Rewrite accurately]\\n* 💡 **Giải thích:** [Explain the error type]\\n\\n**2. Cải thiện Mạch lạc & Logic:**\\n* ❌ **Vấn đề:** [Point out logic gap or mechanical linking]\\n* 💡 **Gợi ý:** [Suggestion for better flow]\\n\\n### 💬 LỜI KHUYÊN CỦA GIÁM KHẢO:\\n[Constructive advice for next steps]"
+                        }}
+                        """
+                        res = call_gemini(prompt, expect_json=True)
+                        if res:
+                            try:
+                                grade = json.loads(res)
+                                crit = json.dumps({"TR": grade['TR'], "CC": grade['CC'], "LR": grade['LR'], "GRA": grade['GRA']})
+                                save_writing_log(user['name'], user['class'], lesson_w, "Education", grade['Overall'], crit, grade['Feedback'])
+                                
+                                st.balloons()
+                                st.success(f"🏆 OVERALL BAND: {grade['Overall']}")
+                                c1, c2, c3, c4 = st.columns(4)
+                                c1.metric("TR", grade['TR']); c2.metric("CC", grade['CC']); c3.metric("LR", grade['LR']); c4.metric("GRA", grade['GRA'])
+                                with st.container(border=True): st.markdown(grade['Feedback'])
+                            except: st.error("Lỗi chấm bài.")
         else: st.warning("Bài này chưa mở.")
     
     # --- MODULE 1: SPEAKING (ĐÃ GIỚI HẠN 5 LẦN & FORMAT MỚI) ---
