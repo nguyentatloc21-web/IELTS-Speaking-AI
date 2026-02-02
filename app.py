@@ -258,69 +258,96 @@ WRITING_MENU = ["Lesson 3: Education & Society"]
 # ================= 2. HỆ THỐNG & API =================
 st.set_page_config(page_title="Mr. Tat Loc IELTS Portal", page_icon="🎓", layout="wide")
 
-    st.markdown("""
-        <style>
-        .main {background-color: #ffffff; font-family: 'Segoe UI', sans-serif;}
-        h1 {color: #003366; font-size: 26px; font-weight: 700;}
-        h2 {color: #004080; font-size: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 25px;}
-        .stButton button {background-color: #004080; color: white; border-radius: 6px; font-weight: 600; padding: 0.5rem 1rem;}
-        .stButton button:hover {background-color: #002244;}
+st.markdown("""
+    <style>
+    /* =============================================
+       1. GLOBAL STYLES (Kế thừa từ bộ Visual Hierarchy)
+       ============================================= */
+    html, body, [class*="css"] {
+        font-family: 'Segoe UI', Roboto, sans-serif;
+        color: #333333;
+    }
+
+    h1 { color: #003366; font-size: 32px !important; font-weight: 800; margin-bottom: 20px; }
+    h2 { color: #004080; font-size: 24px !important; font-weight: 700; border-bottom: 2px solid #e0e0e0; padding-bottom: 8px; margin-top: 30px; }
+    h3 { color: #0059b3; font-size: 20px !important; font-weight: 600; margin-top: 20px; }
     
-    /* SCROLL CONTAINER (Khung cuộn độc lập) */
+    /* Button chuẩn */
+    .stButton button {
+        background-color: #004080; color: white; border-radius: 8px; font-weight: 600; 
+        padding: 0.6rem 1.2rem; border: none; transition: all 0.3s ease;
+    }
+    .stButton button:hover { background-color: #002244; transform: translateY(-2px); }
+
+    /* =============================================
+       2. READING & EXAM MODE STYLES (Phần bạn mới thêm)
+       ============================================= */
+    
+    /* Khung cuộn bài đọc */
     .scroll-container {
         height: 600px;
         overflow-y: auto;
-        padding: 20px;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        background-color: #fcfcfc;
+        padding: 25px; /* Tăng padding chút cho thoáng */
+        border: 1px solid #d1d9e6; /* Viền xanh xám nhẹ hợp tông hơn */
+        border-radius: 12px; /* Bo tròn mềm mại hơn */
+        background-color: #f8f9fa; /* Màu nền xám trắng hiện đại */
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); /* Hiệu ứng chìm nhẹ */
     }
     
-    /* READING TEXT AREA */
+    /* Nội dung bài đọc */
     .reading-text {
-        font-size: 16px; /* Tăng nhẹ size bài đọc cho dễ nhìn */
-        line-height: 1.8;
-        color: #2c3e50;
+        font-size: 17px; /* Tăng lên 17px chuẩn sách giáo khoa */
+        line-height: 1.8; /* Dãn dòng rộng để mắt không mỏi */
+        color: #2c3e50; /* Màu chữ xanh đen đậm, dịu mắt hơn đen tuyền */
         text-align: justify;
-        padding-right: 10px;
+        padding-right: 15px;
     }
     
-    /* CÂU HỎI - ĐÃ TĂNG SIZE TO HƠN */
+    /* Câu hỏi */
     .question-text {
-        font-size: 16px; /* Tăng size chữ câu hỏi lên 20px */
-        font-weight: 600;
-        color: #000000; /* Màu đen đậm cho dễ đọc */
-        margin-bottom: 8px;
+        font-size: 18px; /* Set 18px để phân biệt rõ với văn bản thường */
+        font-weight: 700;
+        color: #003366; /* Dùng màu thương hiệu cho câu hỏi */
+        margin-bottom: 12px;
+        margin-top: 15px;
         line-height: 1.5;
     }
     
-    /* HIGHLIGHT STYLE (Vàng đậm) */
+    /* Highlight (Vàng) */
     .highlighted {
-        background-color: #ffff00;
+        background-color: #fffacd; /* Vàng kem (LemonChiffon) dịu hơn vàng gắt */
+        border-bottom: 2px solid #ffd700;
         color: #000;
-        font-weight: 500;
         cursor: pointer;
+        padding: 2px 0;
     }
     
+    /* Hộp giải thích */
     .explanation-box {
-        background-color: #e8f4fd; 
-        padding: 15px; 
+        background-color: #eef6fc; /* Xanh rất nhạt */
+        padding: 20px; 
         border-radius: 8px;
-        border-left: 5px solid #004080; 
-        margin-top: 10px; 
-        font-size: 0.95rem;
+        border-left: 5px solid #004080; /* Đường kẻ trái màu xanh đậm chủ đạo */
+        margin-top: 15px; 
+        font-size: 16px;
         color: #2c3e50;
     }
-    .correct-ans {color: #27ae60; font-weight: bold;}
-    .wrong-ans {color: #c0392b; font-weight: bold;}
+
+    /* Trạng thái đúng/sai */
+    .correct-ans { color: #27ae60; font-weight: bold; background-color: #e8f8f5; padding: 2px 6px; border-radius: 4px; }
+    .wrong-ans { color: #c0392b; font-weight: bold; background-color: #fdedec; padding: 2px 6px; border-radius: 4px; }
+    
+    /* Tùy chỉnh thanh cuộn cho đẹp (Webkit) */
+    .scroll-container::-webkit-scrollbar { width: 8px; }
+    .scroll-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+    .scroll-container::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
+    .scroll-container::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
     </style>
     
-    <!-- SCRIPT ĐỂ HIGHLIGHT KHI BÔI ĐEN -->
     <script>
     document.addEventListener('mouseup', function() {
         var selection = window.getSelection();
         var selectedText = selection.toString();
-        
         if (selectedText.length > 0) {
             var range = selection.getRangeAt(0);
             var span = document.createElement("span");
@@ -333,13 +360,11 @@ st.set_page_config(page_title="Mr. Tat Loc IELTS Portal", page_icon="🎓", layo
             try {
                 range.surroundContents(span);
                 selection.removeAllRanges();
-            } catch (e) {
-                console.log("Không thể highlight qua nhiều block");
-            }
+            } catch (e) { console.log("Lỗi highlight"); }
         }
     });
     </script>
-""", unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
 try:
     API_KEY = st.secrets["GOOGLE_API_KEY"]
