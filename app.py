@@ -248,7 +248,8 @@ WRITING_CONTENT = {
 * Discuss both these views and give your own opinion.
 * Give reasons for your answer and include any relevant examples from your own knowledge or experience.
 
-_Write at least 250 words._
+---
+*Write at least 250 words.*
 """
     }
 }
@@ -445,48 +446,52 @@ else:
             
             # --- PHẦN 1: CHECKLIST & OUTLINE ---
             
-            # Cập nhật nội dung Expander bằng Markdown thuần
-            with st.expander("CÁC LỖI TƯ DUY & CẤU TRÚC LOGIC (Đọc kỹ trước khi viết)", expanded=False):
+            # Cập nhật nội dung Expander bằng Markdown thuần (Full nội dung, ít icon)
+            with st.expander("📚 CÁC LỖI TƯ DUY & CẤU TRÚC LOGIC (Đọc kỹ trước khi viết)", expanded=False):
                 st.markdown("""
-                ### 1. CÁC LỖI TƯ DUY LOGIC CẦN TRÁNH
-                *Đây là các lỗi "kinh điển" của người Việt, cần loại bỏ ngay để đạt điểm cao:*
+                ### 1. CÁC LỖI TƯ DUY LOGIC CẦN TRÁNH 
+                Đây là các lỗi lập luận phổ biến do ảnh hưởng của tư duy dịch từ tiếng Việt hoặc văn hóa giao tiếp hàng ngày, cần loại bỏ trong văn viết học thuật:
 
                 **⚠️ Hasty Generalization (Khái quát hóa vội vã)**
-                * **Bản chất:** Dùng từ tuyệt đối (*All, Always, Nobody*) dựa trên quan sát hẹp.
-                * ❌ **Sai:** "Graduates **always** find it hard to get a job." *(Sinh viên luôn thất nghiệp -> Sai)*
-                * ✅ **Sửa (Hedging):** "It can be challenging for **many** fresh graduates to secure employment."
+                * **Bản chất:** Sử dụng các từ chỉ sự tuyệt đối (*All, Always, Everyone, Nobody*) dựa trên định kiến hoặc quan sát hẹp, thiếu tính khách quan.
+                * **Ví dụ sai:** "Graduates **always** find it hard to get a job." (Sinh viên tốt nghiệp luôn khó tìm việc -> Sai sự thật).
+                * **Khắc phục (Hedging):** Sử dụng ngôn ngữ rào đón để đảm bảo tính chính xác.
+                * **Sửa:** "It can be challenging for **many** fresh graduates to secure employment."
 
                 **⚠️ Slippery Slope (Trượt dốc phi logic)**
-                * **Bản chất:** Suy diễn hậu quả cực đoan, "drama hóa" vấn đề mà thiếu căn cứ.
-                * ❌ **Sai:** "Playing video games → Drop out → Criminal." *(Chơi game là thành tội phạm ngay).*
-                * ✅ **Sửa:** "Excessive gaming may **negatively impact academic performance** due to a lack of focus."
+                * **Bản chất:** Suy diễn một chuỗi hậu quả cực đoan từ một nguyên nhân ban đầu mà thiếu các mắt xích logic trung gian. Lỗi này thường gặp khi người viết muốn nhấn mạnh hậu quả nhưng lại cường điệu hóa quá mức.
+                * **Ví dụ sai:** "Playing video games leads to dropping out of school, which results in becoming a criminal." (Chơi game -> Bỏ học -> Tội phạm).
+                * **Khắc phục:** Chỉ đề cập đến hệ quả trực tiếp và có tính khả thi cao nhất.
+                * **Sửa:** "Excessive gaming may **negatively impact academic performance** due to a lack of focus."
 
                 **⚠️ Circular Reasoning (Lập luận luẩn quẩn)**
-                * **Bản chất:** Giải thích vấn đề bằng cách lặp lại chính nó (A xấu vì A có hại).
-                * ❌ **Sai:** "Air pollution is harmful because it has bad effects." *(Harmful = Bad effects).*
-                * ✅ **Sửa (Cơ chế):** "Air pollution is detrimental as it **directly contributes to respiratory diseases** such as asthma."
+                * **Bản chất:** Giải thích một vấn đề bằng cách lặp lại vấn đề đó với từ ngữ khác, không cung cấp thêm thông tin hay lý do sâu sắc (Why/How).
+                * **Ví dụ sai:** "Air pollution is harmful because it has bad effects on humans." (*Harmful* và *Bad effects* là tương đương -> Không giải thích được gì).
+                * **Khắc phục:** Triển khai ý bằng nguyên nhân cụ thể hoặc cơ chế tác động.
+                * **Sửa:** "Air pollution is detrimental as it **directly contributes to respiratory diseases** such as asthma."
 
                 ---
 
-                ### 2. CẤU TRÚC ĐOẠN VĂN (MÔ HÌNH P.E.E.R)
-                *Mỗi đoạn thân bài cần tuân thủ thứ tự sau để đảm bảo logic:*
-
-                * **P - Point (Topic Sentence):** Câu chủ đề nêu luận điểm chính trực tiếp, ngắn gọn.
-                * **E - Explanation (Why/How):** Giải thích **TẠI SAO** đúng? (Phần quan trọng nhất).
-                * **E - Example (Evidence):** Ví dụ cụ thể, điển hình (Tránh lấy ví dụ cá nhân như "em trai tôi").
-                * **R - Result/Link:** Câu chốt, khẳng định lại ý nghĩa đối với đề bài.
-
-                ---
-
-                ### 3. TÍNH MẠCH LẠC & PHÁT TRIỂN Ý
+                ### 2. TIÊU CHUẨN CẤU TRÚC ĐOẠN VĂN (MÔ HÌNH P.E.E.R)
+                Mỗi đoạn văn (Body Paragraph) cần tuân thủ cấu trúc chặt chẽ để đảm bảo tính mạch lạc:
                 
-                **Chiều sâu > Chiều rộng**
-                * Đừng liệt kê (*Firstly, Secondly, Thirdly...*) mà mỗi ý chỉ viết 1 câu.
-                * **Giải pháp:** Chỉ chọn **1-2 ý đắt giá nhất** và phân tích sâu theo mô hình P.E.E.R.
 
-                **Tư duy tuyến tính**
-                * Dòng chảy thông tin phải đi thẳng: **A → B → C**.
-                * Tránh tư duy "nhảy cóc" từ A sang D hoặc viết đường vòng.
+                * **P - Point (Topic Sentence):** Câu chủ đề nêu luận điểm chính trực tiếp, ngắn gọn. Tránh lối viết "mở bài gián tiếp" vòng vo.
+                * **E - Explanation (Elaboration):** Giải thích lý do tại sao luận điểm đó đúng. Đây là phần quan trọng nhất thể hiện tư duy (Critical Thinking).
+                * **E - Example (Evidence):** Đưa ra ví dụ cụ thể, điển hình (không lấy ví dụ cá nhân chủ quan).
+                * **R - Result/Link:** Câu chốt, khẳng định lại ý nghĩa của luận điểm đối với câu hỏi đề bài.
+
+                ---
+
+                ### 3. TÍNH MẠCH LẠC & PHÁT TRIỂN Ý (COHERENCE & PROGRESSION)
+                
+                **Depth over Breadth (Chiều sâu hơn Chiều rộng):**
+                * **Lỗi thường gặp:** Liệt kê quá nhiều ý ("Firstly, Secondly, Thirdly...") nhưng mỗi ý chỉ viết sơ sài. Điều này khiến bài viết trở thành một bản danh sách (list) hơn là một bài luận (essay).
+                * **Giải pháp:** Trong một đoạn văn, chỉ nên chọn 1 đến 2 ý tưởng đắt giá nhất và phát triển chúng trọn vẹn theo mô hình P.E.E.R.
+
+                **Linear Thinking (Tư duy tuyến tính):**
+                * Đảm bảo dòng chảy thông tin đi theo đường thẳng: **A dẫn đến B, B dẫn đến C**.
+                * Tránh tư duy đường vòng hoặc nhảy cóc (nhắc đến kết quả D mà không giải thích quá trình B và C).
                 """)
 
             st.subheader("📝 BƯỚC 1: Lập Dàn Ý (Outline Logic Check)")
