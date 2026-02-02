@@ -520,10 +520,13 @@ else:
                     else:
                         with st.spinner("Đang chấm điểm theo Band Descriptors (4-9)..."):
                             prompt = f"""
-                            Role: Professional IELTS Examiner, Output in Vietnamese.
-                            Task: Grade Task 2 Essay.
-                            Topic: {data_w['question']}
-                            Essay: {essay}
+                            Role: Professional IELTS Examiner (Friendly but Strict on Rubric) Output in Vietnamese.
+                            Task: Grade & Correct Essay. Topic: {data_w['question']}. Essay: {essay}
+                            
+                            **CRITICAL INSTRUCTION:**
+                            - DO NOT provide general feedback (e.g., "Grammar is weak").
+                            - YOU MUST QUOTE the exact mistake and REWRITE it.
+                            - Structure feedback exactly as below.
                             
                             RUBRIC (Strict Adherence):
                             - **Band 4 (Limited):** Ideas irrelevant/repetitive. No clear progression. Vocab basic/repetitive. Grammar limited/frequent errors.
