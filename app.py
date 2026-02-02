@@ -574,6 +574,7 @@ else:
                         st.session_state['reading_session']['end_time'] = datetime.now() + timedelta(minutes=20); st.rerun()
 
                 # --- TRẠNG THÁI 2: DOING ---
+                # --- TRẠNG THÁI 2: DOING ---
                 elif st.session_state['reading_session']['status'] == 'doing':
                     # Xử lý Timer (Javascript Realtime Countdown)
                     timer_html = ""
@@ -611,14 +612,10 @@ else:
                     else:
                         st.success("🟢 Chế độ Luyện Tập (Thoải mái thời gian)")
 
-                    # GIAO DIỆN 2 CỘT (SPLIT SCREEN)
-                    col_text, col_quiz = st.columns([1, 1], gap="medium")
+                    c_text, c_quiz = st.columns([1, 1], gap="medium")
                     
-                    # BÊN TRÁI: BÀI ĐỌC (Có cuộn riêng & Highlight)
-                    with col_text:
+                    with c_text:
                         st.subheader("📄 Bài Đọc")
-                        
-                        # --- CÔNG CỤ HIGHLIGHT (STABLE VERSION) ---
                         with st.expander("🖍️ Highlight (Nhập từ)", expanded=True):
                             hl = st.text_input("Nhập từ cần tô màu:", key="hl")
                             c_h1, c_h2 = st.columns(2)
@@ -639,7 +636,7 @@ else:
                         st.subheader("📝 Câu Hỏi")
                         with st.container(height=600):
                             st.markdown("**Questions 1-6: Fill in the blanks (NO MORE THAN TWO WORDS)**")
-                            with st.form("exam"):
+                            with st.form("read_exam_form"):
                                 ans = {}
                                 for q in data['questions_fill']:
                                     # --- SỬA Ở ĐÂY: DÙNG CLASS question-text ---
@@ -647,7 +644,6 @@ else:
                                     ans[q['id']] = st.text_input(f"Answer {q['id']}", label_visibility="collapsed")
                                     st.write("")
                                 
-                                # Nút nộp bài (Cho cả 2 chế độ)
                                 if st.form_submit_button("NỘP BÀI"):
                                     st.session_state['reading_session']['status'] = 'result'
                                     st.session_state['reading_session']['user_answers'] = ans
