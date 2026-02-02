@@ -279,11 +279,28 @@ st.markdown("""
     
     /* READING TEXT AREA */
     .reading-text {
-        font-size: 16px;
+        font-size: 18px; /* Tăng nhẹ size bài đọc cho dễ nhìn */
         line-height: 1.8;
         color: #2c3e50;
         text-align: justify;
         padding-right: 10px;
+    }
+    
+    /* CÂU HỎI - ĐÃ TĂNG SIZE TO HƠN */
+    .question-text {
+        font-size: 20px; /* Tăng size chữ câu hỏi lên 20px */
+        font-weight: 600;
+        color: #000000; /* Màu đen đậm cho dễ đọc */
+        margin-bottom: 8px;
+        line-height: 1.5;
+    }
+    
+    /* HIGHLIGHT STYLE (Vàng đậm) */
+    .highlighted {
+        background-color: #ffff00;
+        color: #000;
+        font-weight: 500;
+        cursor: pointer;
     }
     
     .explanation-box {
@@ -298,6 +315,31 @@ st.markdown("""
     .correct-ans {color: #27ae60; font-weight: bold;}
     .wrong-ans {color: #c0392b; font-weight: bold;}
     </style>
+    
+    <!-- SCRIPT ĐỂ HIGHLIGHT KHI BÔI ĐEN -->
+    <script>
+    document.addEventListener('mouseup', function() {
+        var selection = window.getSelection();
+        var selectedText = selection.toString();
+        
+        if (selectedText.length > 0) {
+            var range = selection.getRangeAt(0);
+            var span = document.createElement("span");
+            span.className = "highlighted";
+            span.title = "Click để xóa highlight";
+            span.onclick = function() {
+                var text = document.createTextNode(this.innerText);
+                this.parentNode.replaceChild(text, this);
+            };
+            try {
+                range.surroundContents(span);
+                selection.removeAllRanges();
+            } catch (e) {
+                console.log("Không thể highlight qua nhiều block");
+            }
+        }
+    });
+    </script>
 """, unsafe_allow_html=True)
 
 try:
@@ -430,6 +472,8 @@ else:
                                 prompt = f"""
                                 Role: Senior IELTS Speaking Examiner (Friendly but Strict on Rubric).
                                 Task: Assess speaking response for "{question}".
+                                **CẤM:** Không được dùng các câu dẫn nhập như "Đây là ...". Hãy vào thẳng nội dung luôn.
+                            
                                 
                                 **RUBRIC CHẤM ĐIỂM (BẮT BUỘC TUÂN THỦ):**
                                 - **Band 7-8-9:** Nói trôi chảy, ít ngắt quãng. Sử dụng từ nối, từ vựng phong phú (idioms, collocations) chính xác. Cấu trúc ngữ pháp phức tạp (câu điều kiện, mệnh đề quan hệ) thành thạo. Phát âm chuẩn, có ngữ điệu.
@@ -450,7 +494,7 @@ else:
                                 4. **Pronunciation:** [Nhận xét về âm đuôi, ngữ điệu, trọng âm]
                                 
                                 ### ĐỀ XUẤT CẢI THIỆN:
-                                * **Original:** "[Trích dẫn câu nói của học viên]"
+                                * **Original:** "[Trích dẫn toàn bộ bài nói của học viên]"
                                 * **Better:** "[Phiên bản nâng cấp tự nhiên hơn/Native speaker style]"
                                 * **Giải thích chi tiết:** [Giải thích từng thay đổi nhỏ: tại sao dùng từ này thay từ kia, cấu trúc này hay hơn chỗ nào...]
                                 """
@@ -502,7 +546,7 @@ else:
                     if 'reading_intro_text' not in st.session_state:
                         with st.spinner("AI đang tạo giới thiệu..."):
                             intro_prompt = f"""
-                            Bạn là một giáo viên IELTS. Hãy giới thiệu 3 điều thú vị nhất về chủ đề "{data['title']}" dựa trên nội dung bài đọc.
+                            Bạn là một giáo viên IELTS. Hãy giới thiệu 3 điều thú vị nhất về chủ đề "{data['title']}" dựa trên nội dung bài đọc, và liên quan gì đến nội dung bài đọc sắp tới.
                             
                             YÊU CẦU:
                             1. **Văn phong:** Đời thường, đơn giản hóa, dễ hiểu, không dùng thuật ngữ phức tạp, không dùng từ trong dấu ngoặc kép.
