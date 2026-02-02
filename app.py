@@ -477,7 +477,7 @@ else:
                                         st.session_state['writing_feedback'] = eval_data['feedback']
                                         st.session_state['writing_collocations'] = eval_data['collocations']
                                         
-                                        if eval_data['score'] >= 8:
+                                        if eval_data['score'] >= 5:
                                             st.success(f"✅ Outline Đạt: {eval_data['score']}/10")
                                             st.session_state['writing_step'] = 'writing'
                                             st.rerun()
