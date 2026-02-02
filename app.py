@@ -6,7 +6,8 @@ import re
 import pandas as pd
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-from datetime import datetime
+# QUAN TRỌNG: Phải import timedelta để tính giờ làm bài
+from datetime import datetime, timedelta
 
 # ================= 1. KẾT NỐI GOOGLE SHEETS (DATABASE) =================
 def connect_gsheet():
