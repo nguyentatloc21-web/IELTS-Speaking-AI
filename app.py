@@ -305,9 +305,9 @@ st.markdown("""
     
     /* Câu hỏi */
     .question-text {
-        font-size: 18px; /* Set 18px để phân biệt rõ với văn bản thường */
-        font-weight: 700;
-        color: #003366; /* Dùng màu thương hiệu cho câu hỏi */
+        font-size: 17px; /* Set 17px để phân biệt rõ với văn bản thường */
+        
+        color: #2c3e50; /* Dùng màu thương hiệu cho câu hỏi */
         margin-bottom: 12px;
         margin-top: 15px;
         line-height: 1.5;
@@ -591,18 +591,17 @@ else:
             # Hiển thị Feedback
             if st.session_state.get('writing_feedback_data'):
                 st.divider()
-                st.markdown("### 💡 KẾT QUẢ PHÂN TÍCH DÀN Ý")
+                st.markdown("### KẾT QUẢ PHÂN TÍCH DÀN Ý")
                 with st.container(border=True):
                     st.markdown(st.session_state['writing_feedback_data'])
 
             # --- PHẦN 2: VIẾT BÀI (LUÔN HIỂN THỊ) ---
     # Chọn chế độ làm bài
-            mode_w = st.radio("Chọn chế độ:", ["-- Chọn chế độ --", "🟢 Luyện Tập (Không giới hạn)", "🔴 Thi Thử (40 Phút)"], horizontal=True, key="w_mode_select")
+            mode_w = st.radio("Chọn chế độ:", ["-- Chọn chế độ --", "Luyện Tập (Không giới hạn)", "Thi Thử (40 Phút)"], horizontal=True, key="w_mode_select")
             
             if mode_w != "-- Chọn chế độ --":
                 # Hiển thị khu vực viết bài
-                with st.expander("💡 Xem lại Gợi ý Từ vựng & Outline", expanded=True):
-                     st.info(f"Collocations: {st.session_state.get('writing_collocations', 'Chưa có dữ liệu từ bước 1')}")
+                
 
                 # Đồng hồ (Chỉ hiện khi chọn Thi Thử)
                 if "Thi Thử" in mode_w:
@@ -622,7 +621,7 @@ else:
                     """
                      components.html(timer_html, height=50)
                 else:
-                     st.success("🟢 Chế độ Luyện Tập")
+                     st.success("Chế độ Luyện Tập")
 
                 essay = st.text_area("Bài làm (Min 250 words):", height=400, key="essay_input")
                 
@@ -698,7 +697,7 @@ else:
             if st.session_state.get('writing_step') == 'finished' and st.session_state.get('writing_result'):
                 res = st.session_state['writing_result']
                 st.balloons()
-                st.success(f"🏆 OVERALL BAND: {res['Overall']}")
+                st.success(f"OVERALL BAND: {res['Overall']}")
                 c1, c2, c3, c4 = st.columns(4)
                 c1.metric("Task Response", res['TR'])
                 c2.metric("Coherence", res['CC'])
@@ -846,9 +845,9 @@ else:
                     col_info2.write("- **Số lượng:** 6 câu hỏi")
                     st.markdown("---")
                     c1, c2 = st.columns(2)
-                    if c1.button("🟢 Luyện Tập (Không giới hạn thời gian)"):
+                    if c1.button("Luyện Tập (Không giới hạn thời gian)"):
                         st.session_state['reading_session']['status'] = 'doing'; st.session_state['reading_session']['mode'] = 'practice'; st.rerun()
-                    if c2.button("🔴 Luyện Thi (20 Phút)"):
+                    if c2.button("Luyện Thi (20 Phút)"):
                         st.session_state['reading_session']['status'] = 'doing'; st.session_state['reading_session']['mode'] = 'exam'
                         st.session_state['reading_session']['end_time'] = datetime.now() + timedelta(minutes=20); st.rerun()
 
@@ -894,8 +893,8 @@ else:
                     c_text, c_quiz = st.columns([1, 1], gap="medium")
                     
                     with c_text:
-                        st.subheader("📄 Bài Đọc")
-                        with st.expander("🖍️ Highlight (Nhập từ)", expanded=True):
+                        st.subheader("Bài đọc")
+                        with st.expander("Highlight (Nhập từ)", expanded=True):
                             hl = st.text_input("Nhập từ cần tô màu:", key="hl")
                             c_h1, c_h2 = st.columns(2)
                             if c_h1.button("Tô màu"): st.session_state['reading_highlight'] = hl
@@ -912,7 +911,7 @@ else:
                         st.markdown(f"<div class='scroll-container'><div class='reading-text'>{html_content}</div></div>", unsafe_allow_html=True)
 
                     with c_quiz:
-                        st.subheader("📝 Câu Hỏi")
+                        st.subheader("Câu Hỏi")
                         with st.container(height=600):
                             st.markdown("**Questions 1-6: Fill in the blanks (NO MORE THAN TWO WORDS)**")
                             with st.form("read_exam_form"):
@@ -930,7 +929,7 @@ else:
 
                 # --- TRẠNG THÁI 3: KẾT QUẢ & GIẢI THÍCH ---
                 elif st.session_state['reading_session']['status'] == 'result':
-                    st.subheader("📊 Kết Quả Bài Làm")
+                    st.subheader("Kết Quả Bài Làm")
                     user_answers = st.session_state['reading_session']['user_answers']
                     score = 0
                     
@@ -959,7 +958,7 @@ else:
                             st.markdown(f"<div class='explanation-box'>💡 <b>Giải thích:</b> {q['exp']}</div>", unsafe_allow_html=True)
                             st.write("---")
 
-                        st.success(f"🏆 Tổng điểm: {score}/{len(data['questions_fill'])}")
+                        st.success(f"Tổng điểm: {score}/{len(data['questions_fill'])}")
                         
                         # Lưu điểm
                         save_reading_log(user['name'], user['class'], lesson_choice, score, len(data['questions_fill']), st.session_state['reading_session']['mode'])
