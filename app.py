@@ -265,6 +265,32 @@ st.markdown("""
     h2 {color: #004080; font-size: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 25px;}
     .stButton button {background-color: #004080; color: white; border-radius: 6px; font-weight: 600; padding: 0.5rem 1rem;}
     .stButton button:hover {background-color: #002244;}
+    
+    /* SCROLL CONTAINER (Khung cuộn độc lập) */
+    .scroll-container {
+        height: 600px;
+        overflow-y: auto;
+        padding: 15px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        background-color: #fcfcfc;
+    }
+    
+    /* READING TEXT AREA */
+    .reading-text {
+        font-size: 16px;
+        line-height: 1.8;
+        color: #2c3e50;
+    }
+    
+    /* HIGHLIGHT STYLE (Vàng đậm) */
+    .highlighted {
+        background-color: #ffeb3b;
+        color: #000;
+        font-weight: 500;
+        cursor: pointer;
+    }
+    
     .explanation-box {
         background-color: #e8f4fd; 
         padding: 15px; 
@@ -276,8 +302,32 @@ st.markdown("""
     }
     .correct-ans {color: #27ae60; font-weight: bold;}
     .wrong-ans {color: #c0392b; font-weight: bold;}
-    .stRadio label {font-size: 16px;}
     </style>
+    
+    <!-- SCRIPT ĐỂ HIGHLIGHT KHI BÔI ĐEN -->
+    <script>
+    document.addEventListener('mouseup', function() {
+        var selection = window.getSelection();
+        var selectedText = selection.toString();
+        
+        if (selectedText.length > 0) {
+            var range = selection.getRangeAt(0);
+            var span = document.createElement("span");
+            span.className = "highlighted";
+            span.title = "Click để xóa highlight";
+            span.onclick = function() {
+                var text = document.createTextNode(this.innerText);
+                this.parentNode.replaceChild(text, this);
+            };
+            try {
+                range.surroundContents(span);
+                selection.removeAllRanges();
+            } catch (e) {
+                console.log("Không thể highlight qua nhiều block");
+            }
+        }
+    });
+    </script>
 """, unsafe_allow_html=True)
 
 try:
@@ -454,7 +504,7 @@ else:
         else:
             st.info("Bài học này chưa cập nhật.")
 
-     # --- MODULE 2: READING (SPLIT VIEW & MODES) ---
+    # --- MODULE 2: READING (SPLIT VIEW & REALTIME TIMER) ---
     elif menu == "📖 Reading":
         st.title("📖 Luyện Reading & Từ Vựng")
         lesson_choice = st.selectbox("Chọn bài đọc:", READING_MENU)
@@ -462,8 +512,7 @@ else:
         # Reset session khi đổi bài
         if 'current_reading_lesson' not in st.session_state or st.session_state['current_reading_lesson'] != lesson_choice:
             st.session_state['current_reading_lesson'] = lesson_choice
-            st.session_state['reading_session'] = {'status': 'intro', 'mode': None, 'start_time': None}
-            st.session_state['reading_highlight'] = ""
+            st.session_state['reading_session'] = {'status': 'intro', 'mode': None, 'end_time': None}
 
         if "Marine Chronometer" in lesson_choice:
             data = READING_CONTENT["Lesson 2: Marine Chronometer"]
@@ -478,81 +527,93 @@ else:
                     st.markdown("""
                     **Thông tin bài thi:**
                     - **Chủ đề:** Lịch sử / Hàng hải
-                    - **Dạng câu hỏi:** Fill in the blanks (Điền từ vào chỗ trống)
+                    - **Dạng câu hỏi:** Fill in the blanks
                     - **Số lượng:** 6 câu hỏi
                     """)
                     
                     col_m1, col_m2 = st.columns(2)
                     with col_m1:
-                        if st.button("🟢 Chế độ Luyện Tập (Không giới hạn)"):
+                        if st.button("🟢 Luyện Tập (Không giới hạn thời gian)"):
                             st.session_state['reading_session']['status'] = 'doing'
-                            st.session_state['reading_session']['mode'] = 'Luyện tập'
+                            st.session_state['reading_session']['mode'] = 'practice'
                             st.rerun()
                     with col_m2:
-                        if st.button("🔴 Chế độ Luyện Thi (20 Phút)"):
+                        if st.button("🔴 Luyện Thi (20 Phút)"):
                             st.session_state['reading_session']['status'] = 'doing'
-                            st.session_state['reading_session']['mode'] = 'Luyện thi'
-                            # Đặt thời gian kết thúc (20 phút từ bây giờ)
-                            st.session_state['reading_session']['start_time'] = datetime.now() + timedelta(minutes=20)
+                            st.session_state['reading_session']['mode'] = 'exam'
+                            # Lưu thời điểm kết thúc (timestamp)
+                            st.session_state['reading_session']['end_time'] = datetime.now() + timedelta(minutes=20)
                             st.rerun()
 
                 # --- TRẠNG THÁI 2: ĐANG LÀM BÀI (SPLIT VIEW) ---
                 elif st.session_state['reading_session']['status'] == 'doing':
-                    # Xử lý Timer
-                    if st.session_state['reading_session']['mode'] == 'Luyện thi':
-                        time_left = st.session_state['reading_session']['start_time'] - datetime.now()
-                        if time_left.total_seconds() > 0:
-                            mins, secs = divmod(int(time_left.total_seconds()), 60)
-                            st.warning(f"⏳ **Thời gian còn lại: {mins:02d}:{secs:02d}**")
+                    # Xử lý Timer (Javascript Realtime Countdown)
+                    timer_html = ""
+                    if st.session_state['reading_session']['mode'] == 'exam':
+                        end_time = st.session_state['reading_session']['end_time']
+                        remaining_seconds = (end_time - datetime.now()).total_seconds()
+                        
+                        if remaining_seconds > 0:
+                            # Javascript để đếm ngược mượt mà không cần reload trang
+                            timer_html = f"""
+                            <div style="font-size: 20px; font-weight: bold; color: #d35400; margin-bottom: 10px;">
+                                ⏳ Thời gian còn lại: <span id="timer"></span>
+                            </div>
+                            <script>
+                            var timeLeft = {int(remaining_seconds)};
+                            var timerElement = document.getElementById("timer");
+                            
+                            var countdown = setInterval(function() {{
+                                var minutes = Math.floor(timeLeft / 60);
+                                var seconds = timeLeft % 60;
+                                timerElement.innerHTML = minutes + "m " + (seconds < 10 ? "0" : "") + seconds + "s";
+                                
+                                timeLeft -= 1;
+                                if (timeLeft < 0) {{
+                                    clearInterval(countdown);
+                                    timerElement.innerHTML = "HẾT GIỜ!";
+                                    alert("Đã hết giờ làm bài! Vui lòng nộp bài.");
+                                }}
+                            }}, 1000);
+                            </script>
+                            """
+                            st.components.v1.html(timer_html, height=50)
                         else:
-                            st.error("🛑 HẾT GIỜ! Vui lòng nộp bài.")
+                            st.error("🛑 ĐÃ HẾT GIỜ! Vui lòng nộp bài ngay.")
                     else:
-                        st.success("🟢 Chế độ Luyện Tập")
+                        st.success("🟢 Chế độ Luyện Tập (Thoải mái thời gian)")
+                        st.caption("Mẹo: Bôi đen văn bản để highlight (Click lại để xóa).")
 
                     # GIAO DIỆN 2 CỘT (SPLIT SCREEN)
                     col_text, col_quiz = st.columns([1, 1], gap="medium")
                     
-                    # BÊN TRÁI: BÀI ĐỌC
+                    # BÊN TRÁI: BÀI ĐỌC (Có cuộn riêng & Highlight)
                     with col_text:
                         st.subheader("📄 Bài Đọc")
-                        
-                        # Tính năng Highlight thủ công
-                        with st.expander("🖍️ Công cụ Highlight", expanded=False):
-                            hl_text = st.text_input("Nhập từ/cụm từ muốn highlight:")
-                            if st.button("Tô màu"):
-                                st.session_state['reading_highlight'] = hl_text
-                            if st.button("Xóa highlight"):
-                                st.session_state['reading_highlight'] = ""
-                        
-                        # Xử lý hiển thị văn bản (Có highlight)
-                        display_text = data['text']
-                        if st.session_state['reading_highlight']:
-                            target = st.session_state['reading_highlight']
-                            # Dùng HTML để tô màu nền vàng
-                            display_text = display_text.replace(target, f"<span style='background-color: yellow; color: black;'>{target}</span>")
-                            display_text = display_text.replace("\n", "<br>") # Giữ xuống dòng
-                            
-                            # Container cuộn (Scrollable)
-                            st.markdown(f"""
-                            <div class="reading-box">{display_text}</div>
-                            """, unsafe_allow_html=True)
-                        else:
-                            st.markdown(f"""
-                            <div class="reading-box">{data['text'].replace(chr(10), '<br>')}</div>
-                            """, unsafe_allow_html=True)
+                        # Nhúng bài đọc vào khung cuộn (scroll-container)
+                        st.markdown(f"""
+                        <div class="scroll-container">
+                            <div class="reading-text">
+                                {data['text'].replace(chr(10), '<br>')}
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
 
-                    # BÊN PHẢI: CÂU HỎI
+                    # BÊN PHẢI: CÂU HỎI (Trong Form để không reload trang làm mất highlight)
                     with col_quiz:
                         st.subheader("📝 Câu Hỏi")
-                        with st.container(height=600): # Container cuộn cho câu hỏi
+                        with st.container(height=600): 
                             st.markdown("**Questions 1-6: Fill in the blanks (NO MORE THAN TWO WORDS)**")
+                            
                             with st.form("read_exam_form"):
                                 user_answers = {}
                                 for q in data['questions_fill']:
                                     user_answers[q['id']] = st.text_input(q['q'])
                                 
-                                # Nút nộp bài
-                                if st.form_submit_button("NỘP BÀI"):
+                                # Nút nộp bài (Cho cả 2 chế độ)
+                                submitted = st.form_submit_button("NỘP BÀI")
+                                
+                                if submitted:
                                     st.session_state['reading_session']['status'] = 'result'
                                     st.session_state['reading_session']['user_answers'] = user_answers
                                     st.rerun()
@@ -578,14 +639,14 @@ else:
                             is_correct = u_ans == c_ans
                             if is_correct: score += 1
                             
-                            icon = "✅" if is_correct else "❌"
-                            st.markdown(f"**{q['q']}**")
                             if is_correct:
-                                st.success(f"Bạn trả lời: {u_ans}")
+                                st.success(f"✅ {q['q']} -> Bạn trả lời: {u_ans}")
                             else:
-                                st.error(f"Bạn trả lời: {u_ans} | Đáp án: {q['a']}")
+                                st.error(f"❌ {q['q']}")
+                                st.markdown(f"**Bạn trả lời:** {u_ans} | **Đáp án:** {q['a']}")
                             
-                            st.markdown(f"<div class='explanation-box'>💡 <b>Giải thích:</b> {q['exp']}</div>", unsafe_allow_html=True)
+                            # Luôn hiện giải thích
+                            st.markdown(f"<div class='explanation-box'>💡 {q['exp']}</div>", unsafe_allow_html=True)
                             st.write("---")
 
                         st.success(f"🏆 Tổng điểm: {score}/{len(data['questions_fill'])}")
@@ -594,7 +655,7 @@ else:
                         save_reading_log(user['name'], user['class'], lesson_choice, score, len(data['questions_fill']), st.session_state['reading_session']['mode'])
                         
                         if st.button("Làm lại bài này"):
-                            st.session_state['reading_session'] = {'status': 'intro', 'mode': None, 'start_time': None}
+                            st.session_state['reading_session'] = {'status': 'intro', 'mode': None, 'end_time': None}
                             st.rerun()
             # TAB 2: Bài tập AI tương tác (JSON Parsing)
             with tab2:
