@@ -449,7 +449,7 @@ else:
                     
                     if st.form_submit_button("🔍 Kiểm Tra Outline"):
                         if intro and body1 and body2 and conc:
-                            with st.spinner("AI đang soi lỗi logic (Fallacies Check)..."):
+                            with st.spinner("Đang kiểm tra logic"):
                                 prompt = f"""
                                 Role: Strict IELTS Writing Logic Coach.
                                 Task: Evaluate this Task 2 Outline. Output in Vietnamese .
