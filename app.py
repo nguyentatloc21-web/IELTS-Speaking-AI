@@ -851,7 +851,7 @@ else:
                                 * **Gốc:** "..."
                                 * **Sửa:** "..."
                                 * **Lý do:** ...
-                        
+                                """
                                 url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
                                 payload = {"contents": [{"parts": [{"text": prompt}, {"inline_data": {"mime_type": "audio/wav", "data": audio_b64}}]}]}
                         
