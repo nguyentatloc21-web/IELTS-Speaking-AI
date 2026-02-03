@@ -831,7 +831,7 @@ else:
                                 ### TRANSCRIPT:
                                 "[Ghi lại nội dung học viên nói]"
 
-                                ### KẾT QUẢ: Band [Score]
+                                ### KẾT QUẢ: [Score]
 
                                 ### PHÂN TÍCH CHI TIẾT:
                                 1. **Fluency & Coherence:** [Nhận xét độ trôi chảy, xử lý các chỗ ngắt ngứ]
