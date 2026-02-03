@@ -821,7 +821,7 @@ else:
                                 Trả về kết quả ngắn gọn, súc tích:
 
                                 ### TRANSCRIPT:
-                                "[Ghi lại nội dung học viên nói]"
+                                "[Ghi lại nội dung học viên nói, không auto correct những từ mà học viên phát âm sai, thiếu âm đuôi]"
 
                                 ### KẾT QUẢ: [Score]
 
@@ -829,7 +829,7 @@ else:
                                 1. **Fluency & Coherence:** [Nhận xét độ trôi chảy, xử lý các chỗ ngắt ngứ, từ nối và cách phát triển ý, trọng tâm câu trả lời]
                                 2. **Lexical Resource:** [Nhận xét vốn từ, các idiomatic language dùng được]
                                 3. **Grammar:** [Nhận xét cấu trúc câu, ngữ pháp]
-                                4. **Pronunciation:** [Nhận xét phát âm, ngữ điệu, trọng âm, chunking, âm đuôi]
+                                4. **Pronunciation:** [Nhận xét phát âm, ngữ điệu, trọng âm, chunking, âm đuôi dựa trên file ghi âm]
 
                                 ### CẢI THIỆN (NÂNG BAND):
                                 *(Chỉ chọn ra tối đa 3-5 lỗi sai lớn nhất hoặc câu diễn đạt vụng về/Việt-lish nhất để sửa. **TUYỆT ĐỐI KHÔNG** sửa những câu đã đúng/ổn).*
