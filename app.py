@@ -783,7 +783,7 @@ else:
                                 # Lưu ý: Vì gửi Audio trực tiếp, ta yêu cầu AI tự Transcribe trước khi chấm.
                                 prompt = f"""
                                 ## ROLE: Senior IELTS Speaking Examiner (Strict but Fair).
-                                Your task is to listen to the attached audio, transcribe it, and then assess the performance.
+                                Your task is to listen to the attached audio, transcribe it, and then assess the performance, output in Vietnamese.
 
                                 ## INPUT DATA:
                                 - **Question:** "{question}"
