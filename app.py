@@ -779,44 +779,47 @@ else:
                                 audio_b64 = base64.b64encode(audio_bytes).decode('utf-8')
                                 # TỰ ĐỘNG NHẬN DIỆN ĐỊNH DẠNG ÂM THANH (Fix lỗi Mobile)
                                 mime_type = audio.type if audio.type else "audio/wav"
-                                # 2. Cấu hình Prompt (Strict Rubric & Pause Handling)
+                                # === PROMPT RUBRIC CHUẨN XÁC ===
                                 prompt = f"""
                                 Role: Senior IELTS Speaking Examiner (Friendly & Constructive).
-                                Student Level: {user['level']['level']}.
-                                Task: Assess speaking response for "{question}". Output in Vietnamese
-                                IGNORE HESITATION:** Since this is spontaneous speech, **IGNORE** natural pauses, "um/ah", or self-corrections unless they destroy grammatical structure. Do not penalize "natural thinking time".
-                                LOWEST PERFORMANCE RULE:** Grade based on the weakest feature. (E.g., Good Grammar but Band 5 Vocab => Overall pulls down to 5.5/6.0).
+                                Student Level: {user['level']['level']} (Use as baseline, but grade based on actual performance in audio).
+                                Task: Assess speaking response for "{question}".
+                                
+                                **CRITICAL INSTRUCTIONS:**
+                                1. **IGNORE HESITATION:** Since this is spontaneous speech, **IGNORE** natural pauses, "um/ah", or self-corrections unless they destroy grammatical structure. Do not penalize "natural thinking time".
+                                2. **LOWEST PERFORMANCE RULE:** Grade based on the weakest feature. (E.g., Good Grammar but Band 5 Vocab => Overall pulls down to 5.5/6.0). Don't just average.
+                                3. **TRANSCRIPT:** You must transcribe the audio exactly as heard before grading.
 
                                 ## GRADING RUBRIC (TIÊU CHÍ PHÂN LOẠI CỐT LÕI):
-
+                                
                                 * **BAND 9 (Native-like):**
-                                    * **Fluency:** Trôi chảy tự nhiên, không hề vấp váp do tìm từ.
-                                    * **Vocab:** Chính xác tuyệt đối, tinh tế, idioms dùng như người bản xứ.
-                                    * **Grammar:** Hoàn toàn sạch lỗi.
+                                  * **Fluency:** Trôi chảy tự nhiên, không hề vấp váp do tìm từ.
+                                  * **Vocab:** Chính xác tuyệt đối, tinh tế, idioms dùng như người bản xứ.
+                                  * **Grammar:** Hoàn toàn sạch lỗi.
 
                                 * **BAND 8 (Rất tốt):**
-                                    * **Fluency:** Hiếm khi lặp lại. Mạch lạc.
-                                    * **Vocab:** Dùng điêu luyện Idioms/từ hiếm (chấp nhận sai sót cực nhỏ).
-                                    * **Grammar:** ĐẠI ĐA SỐ câu không lỗi. Lỗi sai là ngẫu nhiên.
+                                  * **Fluency:** Hiếm khi lặp lại. Mạch lạc.
+                                  * **Vocab:** Dùng điêu luyện Idioms/từ hiếm (chấp nhận sai sót cực nhỏ).
+                                  * **Grammar:** ĐẠI ĐA SỐ câu không lỗi. Lỗi sai là ngẫu nhiên.
 
                                 * **BAND 7 (Tốt - Target):**
-                                    * **Fluency:** Nói dài hơi dễ dàng. Từ nối linh hoạt (không cứng nhắc).
-                                    * **Vocab:** Dùng được từ ít phổ biến (Less common) & Collocation.
-                                    * **Grammar:** THƯỜNG XUYÊN có các câu phức hoàn toàn không lỗi.
+                                  * **Fluency:** Nói dài dễ dàng. Từ nối linh hoạt (không cứng nhắc).
+                                  * **Vocab:** Dùng được từ ít phổ biến (Less common) & Collocation.
+                                  * **Grammar:** THƯỜNG XUYÊN có các câu phức hoàn toàn không lỗi.
 
                                 * **BAND 6 (Khá):**
-                                    * **Fluency:** Sẵn sàng nói dài nhưng đôi khi mất mạch. Từ nối MÁY MÓC.
-                                    * **Vocab:** Đủ để bàn luận. Biết Paraphrase.
-                                    * **Grammar:** Có dùng câu phức nhưng THƯỜNG XUYÊN SAI.
+                                  * **Fluency:** Sẵn sàng nói dài nhưng đôi khi mất mạch. Từ nối MÁY MÓC.
+                                  * **Vocab:** Đủ để bàn luận. Biết Paraphrase.
+                                  * **Grammar:** Có dùng câu phức nhưng THƯỜNG XUYÊN SAI.
 
                                 * **BAND 5 (Trung bình):**
-                                    * **Fluency:** Nói chậm, lặp từ, ngắt quãng nhiều.
-                                    * **Vocab:** Hạn chế, ít Paraphrase.
-                                    * **Grammar:** Chỉ đúng khi dùng CÂU ĐƠN. Câu phức thường sai.
+                                  * **Fluency:** Nói chậm, lặp từ, ngắt quãng nhiều.
+                                  * **Vocab:** Hạn chế, ít Paraphrase.
+                                  * **Grammar:** Chỉ đúng khi dùng CÂU ĐƠN. Câu phức thường sai.
 
                                 * **BAND 4 (Hạn chế):**
-                                    * **Fluency:** Ngắt quãng dài, câu cụt.
-                                    * **Grammar:** Mệnh đề phụ rất hiếm hoặc sai hoàn toàn.
+                                  * **Fluency:** Ngắt quãng dài, câu cụt.
+                                  * **Grammar:** Mệnh đề phụ rất hiếm hoặc sai hoàn toàn.
 
                                 ## OUTPUT FORMAT (Vietnamese Markdown):
                                 Trả về kết quả ngắn gọn, súc tích:
