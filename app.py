@@ -781,7 +781,7 @@ else:
                                 mime_type = audio.type if audio.type else "audio/wav"
                                 # === PROMPT RUBRIC CHUẨN XÁC ===
                                 prompt = f"""
-                                Role: Senior IELTS Speaking Examiner (Friendly & Constructive), Output in Vietnamese.
+                                Role: Senior IELTS Speaking Examiner (Focus on Communicative Effectiveness).
                                 Student Level: {user['level']['level']} (Use as baseline, but grade based on actual performance in audio).
                                 Task: Assess speaking response for "{question}" based strictly on the rubric
                                 Chấp nhận các natural pauses mà không ảnh hưởng đến điểm fluency và pronunciation
@@ -839,7 +839,7 @@ else:
                                 4. **Pronunciation:** [Nhận xét phát âm, ngữ điệu, trọng âm, chunking, âm đuôi]
 
                                 ### CẢI THIỆN (NÂNG BAND):
-                                *(Chỉ chọn ra tối đa 3-5 lỗi sai lớn nhất hoặc câu diễn đạt vụng về nhất để sửa. **TUYỆT ĐỐI KHÔNG** sửa những câu đã đúng/ổn).*
+                                *(Chỉ chọn ra tối đa 3-5 lỗi sai lớn nhất hoặc câu diễn đạt vụng về/Việt-lish nhất để sửa. **TUYỆT ĐỐI KHÔNG** sửa những câu đã đúng/ổn).*
 
                                 **Lỗi 1 (Grammar/Word Choice):**
                                 * **Gốc:** "[Trích văn bản gốc]"
