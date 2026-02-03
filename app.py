@@ -112,12 +112,11 @@ def save_writing_log(student, class_code, lesson, topic, band_score, criteria_sc
 def get_leaderboard(class_code):
     try:
         sheet = connect_gsheet()
-        if not sheet: return None, None, None # Thêm None cho Writing
+        if not sheet: return None, None, None
 
-        # 1. Speaking (ĐÃ SỬA LOGIC CHO LINH HOẠT)
+        # 1. Speaking
         try:
             ws_s = sheet.worksheet("Speaking_Logs")
-            # Lấy toàn bộ dữ liệu (bảo đảm lấy cả header)
             data = ws_s.get_all_values()
             
             if len(data) > 1:
@@ -128,7 +127,11 @@ def get_leaderboard(class_code):
                     df_s = df_s[df_s['Class'] == class_code]
                     
                     if not df_s.empty:
-                        # Tìm cột chứa điểm (Thử lần lượt các tên phổ biến)
+                        # --- FIX LỖI: Chuẩn hóa tên học viên trước khi Group ---
+                        # Bước này giúp gộp "Nguyen Van A" và "Nguyen Van A " thành 1 người
+                        if 'Student' in df_s.columns:
+                            df_s['Student'] = df_s['Student'].astype(str).apply(normalize_name)
+
                         score_col = None
                         for col in ['Score_Num', 'Band_Score', 'Band_Short', 'Score']:
                             if col in df_s.columns:
@@ -136,7 +139,6 @@ def get_leaderboard(class_code):
                                 break
                         
                         if score_col:
-                            # Hàm trích xuất số an toàn
                             def extract_float(val):
                                 try:
                                     found = re.search(r"(\d+\.?\d*)", str(val))
@@ -144,10 +146,9 @@ def get_leaderboard(class_code):
                                 except: return 0.0
 
                             df_s['Final_Score'] = df_s[score_col].apply(extract_float)
-                            
-                            # Lọc bỏ điểm 0
                             df_s = df_s[df_s['Final_Score'] > 0]
                             
+                            # Group by tên đã chuẩn hóa
                             lb_s = df_s.groupby('Student')['Final_Score'].mean().reset_index()
                             lb_s.columns = ['Học Viên', 'Điểm Speaking (TB)']
                             lb_s = lb_s.sort_values(by='Điểm Speaking (TB)', ascending=False).head(10)
@@ -164,6 +165,10 @@ def get_leaderboard(class_code):
             if not df_r.empty and 'Class' in df_r.columns:
                 df_r = df_r[df_r['Class'] == class_code]
                 if not df_r.empty:
+                    # --- FIX LỖI: Chuẩn hóa tên ---
+                    if 'Student' in df_r.columns:
+                        df_r['Student'] = df_r['Student'].astype(str).apply(normalize_name)
+
                     df_r['Score'] = pd.to_numeric(df_r['Score'], errors='coerce')
                     lb_r = df_r.groupby('Student')['Score'].max().reset_index()
                     lb_r.columns = ['Học Viên', 'Điểm Reading (Max)']
@@ -171,6 +176,28 @@ def get_leaderboard(class_code):
                 else: lb_r = None
             else: lb_r = None
         except: lb_r = None
+
+        # 3. Writing
+        try:
+            ws_w = sheet.worksheet("Writing_Logs")
+            df_w = pd.DataFrame(ws_w.get_all_records())
+            if not df_w.empty and 'Class' in df_w.columns:
+                df_w = df_w[df_w['Class'] == class_code]
+                if not df_w.empty:
+                    # --- FIX LỖI: Chuẩn hóa tên ---
+                    if 'Student' in df_w.columns:
+                        df_w['Student'] = df_w['Student'].astype(str).apply(normalize_name)
+
+                    df_w['Overall_Band'] = pd.to_numeric(df_w['Overall_Band'], errors='coerce')
+                    lb_w = df_w.groupby('Student')['Overall_Band'].mean().reset_index()
+                    lb_w.columns = ['Học Viên', 'Điểm Writing (TB)']
+                    lb_w = lb_w.sort_values(by='Điểm Writing (TB)', ascending=False).head(10)
+                else: lb_w = None
+            else: lb_w = None
+        except: lb_w = None
+
+        return lb_s, lb_r, lb_w
+    except: return None, None, None
 
         # 3. Writing (Mới)
         try:
