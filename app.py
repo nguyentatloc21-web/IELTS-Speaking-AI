@@ -787,23 +787,50 @@ else:
             remaining = 5 - attempts
             
             st.markdown(f"**Topic:** {question}")
-            
             if remaining > 0:
                 st.info(f"⚡ Bạn còn **{remaining}** lượt trả lời cho câu này.")
                 audio = st.audio_input("Ghi âm câu trả lời:", key=f"rec_{question}")
                 
                 if audio:
-                    with st.spinner("Đang chấm điểm..."):
-                        try:
-                            audio_bytes = audio.read()
-                            if len(audio_bytes) < 1000:
-                                st.warning("File âm thanh quá ngắn. Vui lòng thử lại.")
-                            else:
-                                audio_b64 = base64.b64encode(audio_bytes).decode('utf-8')
-                                # TỰ ĐỘNG NHẬN DIỆN ĐỊNH DẠNG ÂM THANH (Fix lỗi Mobile)
-                                mime_type = audio.type if audio.type else "audio/wav"
-                                # === PROMPT RUBRIC CHUẨN XÁC ===
-                                prompt = f"""
+                    # --- LOGIC MỚI: Xử lý Retry thông minh ---
+                    # 1. Đọc dữ liệu audio
+                    audio.seek(0)
+                    audio_bytes = audio.read()
+                    # Hash để nhận diện file audio mới (để tránh chấm lại file cũ)
+                    audio_sig = hash(audio_bytes)
+                    
+                    # 2. Khởi tạo State quản lý cho câu hỏi này
+                    state_key = f"proc_{question}"
+                    if state_key not in st.session_state:
+                        st.session_state[state_key] = {"sig": None, "result": None, "error": False}
+                    
+                    proc = st.session_state[state_key]
+                    should_call_api = False
+                    
+                    # A. Nếu đây là file audio mới -> Tự động chấm luôn
+                    if proc["sig"] != audio_sig:
+                        proc["sig"] = audio_sig
+                        proc["result"] = None
+                        proc["error"] = False
+                        should_call_api = True
+                    
+                    # B. Nếu đang ở trạng thái lỗi -> Hiện nút Retry
+                    if proc["error"]:
+                        st.warning("⚠️ Hệ thống đang quá tải (Lỗi 429). Bản thu của bạn vẫn còn.")
+                        if st.button("🔄 Bấm để thử chấm lại ngay", key=f"retry_{question}"):
+                            should_call_api = True
+            
+                    # 3. Thực hiện gọi API (Nếu cần)
+                    if should_call_api:
+                        if len(audio_bytes) < 1000:
+                            st.warning("File âm thanh quá ngắn.")
+                            proc["error"] = False
+                        else:
+                            with st.spinner("Đang kết nối AI chấm điểm..."):
+                                try:
+                                    audio_b64 = base64.b64encode(audio_bytes).decode('utf-8')
+                                    # === PROMPT RUBRIC CHUẨN XÁC ===
+                                    prompt = f"""
                                 Role: Senior IELTS Speaking Examiner (Focus on Communicative Effectiveness).
                         
                                 Task: Assess speaking response for "{question}" based strictly on the rubric
