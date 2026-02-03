@@ -852,20 +852,17 @@ else:
                                 * **Sửa:** "..."
                                 * **Lý do:** ...
                                 """
-                                url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
-                                payload = {"contents": [{"parts": [{"text": prompt}, {"inline_data": {"mime_type": "audio/wav", "data": audio_b64}}]}]}
-                        
-                                resp = requests.post(url, headers={'Content-Type': 'application/json'}, data=json.dumps(payload))
+                                # GỌI HÀM CALL_GEMINI MỚI VỚI CƠ CHẾ RETRY
+                                text_result = call_gemini(prompt, audio_data=audio_b64)
                                 
-                                if resp.status_code == 200:
-                                    text_result = resp.json()['candidates'][0]['content']['parts'][0]['text']
+                                if text_result:
                                     st.markdown(text_result)
                                     st.session_state['speaking_attempts'][question] = attempts + 1
                                     
                                     # LƯU ĐIỂM (Đã sửa lỗi tham số thừa)
                                     save_speaking_log(user['name'], user['class'], lesson_choice, question, text_result)
                                 else:
-                                    st.error(f"⚠️ Lỗi Google (Mã {resp.status_code}): {resp.text}")
+                                    st.error(f"⚠️ Hệ thống đang bận (429 Resource Exhausted). Vui lòng thử lại sau vài giây.")
                         except Exception as e:
                             st.error(f"Lỗi hệ thống: {e}")
             else:
