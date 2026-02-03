@@ -785,10 +785,9 @@ else:
                                 Student Level: {user['level']['level']} (Use as baseline, but grade based on actual performance in audio).
                                 Task: Assess speaking response for "{question}".
                                 
-                                **CRITICAL INSTRUCTIONS:**
-                                1. **IGNORE HESITATION:** Since this is spontaneous speech, **IGNORE** natural pauses, "um/ah", or self-corrections unless they destroy grammatical structure. Do not penalize "natural thinking time".
-                                
-                                2. **TRANSCRIPT:** You must transcribe the audio exactly as heard before grading.
+                                1. **HOLISTIC SCORING:** Grade broadly. If vocabulary is good but grammar has minor slips, reward the vocabulary. Don't let one weakness drag the whole score down.
+                                2. **NATURAL SPEECH:** Accept conversational fillers ("you know", "I guess") and "as" for "because". Do NOT correct them if they sound natural.
+                                3. **TRANSCRIPT:** Transcribe exactly what is heard.
 
                                 ## GRADING RUBRIC (TIÊU CHÍ PHÂN LOẠI CỐT LÕI):
                                 
