@@ -830,9 +830,9 @@ else:
                                 ### KẾT QUẢ: [Score]
 
                                 ### PHÂN TÍCH CHI TIẾT:
-                                1. **Fluency & Coherence:** [Nhận xét độ trôi chảy, xử lý các chỗ ngắt ngứ]
-                                2. **Lexical Resource:** [Nhận xét vốn từ]
-                                3. **Grammar:** [Nhận xét cấu trúc câu]
+                                1. **Fluency & Coherence:** [Nhận xét độ trôi chảy, xử lý các chỗ ngắt ngứ, từ nối và cách phát triển ý, trọng tâm câu trả lời]
+                                2. **Lexical Resource:** [Nhận xét vốn từ, các idiomatic language dùng được]
+                                3. **Grammar:** [Nhận xét cấu trúc câu, ngữ pháp]
                                 4. **Pronunciation:** [Nhận xét ngữ điệu, âm đuôi]
 
                                 ### CẢI THIỆN (NÂNG BAND):
