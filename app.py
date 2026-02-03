@@ -403,47 +403,43 @@ st.markdown("""
     </style>
     
     <script>
-    // TÍNH NĂNG HIGHLIGHT CẢI TIẾN (Hỗ trợ bôi đen nhiều dòng)
+    // TÍNH NĂNG HIGHLIGHT BẰNG CÁCH BÔI ĐEN (Robust Version)
     document.addEventListener('mouseup', function() {
         var selection = window.getSelection();
-        if (selection.rangeCount > 0) {
-            var range = selection.getRangeAt(0);
-            var selectedText = selection.toString();
-            
-            if (selectedText.trim().length > 0) {
-                // Kiểm tra xem vùng chọn có nằm trong bài đọc không
-                var commonAncestor = range.commonAncestorContainer;
-                var readingContainer = null;
-                
-                // Tìm container cha có class 'reading-text'
-                var node = commonAncestor;
-                while (node) {
-                    if (node.nodeType === 1 && node.classList.contains('reading-text')) {
-                        readingContainer = node;
-                        break;
-                    }
-                    node = node.parentNode;
-                }
+        var selectedText = selection.toString();
+        
+        // Chỉ xử lý nếu có text được bôi đen và không rỗng
+        if (selectedText.length > 0 && selection.rangeCount > 0) {
+            // Hàm kiểm tra xem node có nằm trong vùng bài đọc (.reading-text) không
+            function hasReadingClass(node) {
+                if (!node) return false;
+                if (node.nodeType === 3) node = node.parentNode; // Nếu là Text Node thì lấy cha
+                return node.closest('.reading-text') !== null;
+            }
 
-                if (readingContainer) {
-                    try {
-                        // Sử dụng try/catch để xử lý trường hợp highlight phức tạp (qua nhiều thẻ)
-                        // Phương pháp an toàn: Tạo span và bọc nội dung (nếu không cắt ngang thẻ)
-                        var span = document.createElement("span");
-                        span.className = "highlighted";
-                        span.title = "Click để xóa highlight";
-                        span.onclick = function(e) {
-                            e.stopPropagation();
-                            var text = document.createTextNode(this.innerText);
-                            this.parentNode.replaceChild(text, this);
-                            if (text.parentNode) text.parentNode.normalize(); 
-                        };
-                        
-                        range.surroundContents(span);
-                        selection.removeAllRanges();
-                    } catch (e) {
-                        console.log("Highlight phức tạp: Vui lòng chọn từng đoạn văn bản nhỏ hơn.");
-                    }
+            var range = selection.getRangeAt(0);
+            var commonAncestor = range.commonAncestorContainer;
+
+            // Kiểm tra vùng chọn có nằm trọn vẹn trong bài đọc không
+            if (hasReadingClass(commonAncestor)) {
+                try {
+                    var span = document.createElement("span");
+                    span.className = "highlighted";
+                    span.title = "Click để xóa highlight";
+                    
+                    // Sự kiện click để xóa highlight
+                    span.onclick = function(e) {
+                        e.stopPropagation(); // Ngăn sự kiện nổi bọt
+                        var text = document.createTextNode(this.innerText);
+                        this.parentNode.replaceChild(text, this);
+                        // Gộp các text node lại
+                        if (text.parentNode) text.parentNode.normalize(); 
+                    };
+
+                    range.surroundContents(span);
+                    selection.removeAllRanges(); // Bỏ bôi đen sau khi highlight xong
+                } catch (e) { 
+                    console.log("Highlight phức tạp: Vui lòng chọn từng đoạn văn bản nhỏ hơn."); 
                 }
             }
         }
@@ -1105,9 +1101,10 @@ else:
                                 elif "questions_mc" in data:
                                     st.markdown("**Questions: Choose the correct letter, A, B or C.**")
                                     for q in data['questions_mc']:
-                                        st.markdown(f"**{q['q']}**")
+                                        st.markdown(f"<div class='question-text'><strong>{q['q']}</strong></div>", unsafe_allow_html=True)
                                         ans[q['id']] = st.radio(f"Select answer for {q['id']}", q['options'], key=q['id'], label_visibility="collapsed")
                                         st.write("")
+                                
                                 
                                 if st.form_submit_button("NỘP BÀI"):
                                     st.session_state['reading_session']['status'] = 'result'
