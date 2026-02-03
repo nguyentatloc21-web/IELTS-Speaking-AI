@@ -780,20 +780,12 @@ else:
                                 # TỰ ĐỘNG NHẬN DIỆN ĐỊNH DẠNG ÂM THANH (Fix lỗi Mobile)
                                 mime_type = audio.type if audio.type else "audio/wav"
                                 # 2. Cấu hình Prompt (Strict Rubric & Pause Handling)
-                                # Lưu ý: Vì gửi Audio trực tiếp, ta yêu cầu AI tự Transcribe trước khi chấm.
                                 prompt = f"""
-                                ## ROLE: Senior IELTS Speaking Examiner (Strict but Fair).
-                                Your task is to listen to the attached audio, transcribe it, and then assess the performance, output in Vietnamese.
-
-                                ## INPUT DATA:
-                                - **Question:** "{question}"
-                                - **Audio Context:** Student level {user['level']['level']} (But grade based on actual performance).
-                                - **Student Transcript:** "{transcript}
-
-                                ## CRITICAL INSTRUCTIONS (XỬ LÝ AUDIO):
-                                1. **STEP 1 - TRANSCRIPTION:** First, generate a verbatim transcript of the audio.
-                                2. **STEP 2 - IGNORE HESITATION:** Since this is spontaneous speech, **IGNORE** natural pauses, "um/ah", or self-corrections unless they destroy grammatical structure. Do not penalize "natural thinking time".
-                                3. **STEP 3 - LOWEST PERFORMANCE RULE:** Grade based on the weakest feature. (E.g., Good Grammar but Band 5 Vocab => Overall pulls down to 5.5/6.0).
+                                Role: Senior IELTS Speaking Examiner (Friendly & Constructive).
+                                Student Level: {user['level']['level']}.
+                                Task: Assess speaking response for "{question}". Output in Vietnamese
+                                IGNORE HESITATION:** Since this is spontaneous speech, **IGNORE** natural pauses, "um/ah", or self-corrections unless they destroy grammatical structure. Do not penalize "natural thinking time".
+                                LOWEST PERFORMANCE RULE:** Grade based on the weakest feature. (E.g., Good Grammar but Band 5 Vocab => Overall pulls down to 5.5/6.0).
 
                                 ## GRADING RUBRIC (TIÊU CHÍ PHÂN LOẠI CỐT LÕI):
 
