@@ -787,8 +787,7 @@ else:
                                 
                                 **CRITICAL INSTRUCTIONS:**
                                 1. **IGNORE HESITATION:** Since this is spontaneous speech, **IGNORE** natural pauses, "um/ah", or self-corrections unless they destroy grammatical structure. Do not penalize "natural thinking time".
-                                2. **LOWEST PERFORMANCE RULE:** Grade based on the weakest feature. (E.g., Good Grammar but Band 5 Vocab => Overall pulls down to 5.5/6.0). Don't just average.
-                                3. **TRANSCRIPT:** You must transcribe the audio exactly as heard before grading.
+                                2. **TRANSCRIPT:** You must transcribe the audio exactly as heard before grading.
 
                                 ## GRADING RUBRIC (TIÊU CHÍ PHÂN LOẠI CỐT LÕI):
                                 
