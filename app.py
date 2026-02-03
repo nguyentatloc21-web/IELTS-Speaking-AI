@@ -784,57 +784,38 @@ else:
                                 Role: Senior IELTS Speaking Examiner (Focus on Communicative Effectiveness).
                         
                                 Task: Assess speaking response for "{question}" based strictly on the rubric
-                                ## 🚨 CRITICAL INSTRUCTIONS (XỬ LÝ LỖI PHÁT ÂM ẨN):
-                                1. **DETECTING HIDDEN PRONUNCIATION ERRORS:**
-                                - **Lưu ý:** Transcript này là sản phẩm của Speech-to-Text (STT), nên nó có thể đã tự động sửa các lỗi phát âm nhỏ.
-                                - **Nhiệm vụ:** Hãy soi kỹ các từ **"Sound-alike"** (từ nghe giống nhau nhưng sai ngữ cảnh) hoặc các đoạn văn bản vô nghĩa. Đó chính là nơi học viên phát âm sai.
-                                - *Ví dụ:* Nếu transcript hiện "I want to *sip* on the beach" (thay vì *sit*), hãy đánh dấu lỗi Pronunciation ngay.
-
-                                2. **IGNORE STT "NOISE" BUT JUDGE HESITATION:**
-                                - Bỏ qua "uh", "um" nếu nó tự nhiên.
-                                - NHƯNG nếu thấy câu bị gãy vụn, lặp từ liên tục (e.g., "I... I... I think"), hãy trừ điểm Fluency và nghi ngờ Pronunciation chỗ đó.
-
-                                3. **NATURAL SPEAKING (ĐỪNG BẮT LỖI OAN):**
-                                - Đánh giá cao Idioms/Collocations tự nhiên (*early bird, get the blood flowing*).
-                                - Đừng trừ điểm nếu học viên dùng từ đơn giản nhưng đúng ngữ cảnh (Naturalness > Complexity).
-                    
-
                                 ## GRADING RUBRIC (TIÊU CHÍ PHÂN LOẠI CỐT LÕI):
-                                
-                                * **BAND 9 (Native-like):**
-                                  * **Fluency:** Trôi chảy tự nhiên, không hề vấp váp do tìm từ.
-                                  * **Vocab:** Chính xác tuyệt đối, tinh tế, idioms dùng như người bản xứ.
-                                  * **Grammar:** Hoàn toàn sạch lỗi.
-                                  * **Pronunciation:** Hoàn hảo, ngữ điệu tự nhiên, đầy đủ âm cuối và nối âm.
 
-                                * **BAND 8 (Rất tốt):**
-                                  * **Fluency:** Hiếm khi lặp lại. Mạch lạc.
-                                  * **Vocab:** Dùng điêu luyện Idioms/từ hiếm (chấp nhận sai sót cực nhỏ).
-                                  * **Grammar:** ĐẠI ĐA SỐ câu không lỗi. Lỗi sai là ngẫu nhiên.
-                                  * **Pronunciation:** Dễ hiểu xuyên suốt, sử dụng tốt ngữ điệu để nhấn mạnh ý.
+* **BAND 9 (Native-like):**
+    * **Fluency:** Trôi chảy tự nhiên, không hề vấp váp.
+    * **Vocab:** Chính xác tuyệt đối, tinh tế.
+    * **Pronunciation:** Hoàn hảo. Transcript sạch bóng, không có bất kỳ từ nào sai ngữ cảnh hay vô nghĩa.
 
-                                * **BAND 7 (Tốt - Target):**
-                                  * **Fluency:** Nói dài dễ dàng. Từ nối linh hoạt (không cứng nhắc).
-                                  * **Vocab:** Dùng được từ ít phổ biến (Less common) & Collocation.
-                                  * **Grammar:** THƯỜNG XUYÊN có các câu phức hoàn toàn không lỗi.
-                                  * **Pronunciation:** Dễ hiểu, ngắt nghỉ đúng chỗ, ngữ điệu tự nhiên dù thỉnh thoảng có lỗi nhỏ.
+* **BAND 8 (Rất tốt):**
+    * **Fluency:** Mạch lạc, hiếm khi lặp lại.
+    * **Vocab:** Dùng điêu luyện Idioms/từ hiếm.
+    * **Pronunciation:** Dễ hiểu xuyên suốt. Ngữ điệu tốt. Transcript chính xác 99%.
 
-                                * **BAND 6 (Khá):**
-                                  * **Fluency:** Sẵn sàng nói dài nhưng đôi khi mất mạch. Từ nối MÁY MÓC.
-                                  * **Vocab:** Đủ để bàn luận. Biết Paraphrase.
-                                  * **Grammar:** Có dùng câu phức nhưng THƯỜNG XUYÊN SAI.
-                                  * **Pronunciation:** Phát âm rõ ràng phần lớn thời gian, có âm cuối nhưng chưa ổn định.
+* **BAND 7 (Tốt - Target):**
+    * **Fluency:** Nói dài dễ dàng. Từ nối linh hoạt.
+    * **Vocab:** Dùng được Collocation tự nhiên.
+    * **Grammar:** Thường xuyên có câu phức không lỗi.
+    * **Pronunciation:** Dễ hiểu. *(Lưu ý: Chấp nhận một vài lỗi nhỏ, nhưng nếu Transcript xuất hiện từ lạ/sai ngữ cảnh, hãy trừ điểm nhẹ).*
 
-                                * **BAND 5 (Trung bình):**
-                                  * **Fluency:** Nói chậm, lặp từ, ngắt quãng nhiều.
-                                  * **Vocab:** Hạn chế, ít Paraphrase.
-                                  * **Grammar:** Chỉ đúng khi dùng CÂU ĐƠN. Câu phức thường sai.
-                                  * **Pronunciation:** Đôi khi khó hiểu, thiếu âm cuối, ngữ điệu còn hạn chế.
+* **BAND 6 (Khá):**
+    * **Fluency:** Đôi khi mất mạch, từ nối máy móc.
+    * **Vocab:** Đủ để bàn luận, biết Paraphrase.
+    * **Grammar:** Có dùng câu phức nhưng thường xuyên sai.
+    * **Pronunciation:** Rõ ràng phần lớn thời gian. *(Lưu ý: Nếu thấy từ vựng bị biến đổi thành từ khác nghe na ná - Sound-alike words - hoặc 1-2 đoạn vô nghĩa, hãy đánh dấu là Lỗi Phát Âm).*
 
-                                * **BAND 4 (Hạn chế):**
-                                  * **Fluency:** Ngắt quãng dài, câu cụt.
-                                  * **Grammar:** Mệnh đề phụ rất hiếm hoặc sai hoàn toàn.
-                                  * **Pronunciation:** Khó hiểu, phát âm sai nhiều, các âm cuối gần như không có.
+* **BAND 5 (Trung bình):**
+    * **Fluency:** Ngắt quãng nhiều, lặp từ.
+    * **Grammar:** Chỉ đúng khi dùng câu đơn.
+    * **Pronunciation:** *(Dấu hiệu nhận biết: Transcript thường xuyên xuất hiện các từ vô nghĩa hoặc sai hoàn toàn ngữ cảnh do máy không nhận diện được âm).*
+
+* **BAND 4 (Hạn chế):**
+    * **Fluency:** Câu cụt, ngắt quãng dài.
+    * **Pronunciation:** Khó hiểu. Transcript gãy vụn, chứa nhiều từ không liên quan đến chủ đề.
 
                                 ## OUTPUT FORMAT (Vietnamese Markdown):
                                 Trả về kết quả ngắn gọn, súc tích:
