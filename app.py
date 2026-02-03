@@ -788,6 +788,7 @@ else:
                                 ## INPUT DATA:
                                 - **Question:** "{question}"
                                 - **Audio Context:** Student level {user['level']['level']} (But grade based on actual performance).
+                                - **Student Transcript:** "{transcript}
 
                                 ## CRITICAL INSTRUCTIONS (XỬ LÝ AUDIO):
                                 1. **STEP 1 - TRANSCRIPTION:** First, generate a verbatim transcript of the audio.
