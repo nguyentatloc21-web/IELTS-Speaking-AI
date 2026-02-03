@@ -821,7 +821,7 @@ else:
                                 Trả về kết quả chi tiết:
 
                                 ### TRANSCRIPT:
-                                "[Ghi lại nội dung học viên nói, không auto correct những từ mà học viên phát âm sai, thiếu âm đuôi]"
+                                "[Ghi lại nội dung học viên nói, không auto correct những từ mà học viên phát âm sai, thiếu âm đuôi, mà để nguyên từ sai]"
 
                                 ### KẾT QUẢ: [Score - format 5.0, 5.5]
 
