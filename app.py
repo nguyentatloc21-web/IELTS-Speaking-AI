@@ -781,13 +781,11 @@ else:
                                 mime_type = audio.type if audio.type else "audio/wav"
                                 # === PROMPT RUBRIC CHUẨN XÁC ===
                                 prompt = f"""
-                                Role: Senior IELTS Speaking Examiner (Friendly & Constructive).
+                                Role: Senior IELTS Speaking Examiner (Friendly & Constructive), Output in Vietnamese.
                                 Student Level: {user['level']['level']} (Use as baseline, but grade based on actual performance in audio).
                                 Task: Assess speaking response for "{question}".
                                 
-                                1. **HOLISTIC SCORING:** Grade broadly. If vocabulary is good but grammar has minor slips, reward the vocabulary. Don't let one weakness drag the whole score down.
-                                2. **NATURAL SPEECH:** Accept conversational fillers ("you know", "I guess") and "as" for "because". Do NOT correct them if they sound natural.
-                                3. **TRANSCRIPT:** Transcribe exactly what is heard.
+                                Strictly follow this rubric
 
                                 ## GRADING RUBRIC (TIÊU CHÍ PHÂN LOẠI CỐT LÕI):
                                 
