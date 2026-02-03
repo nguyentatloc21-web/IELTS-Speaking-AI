@@ -406,8 +406,9 @@ except:
     st.error("⚠️ Lỗi: Chưa có API Key.")
     st.stop()
 
-# --- HÀM GỌI API GEMINI (ĐÃ TỐI ƯU JSON) ---
-def call_gemini(prompt, expect_json=False):
+# --- HÀM GỌI API GEMINI (ĐÃ TỐI ƯU JSON VÀ FIX LỖI 429) ---
+# --- ĐỊNH NGHĨA QUAN TRỌNG: Cần có tham số audio_data ---
+def call_gemini(prompt, expect_json=False, audio_data=None):
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
     headers = {'Content-Type': 'application/json'}
     
@@ -416,20 +417,33 @@ def call_gemini(prompt, expect_json=False):
     if expect_json:
         final_prompt += "\n\nIMPORTANT: Output STRICTLY JSON without Markdown formatting (no ```json or ```)."
     
-    data = {"contents": [{"parts": [{"text": final_prompt}]}]}
+    # Cấu trúc message parts
+    parts = [{"text": final_prompt}]
+    if audio_data:
+        parts.append({"inline_data": {"mime_type": "audio/wav", "data": audio_data}})
+
+    data = {"contents": [{"parts": parts}]}
     
-    try:
-        resp = requests.post(url, headers=headers, data=json.dumps(data))
-        if resp.status_code == 200:
-            text = resp.json()['candidates'][0]['content']['parts'][0]['text']
-            if expect_json:
-                # Làm sạch chuỗi nếu AI lỡ thêm markdown
-                text = re.sub(r"```json|```", "", text).strip()
-            return text
-        else:
-            return None
-    except:
-        return None
+    # Cơ chế Retry khi gặp lỗi 429
+    for attempt in range(4): # Thử lại tối đa 4 lần
+        try:
+            resp = requests.post(url, headers=headers, data=json.dumps(data))
+            if resp.status_code == 200:
+                text = resp.json()['candidates'][0]['content']['parts'][0]['text']
+                if expect_json:
+                    # Làm sạch chuỗi nếu AI lỡ thêm markdown
+                    text = re.sub(r"```json|```", "", text).strip()
+                return text
+            elif resp.status_code == 429: # Resource Exhausted
+                time.sleep(2 ** attempt) # Đợi 1s, 2s, 4s...
+                continue
+            else:
+                return None
+        except:
+            time.sleep(1)
+            continue
+            
+    return None
 
 # --- QUẢN LÝ SESSION STATE ---
 if 'speaking_attempts' not in st.session_state: st.session_state['speaking_attempts'] = {}
