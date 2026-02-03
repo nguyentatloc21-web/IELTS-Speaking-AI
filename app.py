@@ -307,6 +307,7 @@ suitable only for sheep, but as a wheat-growing nation.
         ]
     }
 }
+
     
 # WRITING CONTENT (Chỉ lớp ELITE)
 WRITING_CONTENT = {
@@ -420,22 +421,45 @@ st.markdown("""
     </style>
     
     <script>
+    // TÍNH NĂNG HIGHLIGHT BẰNG CÁCH BÔI ĐEN (Updated)
     document.addEventListener('mouseup', function() {
         var selection = window.getSelection();
         var selectedText = selection.toString();
+        
+        // Chỉ xử lý nếu có text được bôi đen
         if (selectedText.length > 0) {
-            var range = selection.getRangeAt(0);
-            var span = document.createElement("span");
-            span.className = "highlighted";
-            span.title = "Click để xóa highlight";
-            span.onclick = function() {
-                var text = document.createTextNode(this.innerText);
-                this.parentNode.replaceChild(text, this);
-            };
-            try {
-                range.surroundContents(span);
-                selection.removeAllRanges();
-            } catch (e) { console.log("Lỗi highlight"); }
+            // Hàm kiểm tra xem node có nằm trong vùng bài đọc (.reading-text) không
+            function hasReadingClass(node) {
+                if (!node) return false;
+                if (node.nodeType === 3) node = node.parentNode; // Nếu là Text Node thì lấy cha
+                return node.closest('.reading-text') !== null;
+            }
+
+            var anchor = selection.anchorNode;
+            var focus = selection.focusNode;
+
+            if (hasReadingClass(anchor) && hasReadingClass(focus)) {
+                var range = selection.getRangeAt(0);
+                var span = document.createElement("span");
+                span.className = "highlighted";
+                span.title = "Click để xóa highlight";
+                
+                // Sự kiện click để xóa highlight
+                span.onclick = function(e) {
+                    e.stopPropagation(); // Ngăn sự kiện nổi bọt
+                    var text = document.createTextNode(this.innerText);
+                    this.parentNode.replaceChild(text, this);
+                    // Gộp các text node lại để tránh lỗi chọn sau này
+                    if (text.parentNode) text.parentNode.normalize(); 
+                };
+
+                try {
+                    range.surroundContents(span);
+                    selection.removeAllRanges(); // Bỏ bôi đen sau khi highlight xong
+                } catch (e) { 
+                    console.log("Không thể highlight qua nhiều đoạn văn (block elements)."); 
+                }
+            }
         }
     });
     </script>
@@ -1152,82 +1176,6 @@ else:
                         if st.button("Làm lại bài này"):
                             st.session_state['reading_session'] = {'status': 'intro', 'mode': None, 'end_time': None}
                             st.rerun()
-
-            # TAB 2: Bài tập AI tương tác (JSON Parsing)
-            with tab2:
-                st.info(f"Dành cho trình độ: **{user['level']['level']}**. AI sẽ tạo bài tập trắc nghiệm giúp bạn hiểu sâu từ vựng.")
-                
-                if st.button("Tạo Bài Tập Mới"):
-                    with st.spinner("AI đang soạn đề..."):
-                        # Prompt tạo câu hỏi JSON CHẤT LƯỢNG CAO
-                        prompt = f"""
-                        Based on the text 'Invention of Marine Chronometer', create 10 Vocabulary Questions suitable for IELTS Band {user['level']['level']}.
-                        
-                        REQUIREMENTS:
-                        
-                        1. **Part 1 (Questions 1-5): Practical Meaning**
-                           - Select 5 academic words from the text (e.g., longitude, reliance, fluctuate).
-                           - Ask for their meaning **in Vietnamese**.
-                           - **CRITICAL:** Do NOT reveal the meaning in the question.
-                           - Good example: "Từ 'fluctuating' trong đoạn 4 có nghĩa là gì?"
-                           - Options: 4 Vietnamese definitions.
-                        
-                        2. **Part 2 (Questions 6-10): Contextual Use**
-                           - Select 5 other academic words.
-                           - Create a **NEW English sentence** (unrelated to marine history) with a blank.
-                           - Ask user to choose the correct word to fill in.
-                           - Options: 4 English words from the text.
-                        
-                        Output STRICTLY JSON array format:
-                        [
-                            {{"question": "Question text?", "options": ["A. Option 1", "B. Option 2", "C. Option 3", "D. Option 4"], "answer": "A. Option 1", "explanation": "Brief explanation in Vietnamese."}}
-                        ]
-                        """
-                        json_str = call_gemini(prompt, expect_json=True)
-                        if json_str:
-                            try:
-                                quiz_data = json.loads(json_str)
-                                st.session_state['generated_quiz'] = quiz_data
-                            except: st.error("Lỗi dữ liệu từ AI. Vui lòng thử lại.")
-                        else: st.warning("⚠️ Máy chủ Google đang quá tải. Vui lòng thử lại sau giây lát.")
-
-                # Hiển thị bài tập nếu đã có trong Session State
-                if st.session_state['generated_quiz']:
-                    st.divider()
-                    st.subheader("✍️ Bài Tập Ôn Luyện")
-                    
-                    with st.form("ai_quiz_form"):
-                        quiz = st.session_state['generated_quiz']
-                        user_choices = {}
-                        
-                        for i, q in enumerate(quiz):
-                            st.markdown(f"**Câu {i+1}: {q['question']}**")
-                            # Dùng radio button cho tương tác
-                            user_choices[i] = st.radio(f"Lựa chọn câu {i+1}", q['options'], key=f"ai_q_{i}", label_visibility="collapsed")
-                            st.write("")
-                        
-                        if st.form_submit_button("Chấm điểm"):
-                            score = 0
-                            for i, q in enumerate(quiz):
-                                u_choice = user_choices.get(i)
-                                if u_choice:
-                                    # So sánh đáp án (AI thường trả về full text option hoặc ký tự A,B,C)
-                                    # Ta so sánh chuỗi tương đối
-                                    if u_choice == q['answer'] or u_choice.startswith(q['answer']):
-                                        st.success(f"✅ Câu {i+1}: Chính xác!")
-                                        score += 1
-                                    else:
-                                        st.error(f"❌ Câu {i+1}: Sai. Đáp án đúng là {q['answer']}")
-                                    
-                                    # Hiện giải thích
-                                    if 'explanation' in q:
-                                        st.markdown(f"<div class='explanation-box'>💡 {q['explanation']}</div>", unsafe_allow_html=True)
-                                else:
-                                    st.warning(f"⚠️ Câu {i+1}: Bạn chưa chọn đáp án.")
-                            
-                            st.info(f"Kết quả: {score}/{len(quiz)}")
-        else:
-            st.info("Bài học này chưa cập nhật.")
 
 
     # --- MODULE 3: LISTENING (FIX LỖI & TỐI ƯU) ---
