@@ -782,7 +782,7 @@ else:
                                 # === PROMPT RUBRIC CHUẨN XÁC ===
                                 prompt = f"""
                                 Role: Senior IELTS Speaking Examiner (Focus on Communicative Effectiveness).
-                                Student Level: {user['level']['level']} (Use as baseline, but grade based on actual performance in audio).
+                        
                                 Task: Assess speaking response for "{question}" based strictly on the rubric
                                 Chấp nhận các natural pauses mà không ảnh hưởng đến điểm fluency và pronunciation
                     
