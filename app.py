@@ -823,16 +823,16 @@ else:
                                 ### TRANSCRIPT:
                                 "[Ghi lại nội dung học viên nói, không auto correct những từ mà học viên phát âm sai, thiếu âm đuôi]"
 
-                                ### KẾT QUẢ: [Score]
+                                ### KẾT QUẢ: [Score - format 5.0, 5.5]
 
                                 ### PHÂN TÍCH CHI TIẾT:
-                                1. **Fluency & Coherence:** [Nhận xét độ trôi chảy, xử lý các chỗ ngắt ngứ, từ nối và cách phát triển ý, trọng tâm câu trả lời]
-                                2. **Lexical Resource:** [Nhận xét vốn từ, các idiomatic language dùng được]
+                                1. **Fluency & Coherence:** [Nhận xét độ trôi chảy, xử lý các chỗ ngắt ngứ, từ nối và cách phát triển ý logic, trọng tâm câu trả lời]
+                                2. **Lexical Resource:** [Nhận xét vốn từ, các idiomatic language dùng được liên quan đến topic câu hỏi]
                                 3. **Grammar:** [Nhận xét cấu trúc câu, ngữ pháp]
                                 4. **Pronunciation:** [Nhận xét phát âm, trọng âm, chunking, âm đuôi dựa trên file ghi âm]
 
                                 ### CẢI THIỆN (NÂNG BAND):
-                                *(Chỉ chọn ra tối đa 3-5 lỗi sai lớn nhất hoặc câu diễn đạt vụng về/Việt-lish nhất để sửa. **TUYỆT ĐỐI KHÔNG** sửa những câu đã đúng/ổn).*
+                                *(Chỉ chọn ra tối đa 3-5 lỗi sai lớn nhất hoặc câu diễn đạt vụng về/Việt-lish nhất để sửa cho tự nhiên hơn. **TUYỆT ĐỐI KHÔNG** sửa những câu đã đúng/ổn).*
 
                                 **Lỗi 1 (Grammar/Word Choice):**
                                 * **Gốc:** "[Trích văn bản gốc]"
