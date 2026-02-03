@@ -779,67 +779,78 @@ else:
                                 audio_b64 = base64.b64encode(audio_bytes).decode('utf-8')
                                 # TỰ ĐỘNG NHẬN DIỆN ĐỊNH DẠNG ÂM THANH (Fix lỗi Mobile)
                                 mime_type = audio.type if audio.type else "audio/wav"
+                                # 2. Cấu hình Prompt (Strict Rubric & Pause Handling)
+                                # Lưu ý: Vì gửi Audio trực tiếp, ta yêu cầu AI tự Transcribe trước khi chấm.
                                 prompt = f"""
-                                Role: Senior IELTS Speaking Examiner (Friendly but Strict on Rubric).
-                                Task: Assess speaking response for "{question}".
-                                **CẤM:** Không được dùng các câu dẫn nhập như "Đây là ...". Hãy vào thẳng nội dung luôn.
-                            
-                                
-                                **RUBRIC CHẤM ĐIỂM (BẮT BUỘC TUÂN THỦ):**
-                                ## HƯỚNG DẪN CHẤM THI (LƯU Ý KỸ THUẬT):
-                                1. **XỬ LÝ NGẮT NGHỈ (QUAN TRỌNG):** Đây là văn bản chuyển từ giọng nói (STT). **BỎ QUA** các lỗi ngắt quãng/dấu chấm lửng (...) nếu chúng không làm gãy cấu trúc ngữ pháp. Hãy giả định thí sinh đang suy nghĩ tự nhiên (natural hesitation). Chỉ trừ điểm Fluency nếu câu bị cụt hoặc lặp từ vô nghĩa.
-                                2. **NGUYÊN TẮC CHẤM:** Đánh giá dựa trên "Sàn thấp nhất" (Lowest performance). Ví dụ: Ngữ pháp tốt (Band 7) nhưng Từ vựng nghèo nàn (Band 5) -> Kéo điểm xuống gần Band 5-6.
+                                ## ROLE: Senior IELTS Speaking Examiner (Strict but Fair).
+                                Your task is to listen to the attached audio, transcribe it, and then assess the performance.
 
-                                ## TIÊU CHÍ PHÂN LOẠI (KEYWORDS CỐT LÕI):
+                                ## INPUT DATA:
+                                - **Question:** "{question}"
+                                - **Audio Context:** Student level {user['level']['level']} (But grade based on actual performance).
 
-                                * **BAND 9 (Thành thạo - Native-like):**
-                                * **Fluency:** Trôi chảy tự nhiên, không hề vấp váp do tìm từ.
-                                * **Vocab:** Chính xác tuyệt đối, tinh tế, dùng từ như người bản xứ.
-                                * **Grammar:** Linh hoạt, hoàn toàn sạch lỗi (chỉ chấp nhận lỗi trượt miệng cực nhỏ).
+                                ## CRITICAL INSTRUCTIONS (XỬ LÝ AUDIO):
+                                1. **STEP 1 - TRANSCRIPTION:** First, generate a verbatim transcript of the audio.
+                                2. **STEP 2 - IGNORE HESITATION:** Since this is spontaneous speech, **IGNORE** natural pauses, "um/ah", or self-corrections unless they destroy grammatical structure. Do not penalize "natural thinking time".
+                                3. **STEP 3 - LOWEST PERFORMANCE RULE:** Grade based on the weakest feature. (E.g., Good Grammar but Band 5 Vocab => Overall pulls down to 5.5/6.0).
+
+                                ## GRADING RUBRIC (TIÊU CHÍ PHÂN LOẠI CỐT LÕI):
+
+                                * **BAND 9 (Native-like):**
+                                    * **Fluency:** Trôi chảy tự nhiên, không hề vấp váp do tìm từ.
+                                    * **Vocab:** Chính xác tuyệt đối, tinh tế, idioms dùng như người bản xứ.
+                                    * **Grammar:** Hoàn toàn sạch lỗi.
 
                                 * **BAND 8 (Rất tốt):**
-                                * **Fluency:** Hiếm khi lặp lại/tự sửa lỗi. Mạch lạc, dễ theo dõi.
-                                * **Vocab:** Sử dụng điêu luyện Idioms/từ hiếm (chấp nhận sai sót nhỏ không đáng kể).
-                                * **Grammar:** ĐẠI ĐA SỐ các câu đều không có lỗi. Lỗi sai là ngẫu nhiên (không hệ thống).
+                                    * **Fluency:** Hiếm khi lặp lại. Mạch lạc.
+                                    * **Vocab:** Dùng điêu luyện Idioms/từ hiếm (chấp nhận sai sót cực nhỏ).
+                                    * **Grammar:** ĐẠI ĐA SỐ câu không lỗi. Lỗi sai là ngẫu nhiên.
 
-                                * **BAND 7 (Tốt):**
-                                * **Fluency:** Nói dài hơi dễ dàng. Từ nối dùng linh hoạt (không bị cứng nhắc kiểu "Firstly, Secondly").
-                                * **Vocab:** Dùng được từ vựng ít phổ biến (Less common) & Collocation (tuy đôi khi chọn từ chưa chuẩn).
-                                * **Grammar:** THƯỜNG XUYÊN có các câu phức hoàn toàn không lỗi (Frequent error-free sentences).
+                                * **BAND 7 (Tốt - Target):**
+                                    * **Fluency:** Nói dài hơi dễ dàng. Từ nối linh hoạt (không cứng nhắc).
+                                    * **Vocab:** Dùng được từ ít phổ biến (Less common) & Collocation.
+                                    * **Grammar:** THƯỜNG XUYÊN có các câu phức hoàn toàn không lỗi.
 
-                                * **BAND 6 (Khá - Competent):**
-                                * **Fluency:** Sẵn sàng nói dài nhưng đôi khi mất mạch lạc. Từ nối dùng MÁY MÓC (Mechanical) hoặc sai.
-                                * **Vocab:** Đủ từ vựng để bàn luận. Biết cách Paraphrase (diễn giải lại).
-                                * **Grammar:** Có dùng câu phức nhưng THƯỜNG XUYÊN SAI (dù người nghe vẫn hiểu ý).
+                                * **BAND 6 (Khá):**
+                                    * **Fluency:** Sẵn sàng nói dài nhưng đôi khi mất mạch. Từ nối MÁY MÓC.
+                                    * **Vocab:** Đủ để bàn luận. Biết Paraphrase.
+                                    * **Grammar:** Có dùng câu phức nhưng THƯỜNG XUYÊN SAI.
 
-                                * **BAND 5 (Trung bình - Modest):**
-                                * **Fluency:** Nói chậm, lặp từ, lạm dụng quá mức một vài từ nối quen thuộc.
-                                * **Vocab:** Vốn từ hạn chế, ít khả năng Paraphrase.
-                                * **Grammar:** Chỉ chính xác khi dùng CÂU ĐƠN. Cứ sang câu phức là sai hoặc gượng gạo.
+                                * **BAND 5 (Trung bình):**
+                                    * **Fluency:** Nói chậm, lặp từ, ngắt quãng nhiều.
+                                    * **Vocab:** Hạn chế, ít Paraphrase.
+                                    * **Grammar:** Chỉ đúng khi dùng CÂU ĐƠN. Câu phức thường sai.
 
                                 * **BAND 4 (Hạn chế):**
-                                * **Fluency:** Ngắt quãng dài, không thể kết nối các câu lại với nhau.
-                                * **Vocab:** Rất cơ bản, lặp đi lặp lại.
-                                * **Grammar:** Các mệnh đề phụ (Subordinate clauses) rất hiếm hoặc dùng sai hoàn toàn.
-                                
-                                
-                                **Input Audio Context:** This is a student from class level {user['level']['level']}. However, GRADE BASED ON PERFORMANCE, not just level. E.g., if they use high-level idioms like "bilingual MC", "on the side" correctly, they deserve Band 6.0+ regardless of their class.
-                                
-                                OUTPUT FORMAT (Vietnamese Markdown):
-                                
-                                ### KẾT QUẢ: [Band Score] (Chấm công tâm theo rubric)
-                                
-                                ### PHÂN TÍCH CHI TIẾT (Dựa trên 4 tiêu chí):
-                                1. **Fluency & Coherence:** [Nhận xét độ trôi chảy, các từ nối đã dùng]
-                                2. **Lexical Resource:** [Đánh giá vốn từ, collocations, idioms (nếu có)]
-                                3. **Grammatical Range & Accuracy:** [Nhận xét cấu trúc câu đơn/phức, thì sử dụng]
-                                4. **Pronunciation:** [Nhận xét về âm đuôi, ngữ điệu, trọng âm]
-                                
-                                ### ĐỀ XUẤT CẢI THIỆN:
-                                * **Original:** "[Trích dẫn toàn bộ bài nói của học viên]"
-                                * **Better:** "[Giữ nguyên các cụm hay, chỉ sửa lỗi hoặc mở rộng ý)]"
-                                * **Giải thích chi tiết:** [Giải thích chi tiết từng thay đổi, dịch nghĩa tiếng Việt]
-                                """
+                                    * **Fluency:** Ngắt quãng dài, câu cụt.
+                                    * **Grammar:** Mệnh đề phụ rất hiếm hoặc sai hoàn toàn.
+
+                                ## OUTPUT FORMAT (Vietnamese Markdown):
+                                Trả về kết quả ngắn gọn, súc tích:
+
+                                ### TRANSCRIPT:
+                                "[Ghi lại nội dung học viên nói]"
+
+                                ### KẾT QUẢ: Band [Score]
+
+                                ### PHÂN TÍCH CHI TIẾT:
+                                1. **Fluency & Coherence:** [Nhận xét độ trôi chảy, xử lý các chỗ ngắt ngứ]
+                                2. **Lexical Resource:** [Nhận xét vốn từ]
+                                3. **Grammar:** [Nhận xét cấu trúc câu]
+                                4. **Pronunciation:** [Nhận xét ngữ điệu, âm đuôi]
+
+                                ### CẢI THIỆN (NÂNG BAND):
+                                *(Chỉ chọn ra tối đa 3-5 lỗi sai lớn nhất hoặc câu diễn đạt vụng về nhất để sửa. **TUYỆT ĐỐI KHÔNG** sửa những câu đã đúng/ổn).*
+
+                                * **Lỗi 1 (Grammar/Word Choice):**
+                                * **Gốc:** "[Trích văn bản gốc]"
+                                * **Sửa:** "[Viết lại tự nhiên hơn - Natural Speaking]"
+                                * **Lý do:** [Giải thích ngắn gọn]
+
+                                * **Lỗi 2 (Unnatural Phrasing):**
+                                * **Gốc:** "..."
+                                * **Sửa:** "..."
+                                * **Lý do:** ...
                         
                                 url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
                                 payload = {"contents": [{"parts": [{"text": prompt}, {"inline_data": {"mime_type": "audio/wav", "data": audio_b64}}]}]}
