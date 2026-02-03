@@ -128,7 +128,6 @@ def get_leaderboard(class_code):
                     
                     if not df_s.empty:
                         # --- FIX LỖI: Chuẩn hóa tên học viên trước khi Group ---
-                        # Bước này giúp gộp "Nguyen Van A" và "Nguyen Van A " thành 1 người
                         if 'Student' in df_s.columns:
                             df_s['Student'] = df_s['Student'].astype(str).apply(normalize_name)
 
@@ -190,24 +189,6 @@ def get_leaderboard(class_code):
 
                     df_w['Overall_Band'] = pd.to_numeric(df_w['Overall_Band'], errors='coerce')
                     lb_w = df_w.groupby('Student')['Overall_Band'].mean().reset_index()
-                    lb_w.columns = ['Học Viên', 'Điểm Writing (TB)']
-                    lb_w = lb_w.sort_values(by='Điểm Writing (TB)', ascending=False).head(10)
-                else: lb_w = None
-            else: lb_w = None
-        except: lb_w = None
-
-        return lb_s, lb_r, lb_w
-    except: return None, None, None
-
-        # 3. Writing (Mới)
-        try:
-            ws_w = sheet.worksheet("Writing_Logs")
-            df_w = pd.DataFrame(ws_w.get_all_records())
-            if not df_w.empty and 'Class' in df_w.columns:
-                df_w = df_w[df_w['Class'] == class_code]
-                if not df_w.empty:
-                    df_w['Overall_Band'] = pd.to_numeric(df_w['Overall_Band'], errors='coerce')
-                    lb_w = df_w.groupby('Student')['Overall_Band'].mean().reset_index() # TB điểm writing
                     lb_w.columns = ['Học Viên', 'Điểm Writing (TB)']
                     lb_w = lb_w.sort_values(by='Điểm Writing (TB)', ascending=False).head(10)
                 else: lb_w = None
