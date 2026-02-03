@@ -270,33 +270,15 @@ Most chronometer forerunners of that particular generation were English, but tha
         "status": "Active",
         "title": "Australian Agricultural Innovations: 1850 – 1900",
         "text": """
-During this period, there was a widespread expansion of agriculture in Australia. The selection
-system was begun, whereby small sections of land were parceled out by lot. Particularly in New
-South Wales, this led to conflicts between small holders and the emerging squatter class, whose
-abuse of the system often allowed them to take vast tracts of fertile land.
-There were also many positive advances in farming technology as the farmers adapted agricultural
-methods to the harsh Australian conditions. One of the most important was “dry farming”. This
-was the discovery that repeated ploughing of fallow, unproductive land could preserve nitrates and
-moisture, allowing the land to eventually be cultivated. This, along with the extension of the
-railways, allowed the development of what are now great inland wheat lands.
-The inland areas of Australia are less fertile than most other wheat-producing countries and yields
-per acre are lower. This slowed their development, but also led to the development of several labour
-saving devices. In 1843 John Ridley, a South Australian farmer, invented “the stripper”, a basic
-harvesting machine. By the 1860s its use was widespread. H. V. McKay, then only nineteen,
-modified the machine so that it was a complete harvester: cutting, collecting and sorting. McKay
-developed this early innovation into a large harvester manufacturing industry centred near
-Melbourne and exporting worldwide. Robert Bowyer Smith invented the “stump jump plough”,
-which let a farmer plough land which still had tree stumps on it. It did this by replacing the
-traditional plough shear with a set of wheels that could go over stumps, if necessary.
-The developments in farm machinery were supported by scientific research. During the late 19th
-century, South Australian wheat yields were declining. An agricultural scientist at the colony’s
-agricultural college, John Custance, found that this was due to a lack of phosphates and advised the
-use of soluble superphosphate fertilizer. The implementation of this scheme revitalised the industry.
-From early days it had been obvious that English and European sheep breeds had to be adapted to
-Australian conditions, but only near the end of the century was the same applied to crops. Prior to
-this, English and South African strains had been use, with varying degrees of success. WilliamFarrer, from Cambridge University, was the first to develop new wheat varieties that were better
-able to withstand dry Australian conditions. By 1914, Australia was no longer thought of as a land
-suitable only for sheep, but as a wheat-growing nation.
+During this period, there was a widespread expansion of agriculture in Australia. The selection system was begun, whereby small sections of land were parceled out by lot. Particularly in New South Wales, this led to conflicts between small holders and the emerging squatter class, whose abuse of the system often allowed them to take vast tracts of fertile land.
+
+There were also many positive advances in farming technology as the farmers adapted agricultural methods to the harsh Australian conditions. One of the most important was “dry farming”. This was the discovery that repeated ploughing of fallow, unproductive land could preserve nitrates and moisture, allowing the land to eventually be cultivated. This, along with the extension of the railways, allowed the development of what are now great inland wheat lands.
+
+The inland areas of Australia are less fertile than most other wheat-producing countries and yields per acre are lower. This slowed their development, but also led to the development of several labour saving devices. In 1843 John Ridley, a South Australian farmer, invented “the stripper”, a basic harvesting machine. By the 1860s its use was widespread. H. V. McKay, then only nineteen, modified the machine so that it was a complete harvester: cutting, collecting and sorting. McKay developed this early innovation into a large harvester manufacturing industry centred near Melbourne and exporting worldwide. Robert Bowyer Smith invented the “stump jump plough”, which let a farmer plough land which still had tree stumps on it. It did this by replacing the traditional plough shear with a set of wheels that could go over stumps, if necessary.
+
+The developments in farm machinery were supported by scientific research. During the late 19th century, South Australian wheat yields were declining. An agricultural scientist at the colony’s agricultural college, John Custance, found that this was due to a lack of phosphates and advised the use of soluble superphosphate fertilizer. The implementation of this scheme revitalised the industry.
+
+From early days it had been obvious that English and European sheep breeds had to be adapted to Australian conditions, but only near the end of the century was the same applied to crops. Prior to this, English and South African strains had been use, with varying degrees of success. WilliamFarrer, from Cambridge University, was the first to develop new wheat varieties that were better able to withstand dry Australian conditions. By 1914, Australia was no longer thought of as a land suitable only for sheep, but as a wheat-growing nation.
         """,
         "questions_mc": [
             {"id": "q1", "q": "1. What is dry farming?", "options": ["A. Preserving nitrates and moisture.", "B. Ploughing the land again and again.", "C. Cultivating fallow land."], "a": "B. Ploughing the land again and again.", "exp": "Dẫn chứng (Đoạn 2): 'This was the discovery that repeated ploughing of fallow... could preserve nitrates...' -> Dry farming là phương pháp cày xới liên tục (repeated ploughing) để giữ ẩm."},
@@ -421,43 +403,47 @@ st.markdown("""
     </style>
     
     <script>
-    // TÍNH NĂNG HIGHLIGHT BẰNG CÁCH BÔI ĐEN (Robust Version)
+    // TÍNH NĂNG HIGHLIGHT CẢI TIẾN (Hỗ trợ bôi đen nhiều dòng)
     document.addEventListener('mouseup', function() {
         var selection = window.getSelection();
-        var selectedText = selection.toString();
-        
-        // Chỉ xử lý nếu có text được bôi đen và không rỗng
-        if (selectedText.length > 0 && selection.rangeCount > 0) {
-            // Hàm kiểm tra xem node có nằm trong vùng bài đọc (.reading-text) không
-            function hasReadingClass(node) {
-                if (!node) return false;
-                if (node.nodeType === 3) node = node.parentNode; // Nếu là Text Node thì lấy cha
-                return node.closest('.reading-text') !== null;
-            }
-
+        if (selection.rangeCount > 0) {
             var range = selection.getRangeAt(0);
-            var commonAncestor = range.commonAncestorContainer;
+            var selectedText = selection.toString();
+            
+            if (selectedText.trim().length > 0) {
+                // Kiểm tra xem vùng chọn có nằm trong bài đọc không
+                var commonAncestor = range.commonAncestorContainer;
+                var readingContainer = null;
+                
+                // Tìm container cha có class 'reading-text'
+                var node = commonAncestor;
+                while (node) {
+                    if (node.nodeType === 1 && node.classList.contains('reading-text')) {
+                        readingContainer = node;
+                        break;
+                    }
+                    node = node.parentNode;
+                }
 
-            // Kiểm tra vùng chọn có nằm trọn vẹn trong bài đọc không
-            if (hasReadingClass(commonAncestor)) {
-                try {
-                    var span = document.createElement("span");
-                    span.className = "highlighted";
-                    span.title = "Click để xóa highlight";
-                    
-                    // Sự kiện click để xóa highlight
-                    span.onclick = function(e) {
-                        e.stopPropagation(); // Ngăn sự kiện nổi bọt
-                        var text = document.createTextNode(this.innerText);
-                        this.parentNode.replaceChild(text, this);
-                        // Gộp các text node lại
-                        if (text.parentNode) text.parentNode.normalize(); 
-                    };
-
-                    range.surroundContents(span);
-                    selection.removeAllRanges(); // Bỏ bôi đen sau khi highlight xong
-                } catch (e) { 
-                    console.log("Không thể highlight qua nhiều đoạn văn bản (block elements). Hãy chọn từng đoạn một."); 
+                if (readingContainer) {
+                    try {
+                        // Sử dụng try/catch để xử lý trường hợp highlight phức tạp (qua nhiều thẻ)
+                        // Phương pháp an toàn: Tạo span và bọc nội dung (nếu không cắt ngang thẻ)
+                        var span = document.createElement("span");
+                        span.className = "highlighted";
+                        span.title = "Click để xóa highlight";
+                        span.onclick = function(e) {
+                            e.stopPropagation();
+                            var text = document.createTextNode(this.innerText);
+                            this.parentNode.replaceChild(text, this);
+                            if (text.parentNode) text.parentNode.normalize(); 
+                        };
+                        
+                        range.surroundContents(span);
+                        selection.removeAllRanges();
+                    } catch (e) {
+                        console.log("Highlight phức tạp: Vui lòng chọn từng đoạn văn bản nhỏ hơn.");
+                    }
                 }
             }
         }
