@@ -786,10 +786,40 @@ else:
                             
                                 
                                 **RUBRIC CHẤM ĐIỂM (BẮT BUỘC TUÂN THỦ):**
-                                - **Band 7-8-9:** Nói trôi chảy, ít ngắt quãng. Sử dụng từ nối, từ vựng phong phú (idioms, collocations) chính xác. Cấu trúc ngữ pháp phức tạp (câu điều kiện, mệnh đề quan hệ) thành thạo. Phát âm chuẩn, có ngữ điệu.
-                                - **Band 6:** Nói mạch lạc nhưng đôi khi mất kết nối. Có dùng từ nối. Vốn từ đủ dùng, bắt đầu paraphrase. Có sử dụng câu phức nhưng vẫn còn lỗi. Phát âm rõ ràng.
-                                - **Band 5:** Duy trì được mạch nói nhưng hay lặp lại/tự sửa sai. Vốn từ hạn chế ở các chủ đề quen thuộc. Dùng câu đơn đúng, câu phức thường sai.
-                                - **Band 4:** Hay ngập ngừng, nói câu cụt. Vốn từ nghèo nàn, lặp lại. Ngữ pháp rất cơ bản, mắc lỗi thường xuyên.
+                                1. **Band 9 (Expert):**
+                                - **Fluency:** Speaks fluently with only rare repetition or self-correction. Hesitation is ONLY for content, not language.
+                                - **Vocab:** Uses vocabulary with full flexibility and precision. Idiomatic language is natural and accurate.
+                                - **Grammar:** Full range of structures naturally and appropriately. consistent grammatical accuracy.
+                                - **Pronunciation:** Effortless, sustains flexible use of features throughout.
+
+                                2. **Band 8 (Very Good):**
+                                - **Fluency:** Speaks fluently with only occasional repetition/self-correction.
+                                - **Vocab:** Uses a wide vocab resource flexibly to convey precise meaning. Uses less common and idiomatic vocabulary skillfully but with occasional inaccuracies.
+                                - **Grammar:** Wide range of structures. The majority of sentences are error-free. Occasional non-systematic errors.
+                                - **Pronunciation:** Sustains flexible use of features, with only occasional lapses.
+
+                                3. **Band 7 (Good) - *MỨC SÀN QUAN TRỌNG*:**
+                                - **Fluency:** Speaks at length without noticeable effort or loss of coherence. May demonstrate some language-related hesitation.
+                                - **Vocab:** Uses vocabulary resources flexibly. Uses some less common and idiomatic vocabulary and shows some awareness of style and collocation, though with some inappropriate choices.
+                                - **Grammar:** Uses a range of complex structures with some flexibility. Frequently produces error-free sentences, though some grammatical mistakes persist.
+                                - **Pronunciation:** Shows all the positive features of Band 6 and some of Band 8.
+
+                                4. **Band 6 (Competent):**
+                                - **Fluency:** Is willing to speak at length, though may lose coherence at times due to occasional repetition, self-correction, or hesitation. Uses a range of connectives and discourse markers but not always appropriately (**sometimes mechanical**).
+                                - **Vocab:** Has a wide enough vocabulary to discuss topics at length and make meaning clear in spite of inappropriacies. Successfully paraphrases.
+                                - **Grammar:** Uses a mix of simple and complex structures, but with limited flexibility. May make frequent mistakes with complex structures, though these rarely cause comprehension problems.
+                                - **Pronunciation:** Uses a range of pronunciation features with mixed control.
+
+                                5. **Band 5 (Modest):**
+                                - **Fluency:** Usually maintains flow but uses repetition, self-correction and/or slow speech to keep going.
+                                - **Vocab:** Manages to talk about familiar and unfamiliar topics but uses vocabulary with limited flexibility.
+                                - **Grammar:** Produces basic sentences with reasonable accuracy. Uses a limited range of more complex structures, but these usually contain errors and may cause some comprehension problems.
+                                - **Pronunciation:** Shows all the positive features of Band 4 and some of Band 6.
+
+                                6. **Band 4 (Limited):**
+                                - **Fluency:** Cannot respond without noticeable pauses and may speak slowly, with frequent repetition and self-correction.
+                                - **Vocab:** Able to talk about familiar topics but can only convey basic meaning on unfamiliar topics. Frequent errors in word choice.
+                                - **Grammar:** Produces basic sentence forms and some correct simple sentences but subordinate structures are rare.
                                 
                                 **Input Audio Context:** This is a student from class level {user['level']['level']}. However, GRADE BASED ON PERFORMANCE, not just level. E.g., if they use high-level idioms like "bilingual MC", "on the side" correctly, they deserve Band 6.0+ regardless of their class.
                                 
@@ -805,8 +835,8 @@ else:
                                 
                                 ### ĐỀ XUẤT CẢI THIỆN:
                                 * **Original:** "[Trích dẫn toàn bộ bài nói của học viên]"
-                                * **Better:** "[Phiên bản nâng cấp tự nhiên hơn/Native speaker style]"
-                                * **Giải thích chi tiết:** [Giải thích từng thay đổi nhỏ: tại sao dùng từ này thay từ kia, cấu trúc này hay hơn chỗ nào...]
+                                * **Better:** "[Phiên bản nâng cấp (Giữ nguyên các cụm hay, chỉ sửa lỗi hoặc mở rộng ý)]"
+                                * **Giải thích chi tiết:** [Giải thích tại sao sửa hoặc tại sao giữ nguyên]
                                 """
                         
                                 url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
