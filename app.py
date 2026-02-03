@@ -826,7 +826,7 @@ else:
                             st.warning("File âm thanh quá ngắn.")
                             proc["error"] = False
                         else:
-                            with st.spinner("Đang kết nối AI chấm điểm..."):
+                            with st.spinner("Đang chấm điểm..."):
                                 try:
                                     audio_b64 = base64.b64encode(audio_bytes).decode('utf-8')
                                     # === PROMPT RUBRIC CHUẨN XÁC ===
@@ -894,19 +894,24 @@ else:
                                 * **Sửa:** "..."
                                 * **Lý do:** ...
                                 """
-                                # GỌI HÀM CALL_GEMINI MỚI VỚI CƠ CHẾ RETRY
-                                text_result = call_gemini(prompt, audio_data=audio_b64)
-                                
-                                if text_result:
-                                    st.markdown(text_result)
-                                    st.session_state['speaking_attempts'][question] = attempts + 1
+                                    # Gọi API
+                                    text_result = call_gemini(prompt, audio_data=audio_b64)
                                     
-                                    # LƯU ĐIỂM (Đã sửa lỗi tham số thừa)
-                                    save_speaking_log(user['name'], user['class'], lesson_choice, question, text_result)
-                                else:
-                                    st.error(f"⚠️ Hệ thống đang bận (429 Resource Exhausted). Vui lòng thử lại sau vài giây.")
-                        except Exception as e:
-                            st.error(f"Lỗi hệ thống: {e}")
+                                    if text_result:
+                                        proc["result"] = text_result
+                                        proc["error"] = False
+                                        st.session_state['speaking_attempts'][question] = attempts + 1
+                                        save_speaking_log(user['name'], user['class'], lesson_choice, question, text_result)
+                                        st.rerun() # Rerun để ẩn nút Retry và hiện kết quả
+                                    else:
+                                        proc["error"] = True # Đánh dấu lỗi
+                                        st.rerun() # Rerun để hiện nút Retry
+                                except Exception as e:
+                                    st.error(f"Lỗi không xác định: {e}")
+                    
+                    # 4. Hiển thị kết quả (Nếu đã có)
+                    if proc["result"]:
+                        st.markdown(proc["result"])
             else:
                 st.warning("⛔ Đã hết 5 lượt trả lời.")
         else:
