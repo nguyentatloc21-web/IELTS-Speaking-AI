@@ -34,9 +34,7 @@ def connect_gsheet():
         return None
 
 def save_speaking_log(student, class_code, lesson, question, full_feedback):
-    """
-    Hàm lưu điểm Speaking thông minh
-    """
+    """Lưu điểm Speaking"""
     try:
         sheet = connect_gsheet()
         if sheet:
@@ -44,14 +42,10 @@ def save_speaking_log(student, class_code, lesson, question, full_feedback):
                 ws = sheet.worksheet("Speaking_Logs")
             except:
                 ws = sheet.add_worksheet(title="Speaking_Logs", rows="1000", cols="10")
-                # Header chuẩn 8 cột
                 ws.append_row(["Timestamp", "Student", "Class", "Lesson", "Question", "Band_Short", "Score_Num", "Full_Feedback"])
             
-            # --- LOGIC TRÍCH XUẤT ĐIỂM SỐ ---
             score_num = 0.0
             band_short = "N/A"
-            
-            # Tìm các mẫu số phổ biến trong bài chấm IELTS
             match = re.search(r"(?:Band Score|KẾT QUẢ|BAND|Band).*?(\d+\.?\d*)", full_feedback, re.IGNORECASE)
             if match:
                 try:
@@ -66,18 +60,8 @@ def save_speaking_log(student, class_code, lesson, question, full_feedback):
                     score_num = float(match_fallback.group(1))
                     band_short = str(score_num)
 
-            # Lưu vào Sheet
-            ws.append_row([
-                str(datetime.now()), 
-                student, 
-                class_code, 
-                lesson, 
-                question, 
-                band_short,  # Cột 6
-                score_num,   # Cột 7
-                full_feedback # Cột 8
-            ])
-            st.toast("✅ Đã lưu điểm và feedback vào hệ thống!", icon="💾")
+            ws.append_row([str(datetime.now()), student, class_code, lesson, question, band_short, score_num, full_feedback])
+            st.toast("✅ Đã lưu kết quả!", icon="💾")
     except Exception as e:
         print(f"Save Error: {e}")
 
