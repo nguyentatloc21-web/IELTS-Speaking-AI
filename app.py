@@ -786,37 +786,42 @@ else:
                             
                                 
                                 **RUBRIC CHẤM ĐIỂM (BẮT BUỘC TUÂN THỦ):**
-                                ## GRADING RUBRIC (CRITICAL DIFFERENTIATORS):
-                                Evaluate based on the "lowest performance" principle.
-                                * **BAND 9 (Native-like):**
-                                * **Fluency:** Effortless, no language-related hesitation.
-                                * **Vocab:** Precise, sophisticated, stylistic control.
-                                * **Grammar:** Naturally flexible, completely error-free (slips only).
+                                ## HƯỚNG DẪN CHẤM THI (LƯU Ý KỸ THUẬT):
+                                1. **XỬ LÝ NGẮT NGHỈ (QUAN TRỌNG):** Đây là văn bản chuyển từ giọng nói (STT). **BỎ QUA** các lỗi ngắt quãng/dấu chấm lửng (...) nếu chúng không làm gãy cấu trúc ngữ pháp. Hãy giả định thí sinh đang suy nghĩ tự nhiên (natural hesitation). Chỉ trừ điểm Fluency nếu câu bị cụt hoặc lặp từ vô nghĩa.
+                                2. **NGUYÊN TẮC CHẤM:** Đánh giá dựa trên "Sàn thấp nhất" (Lowest performance). Ví dụ: Ngữ pháp tốt (Band 7) nhưng Từ vựng nghèo nàn (Band 5) -> Kéo điểm xuống gần Band 5-6.
 
-                                * **BAND 8 (Very Good):**
-                                * **Fluency:** Rare repetition/correction. Coherence is easy.
-                                * **Vocab:** Skillful use of idioms/uncommon words (occasional inaccuracies).
-                                * **Grammar:** Majority of sentences are error-free. Errors are non-systematic (random).
+                                ## TIÊU CHÍ PHÂN LOẠI (KEYWORDS CỐT LÕI):
 
-                                * **BAND 7 (Good - TARGET):**
-                                * **Fluency:** Speaks at length. Connectives used flexibly (not just "Firstly/Secondly").
-                                * **Vocab:** Uses less common items & collocation awareness (some inappropriate choices allowed).
-                                * **Grammar:** FREQUENT error-free sentences. Good control of complex structures.
+                                * **BAND 9 (Thành thạo - Native-like):**
+                                * **Fluency:** Trôi chảy tự nhiên, không hề vấp váp do tìm từ.
+                                * **Vocab:** Chính xác tuyệt đối, tinh tế, dùng từ như người bản xứ.
+                                * **Grammar:** Linh hoạt, hoàn toàn sạch lỗi (chỉ chấp nhận lỗi trượt miệng cực nhỏ).
 
-                                * **BAND 6 (Competent):**
-                                * **Fluency:** Willing to speak but loses coherence. Connectives are MECHANICAL or faulty.
-                                * **Vocab:** Adequate topic vocab. Successfully paraphrases.
-                                * **Grammar:** Mix of simple & complex. Complex sentences frequently have errors (but meaning is clear).
+                                * **BAND 8 (Rất tốt):**
+                                * **Fluency:** Hiếm khi lặp lại/tự sửa lỗi. Mạch lạc, dễ theo dõi.
+                                * **Vocab:** Sử dụng điêu luyện Idioms/từ hiếm (chấp nhận sai sót nhỏ không đáng kể).
+                                * **Grammar:** ĐẠI ĐA SỐ các câu đều không có lỗi. Lỗi sai là ngẫu nhiên (không hệ thống).
 
-                                * **BAND 5 (Modest):**
-                                * **Fluency:** Slow, repetitive, over-use of certain connectives.
-                                * **Vocab:** Limited flexibility, minimal paraphrasing.
-                                * **Grammar:** Accurate ONLY in simple sentences. Complex structures are faulty.
+                                * **BAND 7 (Tốt):**
+                                * **Fluency:** Nói dài hơi dễ dàng. Từ nối dùng linh hoạt (không bị cứng nhắc kiểu "Firstly, Secondly").
+                                * **Vocab:** Dùng được từ vựng ít phổ biến (Less common) & Collocation (tuy đôi khi chọn từ chưa chuẩn).
+                                * **Grammar:** THƯỜNG XUYÊN có các câu phức hoàn toàn không lỗi (Frequent error-free sentences).
 
-                                * **BAND 4 (Limited):**
-                                * **Fluency:** Long pauses, cannot link sentences.
-                                * **Vocab:** Basic/Repetitive.
-                                * **Grammar:** Subordinate clauses are rare/wrong.
+                                * **BAND 6 (Khá - Competent):**
+                                * **Fluency:** Sẵn sàng nói dài nhưng đôi khi mất mạch lạc. Từ nối dùng MÁY MÓC (Mechanical) hoặc sai.
+                                * **Vocab:** Đủ từ vựng để bàn luận. Biết cách Paraphrase (diễn giải lại).
+                                * **Grammar:** Có dùng câu phức nhưng THƯỜNG XUYÊN SAI (dù người nghe vẫn hiểu ý).
+
+                                * **BAND 5 (Trung bình - Modest):**
+                                * **Fluency:** Nói chậm, lặp từ, lạm dụng quá mức một vài từ nối quen thuộc.
+                                * **Vocab:** Vốn từ hạn chế, ít khả năng Paraphrase.
+                                * **Grammar:** Chỉ chính xác khi dùng CÂU ĐƠN. Cứ sang câu phức là sai hoặc gượng gạo.
+
+                                * **BAND 4 (Hạn chế):**
+                                * **Fluency:** Ngắt quãng dài, không thể kết nối các câu lại với nhau.
+                                * **Vocab:** Rất cơ bản, lặp đi lặp lại.
+                                * **Grammar:** Các mệnh đề phụ (Subordinate clauses) rất hiếm hoặc dùng sai hoàn toàn.
+                                
                                 
                                 **Input Audio Context:** This is a student from class level {user['level']['level']}. However, GRADE BASED ON PERFORMANCE, not just level. E.g., if they use high-level idioms like "bilingual MC", "on the side" correctly, they deserve Band 6.0+ regardless of their class.
                                 
@@ -833,7 +838,7 @@ else:
                                 ### ĐỀ XUẤT CẢI THIỆN:
                                 * **Original:** "[Trích dẫn toàn bộ bài nói của học viên]"
                                 * **Better:** "[Giữ nguyên các cụm hay, chỉ sửa lỗi hoặc mở rộng ý)]"
-                                * **Giải thích chi tiết:** [Giải thích tại sao sửa hoặc tại sao giữ nguyên]
+                                * **Giải thích chi tiết:** [Giải thích chi tiết từng thay đổi, dịch nghĩa tiếng Việt]
                                 """
                         
                                 url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
