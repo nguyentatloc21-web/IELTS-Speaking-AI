@@ -784,8 +784,13 @@ else:
                                 Role: Senior IELTS Speaking Examiner (Focus on Communicative Effectiveness).
                         
                                 Task: Assess speaking response for "{question}" based strictly on the rubric
-                                Chấp nhận các natural pauses mà không ảnh hưởng đến điểm fluency và pronunciation
-                                NGUYÊN TẮC CHẤM: Đánh giá dựa trên "Sàn thấp nhất" (Lowest performance). Ví dụ: Ngữ pháp tốt (Band 7) nhưng Từ vựng nghèo nàn (Band 5) -> Kéo điểm xuống gần Band 5-6.
+                                **CRITICAL INSTRUCTIONS:**
+                                1. **LISTEN TO AUDIO SIGNAL:** Detect mispronunciation or hesitation. Do NOT rely only on transcript.
+                                2. **NO AUTO-CORRECT:** If the student says "bannan" but means "banana", you MUST point out the pronunciation error. DO NOT just write "banana" in transcript without comment.
+                                3. **PRONUNCIATION:**
+                                   - **If Bad:** Specify the word and how it sounded (e.g., "Said 'think' as 'sink'").
+                                   - **If Good:** Praise intonation or stress. DO NOT say "needs improvement" if it's already good.
+                                4. **VOCAB:** Praise good words. DO NOT paraphrase if the original phrase is already natural/correct.
 
                                 ## GRADING RUBRIC (TIÊU CHÍ PHÂN LOẠI CỐT LÕI):
                                 
