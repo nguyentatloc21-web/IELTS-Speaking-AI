@@ -832,7 +832,7 @@ else:
                                 
                                 ### ĐỀ XUẤT CẢI THIỆN:
                                 * **Original:** "[Trích dẫn toàn bộ bài nói của học viên]"
-                                * **Better:** "[Phiên bản nâng cấp (Giữ nguyên các cụm hay, chỉ sửa lỗi hoặc mở rộng ý)]"
+                                * **Better:** "[Giữ nguyên các cụm hay, chỉ sửa lỗi hoặc mở rộng ý)]"
                                 * **Giải thích chi tiết:** [Giải thích tại sao sửa hoặc tại sao giữ nguyên]
                                 """
                         
