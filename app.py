@@ -430,7 +430,7 @@ if 'reading_session' not in st.session_state: st.session_state['reading_session'
 if 'reading_highlight' not in st.session_state: st.session_state['reading_highlight'] = ""
 if 'writing_step' not in st.session_state: st.session_state['writing_step'] = 'outline' 
 if 'writing_outline_score' not in st.session_state: st.session_state['writing_outline_score'] = 0
-# ================= 3. LOGIC ĐĂNG NHẬP =================
+# ================= 3. LOGIC ĐĂNG NHẬP (ĐÃ CHUẨN HÓA TÊN) =================
 def login():
     st.markdown("<div style='text-align: center; margin-top: 50px;'><h1>MR. TAT LOC IELTS CLASS</h1></div>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 1, 1])
@@ -440,13 +440,13 @@ def login():
             class_code = st.selectbox("Chọn Mã Lớp:", ["-- Chọn lớp --"] + list(CLASS_CONFIG.keys()))
             if st.form_submit_button("Vào Lớp Học"):
                 if name and class_code != "-- Chọn lớp --":
-                    st.session_state['user'] = {"name": name, "class": class_code, "level": CLASS_CONFIG[class_code]}
+                    # CHUẨN HÓA TÊN: "  nguyễn văn a  " -> "Nguyễn Văn A"
+                    clean_name = normalize_name(name)
+                    st.session_state['user'] = {"name": clean_name, "class": class_code, "level": CLASS_CONFIG[class_code]}
                     st.rerun()
                 else: st.warning("Vui lòng điền đủ thông tin.")
 
-def logout():
-    st.session_state['user'] = None
-    st.rerun()
+def logout(): st.session_state['user'] = None; st.rerun()
 
 # ================= 4. GIAO DIỆN CHÍNH =================
 if 'user' not in st.session_state or st.session_state['user'] is None:
