@@ -785,7 +785,7 @@ else:
                         
                                 Task: Assess speaking response for "{question}" based strictly on the rubric
                                 Chấp nhận các natural pauses mà không ảnh hưởng đến điểm fluency và pronunciation
-                    
+                                NGUYÊN TẮC CHẤM: Đánh giá dựa trên "Sàn thấp nhất" (Lowest performance). Ví dụ: Ngữ pháp tốt (Band 7) nhưng Từ vựng nghèo nàn (Band 5) -> Kéo điểm xuống gần Band 5-6.
 
                                 ## GRADING RUBRIC (TIÊU CHÍ PHÂN LOẠI CỐT LÕI):
                                 
@@ -844,7 +844,7 @@ else:
                                 **Lỗi 1 (Grammar/Word Choice):**
                                 * **Gốc:** "[Trích văn bản gốc]"
                                 * **Sửa:** "[Viết lại tự nhiên hơn - Natural Speaking]"
-                                * **Lý do:** [Giải thích ngắn gọn]
+                                * **Lý do:** [Giải thích ngắn gọn, nghĩa tiếng Việt]
 
                                 **Lỗi 2 (Unnatural Phrasing):**
                                 * **Gốc:** "..."
