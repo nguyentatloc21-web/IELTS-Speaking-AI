@@ -787,10 +787,7 @@ else:
                                 **CRITICAL INSTRUCTIONS:**
                                 1. **LISTEN TO AUDIO SIGNAL:** Detect mispronunciation or hesitation. Do NOT rely only on transcript.
                                 2. **NO AUTO-CORRECT:** If the student says "bannan" but means "banana", you MUST point out the pronunciation error. DO NOT just write "banana" in transcript without comment.
-                                3. **PRONUNCIATION:**
-                                   - **If Bad:** Specify the word and how it sounded (e.g., "Said 'think' as 'sink'").
-                                   - **If Good:** Praise intonation or stress. DO NOT say "needs improvement" if it's already good.
-                                4. **VOCAB:** Praise good words. DO NOT paraphrase if the original phrase is already natural/correct.
+                    
 
                                 ## GRADING RUBRIC (TIÊU CHÍ PHÂN LOẠI CỐT LÕI):
                                 
