@@ -831,9 +831,17 @@ else:
                                     audio_b64 = base64.b64encode(audio_bytes).decode('utf-8')
                                     # === PROMPT RUBRIC CHUẨN XÁC ===
                                     prompt = f"""
-                                Role: Senior IELTS Speaking Examiner (Focus on Communicative Effectiveness).
+                                Role: Senior IELTS Speaking Examiner.
                         
-                                Task: Assess speaking response for "{question}" based strictly on the rubric
+                                Task: Assess speaking response for "{question}" based strictly on the rubric.
+                                **🚨 CRITICAL INSTRUCTION FOR TRANSCRIPT (QUAN TRỌNG NHẤT):**
+                                1. **VERBATIM TRANSCRIPTION:** You must write EXACTLY what you hear, sound-by-sound.
+                                2. **NO AUTO-CORRECT:** Do NOT fix grammar or pronunciation errors. 
+                                   - If the user says "I go school" (missing 'to'), WRITE "I go school".
+                                   - If the user mispronounces "think" as "sink", WRITE "sink" (or "tink").
+                                   - If the user misses final sounds (e.g., "five" -> "fi"), WRITE "fi".
+                                3. The transcript MUST reflect the raw performance so the user can see their mistakes.
+
                                 ## GRADING RUBRIC (TIÊU CHÍ PHÂN LOẠI CỐT LÕI):
 
                                 * **BAND 9 (Native-like):**
@@ -871,7 +879,7 @@ else:
                                 Trả về kết quả chi tiết:
 
                                 ### TRANSCRIPT:
-                                "[Dựa trên file ghi âm, ghi lại chính xác nội dung học viên nói, kể cả những từ vô nghĩa, không auto correct những từ mà học viên phát âm sai]"
+                                "[Ghi lại chính xác từng âm thanh nghe được. Nếu học viên nói sai ngữ pháp hoặc phát âm sai từ nào, HÃY GHI LẠI Y NGUYÊN LỖI ĐÓ. Ví dụ: nói 'sink' thay vì 'think', hãy ghi 'sink'. TUYỆT ĐỐI KHÔNG TỰ ĐỘNG SỬA THÀNH CÂU ĐÚNG]"
 
                                 ### KẾT QUẢ: [Score - format 5.0, 5.5]
 
