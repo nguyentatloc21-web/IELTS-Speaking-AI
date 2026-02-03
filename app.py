@@ -421,13 +421,13 @@ st.markdown("""
     </style>
     
     <script>
-    // TÍNH NĂNG HIGHLIGHT BẰNG CÁCH BÔI ĐEN (Updated)
+    // TÍNH NĂNG HIGHLIGHT BẰNG CÁCH BÔI ĐEN (Robust Version)
     document.addEventListener('mouseup', function() {
         var selection = window.getSelection();
         var selectedText = selection.toString();
         
-        // Chỉ xử lý nếu có text được bôi đen
-        if (selectedText.length > 0) {
+        // Chỉ xử lý nếu có text được bôi đen và không rỗng
+        if (selectedText.length > 0 && selection.rangeCount > 0) {
             // Hàm kiểm tra xem node có nằm trong vùng bài đọc (.reading-text) không
             function hasReadingClass(node) {
                 if (!node) return false;
@@ -435,29 +435,29 @@ st.markdown("""
                 return node.closest('.reading-text') !== null;
             }
 
-            var anchor = selection.anchorNode;
-            var focus = selection.focusNode;
+            var range = selection.getRangeAt(0);
+            var commonAncestor = range.commonAncestorContainer;
 
-            if (hasReadingClass(anchor) && hasReadingClass(focus)) {
-                var range = selection.getRangeAt(0);
-                var span = document.createElement("span");
-                span.className = "highlighted";
-                span.title = "Click để xóa highlight";
-                
-                // Sự kiện click để xóa highlight
-                span.onclick = function(e) {
-                    e.stopPropagation(); // Ngăn sự kiện nổi bọt
-                    var text = document.createTextNode(this.innerText);
-                    this.parentNode.replaceChild(text, this);
-                    // Gộp các text node lại để tránh lỗi chọn sau này
-                    if (text.parentNode) text.parentNode.normalize(); 
-                };
-
+            // Kiểm tra vùng chọn có nằm trọn vẹn trong bài đọc không
+            if (hasReadingClass(commonAncestor)) {
                 try {
+                    var span = document.createElement("span");
+                    span.className = "highlighted";
+                    span.title = "Click để xóa highlight";
+                    
+                    // Sự kiện click để xóa highlight
+                    span.onclick = function(e) {
+                        e.stopPropagation(); // Ngăn sự kiện nổi bọt
+                        var text = document.createTextNode(this.innerText);
+                        this.parentNode.replaceChild(text, this);
+                        // Gộp các text node lại
+                        if (text.parentNode) text.parentNode.normalize(); 
+                    };
+
                     range.surroundContents(span);
                     selection.removeAllRanges(); // Bỏ bôi đen sau khi highlight xong
                 } catch (e) { 
-                    console.log("Không thể highlight qua nhiều đoạn văn (block elements)."); 
+                    console.log("Không thể highlight qua nhiều đoạn văn bản (block elements). Hãy chọn từng đoạn một."); 
                 }
             }
         }
@@ -992,7 +992,15 @@ else:
     # --- MODULE 2: READING (SPLIT VIEW & REALTIME TIMER) ---
     elif menu == "📖 Reading":
         st.title("📖 Luyện Reading & Từ Vựng")
-        lesson_choice = st.selectbox("Chọn bài đọc:", READING_MENU)
+        
+        # --- CẬP NHẬT MENU DYNAMIC (ĐÃ SỬA LỖI MẤT BÀI 3) ---
+        # Đảm bảo bài Lesson 3 luôn hiển thị đúng
+        reading_options = [
+            "Lesson 2: Marine Chronometer",
+            "Lesson 3: Australian Agricultural Innovations"
+        ] + [f"Lesson {i}" for i in range(1, 11) if i not in [2, 3]]
+        
+        lesson_choice = st.selectbox("Chọn bài đọc:", reading_options)
         
         # Reset session khi đổi bài
         if 'current_reading_lesson' not in st.session_state or st.session_state['current_reading_lesson'] != lesson_choice:
@@ -1006,26 +1014,24 @@ else:
             
             tab1, tab2 = st.tabs(["Làm Bài Đọc Hiểu", "Bài Tập Từ Vựng AI"])
             
+            
             # TAB 1: BÀI ĐỌC CHÍNH (Split View)
             with tab1:
                 # --- TRẠNG THÁI 1: GIỚI THIỆU & CHỌN CHẾ ĐỘ ---
                 if st.session_state['reading_session']['status'] == 'intro':
                     st.info(f"### {data['title']}")
                     
-                    # LOGIC INTRO MỚI
-                    if 'reading_intro_text' not in st.session_state:
-                         # 1. Lesson 2 cho lớp PLA
-                        if "Lesson 2" in lesson_choice and user['class'].startswith("PLA"):
-                             st.session_state['reading_intro_text'] = "Thời chưa có vệ tinh, các thủy thủ rất sợ đi biển xa vì họ không biết mình đang ở đâu. Cách duy nhất để xác định vị trí là phải biết giờ chính xác. Nhưng khổ nỗi, đồng hồ quả lắc ngày xưa cứ mang lên tàu rung lắc là chạy sai hết. Bài này kể về hành trình chế tạo ra chiếc đồng hồ đi biển đầu tiên, thứ đã cứu mạng hàng ngàn thủy thủ."
-                        # 2. Lesson 3
-                        if "Lesson 3" in lesson_choice and user['class'].startswith("PLA"):
-                             st.session_state['reading_intro_text'] = "Làm nông nghiệp ở Úc khó hơn nhiều so với ở Anh hay châu Âu vì đất đai ở đây rất khô và thiếu dinh dưỡng. Vào cuối thế kỷ 19, những người nông dân Úc đứng trước nguy cơ phá sản vì các phương pháp canh tác cũ không còn hiệu quả.\nBài đọc này sẽ cho các bạn thấy họ đã xoay sở như thế nào bằng công nghệ. Từ việc chế tạo ra chiếc cày đặc biệt có thể tự 'nhảy' qua gốc cây, cho đến việc lai tạo giống lúa mì chịu hạn. Chính những sáng kiến này đã biến nước Úc từ một nơi chỉ nuôi cừu thành một cường quốc xuất khẩu lúa mì thế giới."
-                        
-                        # Đã xóa phần tự động tạo Intro bằng AI
+                    # LOGIC INTRO CỐ ĐỊNH (KHÔNG DÙNG AI)
+                    intro_text = ""
+                    # 1. Lesson 2 cho lớp PLA
+                    if "Lesson 2" in lesson_choice and user['class'].startswith("PLA"):
+                         intro_text = "Thời chưa có vệ tinh, các thủy thủ rất sợ đi biển xa vì họ không biết mình đang ở đâu. Cách duy nhất để xác định vị trí là phải biết giờ chính xác. Nhưng khổ nỗi, đồng hồ quả lắc ngày xưa cứ mang lên tàu rung lắc là chạy sai hết. Bài này kể về hành trình chế tạo ra chiếc đồng hồ đi biển đầu tiên, thứ đã cứu mạng hàng ngàn thủy thủ."
+                    # 2. Lesson 3 (Cho mọi lớp hoặc PLA)
+                    elif "Lesson 3" in lesson_choice:
+                         intro_text = "Làm nông nghiệp ở Úc khó hơn nhiều so với ở Anh hay châu Âu vì đất đai ở đây rất khô và thiếu dinh dưỡng. Vào cuối thế kỷ 19, những người nông dân Úc đứng trước nguy cơ phá sản vì các phương pháp canh tác cũ không còn hiệu quả.\nBài đọc này sẽ cho các bạn thấy họ đã xoay sở như thế nào bằng công nghệ. Từ việc chế tạo ra chiếc cày đặc biệt có thể tự 'nhảy' qua gốc cây, cho đến việc lai tạo giống lúa mì chịu hạn. Chính những sáng kiến này đã biến nước Úc từ một nơi chỉ nuôi cừu thành một cường quốc xuất khẩu lúa mì thế giới."
                     
-                    if st.session_state.get('reading_intro_text'):
-                        st.markdown(f"**Giới thiệu về bài đọc:**\n\n{st.session_state['reading_intro_text']}")
-                    
+                    if intro_text:
+                        st.markdown(f"**Giới thiệu về bài đọc:**\n\n{intro_text}")
                     
                     st.write("**Thông tin bài thi:**")
                     col_info1, col_info2 = st.columns(2)
@@ -1043,8 +1049,6 @@ else:
                     if c2.button("Luyện Thi (20 Phút)"):
                         st.session_state['reading_session']['status'] = 'doing'; st.session_state['reading_session']['mode'] = 'exam'
                         st.session_state['reading_session']['end_time'] = datetime.now() + timedelta(minutes=20); st.rerun()
-
-                # --- TRẠNG THÁI 2: DOING ---
                 # --- TRẠNG THÁI 2: DOING ---
                 elif st.session_state['reading_session']['status'] == 'doing':
                     # Xử lý Timer (Javascript Realtime Countdown)
