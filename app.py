@@ -444,15 +444,21 @@ else:
         c1, c2, c3 = st.columns(3)
         with c1:
             st.subheader("🎤 Speaking (TB)")
-            if lb_s is not None and not lb_s.empty: st.dataframe(lb_s.style.format({"Điểm Speaking (TB)": "{:.2f}"}).background_gradient(cmap="Blues"), use_container_width=True)
+            if lb_s is not None and not lb_s.empty: 
+                # Đã xóa .background_gradient để fix lỗi
+                st.dataframe(lb_s.style.format({"Điểm Speaking (TB)": "{:.2f}"}), use_container_width=True)
             else: st.info("Chưa có dữ liệu.")
         with c2:
             st.subheader("📚 Reading (Max)")
-            if lb_r is not None and not lb_r.empty: st.dataframe(lb_r.style.format({"Điểm Reading (Max)": "{:.1f}"}).background_gradient(cmap="Greens"), use_container_width=True)
+            if lb_r is not None and not lb_r.empty: 
+                # Đã xóa .background_gradient để fix lỗi
+                st.dataframe(lb_r.style.format({"Điểm Reading (Max)": "{:.1f}"}), use_container_width=True)
             else: st.info("Chưa có dữ liệu.")
         with c3:
             st.subheader("✍️ Writing (TB)")
-            if lb_w is not None and not lb_w.empty: st.dataframe(lb_w.style.format({"Điểm Writing (TB)": "{:.2f}"}).background_gradient(cmap="Oranges"), use_container_width=True)
+            if lb_w is not None and not lb_w.empty: 
+                # Đã xóa .background_gradient để fix lỗi
+                st.dataframe(lb_w.style.format({"Điểm Writing (TB)": "{:.2f}"}), use_container_width=True)
             else: st.info("Chưa có dữ liệu.")
 
     # --- MODULE 5: WRITING (NEW & POLISHED) ---
