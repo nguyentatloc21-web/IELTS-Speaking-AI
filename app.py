@@ -796,30 +796,36 @@ else:
                                   * **Fluency:** Trôi chảy tự nhiên, không hề vấp váp do tìm từ.
                                   * **Vocab:** Chính xác tuyệt đối, tinh tế, idioms dùng như người bản xứ.
                                   * **Grammar:** Hoàn toàn sạch lỗi.
+                                  * **Pronunciation:** Hoàn hảo, ngữ điệu tự nhiên, đầy đủ âm cuối và nối âm.
 
                                 * **BAND 8 (Rất tốt):**
                                   * **Fluency:** Hiếm khi lặp lại. Mạch lạc.
                                   * **Vocab:** Dùng điêu luyện Idioms/từ hiếm (chấp nhận sai sót cực nhỏ).
                                   * **Grammar:** ĐẠI ĐA SỐ câu không lỗi. Lỗi sai là ngẫu nhiên.
+                                  * **Pronunciation:** Dễ hiểu xuyên suốt, sử dụng tốt ngữ điệu để nhấn mạnh ý.
 
                                 * **BAND 7 (Tốt - Target):**
                                   * **Fluency:** Nói dài dễ dàng. Từ nối linh hoạt (không cứng nhắc).
                                   * **Vocab:** Dùng được từ ít phổ biến (Less common) & Collocation.
                                   * **Grammar:** THƯỜNG XUYÊN có các câu phức hoàn toàn không lỗi.
+                                  * **Pronunciation:** Dễ hiểu, ngắt nghỉ đúng chỗ, ngữ điệu tự nhiên dù thỉnh thoảng có lỗi nhỏ.
 
                                 * **BAND 6 (Khá):**
                                   * **Fluency:** Sẵn sàng nói dài nhưng đôi khi mất mạch. Từ nối MÁY MÓC.
                                   * **Vocab:** Đủ để bàn luận. Biết Paraphrase.
                                   * **Grammar:** Có dùng câu phức nhưng THƯỜNG XUYÊN SAI.
+                                  * **Pronunciation:** Phát âm rõ ràng phần lớn thời gian, có âm cuối nhưng chưa ổn định.
 
                                 * **BAND 5 (Trung bình):**
                                   * **Fluency:** Nói chậm, lặp từ, ngắt quãng nhiều.
                                   * **Vocab:** Hạn chế, ít Paraphrase.
                                   * **Grammar:** Chỉ đúng khi dùng CÂU ĐƠN. Câu phức thường sai.
+                                  * **Pronunciation:** Đôi khi khó hiểu, thiếu âm cuối, ngữ điệu còn hạn chế.
 
                                 * **BAND 4 (Hạn chế):**
                                   * **Fluency:** Ngắt quãng dài, câu cụt.
                                   * **Grammar:** Mệnh đề phụ rất hiếm hoặc sai hoàn toàn.
+                                  * **Pronunciation:** Khó hiểu, phát âm sai nhiều, các âm cuối gần như không có.
 
                                 ## OUTPUT FORMAT (Vietnamese Markdown):
                                 Trả về kết quả ngắn gọn, súc tích:
