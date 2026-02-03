@@ -265,9 +265,49 @@ Most chronometer forerunners of that particular generation were English, but tha
             {"id": "q5", "q": "5. Hadley’s instrument can use [.........] to make a calculation of location of ships or planes.", "a": "angles", "exp": "Dẫn chứng (Đoạn 7): 'The sextant is the tool that people adopt to measure angles...' -> Dùng để đo góc."},
             {"id": "q6", "q": "6. The modern version of Harrison’s invention is called [.........].", "a": "marine chronometer", "exp": "Dẫn chứng (Đoạn 8): '...turns it into a genuine modem commercial product... marine chronometer...' -> Đồng hồ hàng hải."}
         ]
+    },
+    "Lesson 3: Australian Agricultural Innovations": {
+        "status": "Active",
+        "title": "Australian Agricultural Innovations: 1850 – 1900",
+        "text": """
+During this period, there was a widespread expansion of agriculture in Australia. The selection
+system was begun, whereby small sections of land were parceled out by lot. Particularly in New
+South Wales, this led to conflicts between small holders and the emerging squatter class, whose
+abuse of the system often allowed them to take vast tracts of fertile land.
+There were also many positive advances in farming technology as the farmers adapted agricultural
+methods to the harsh Australian conditions. One of the most important was “dry farming”. This
+was the discovery that repeated ploughing of fallow, unproductive land could preserve nitrates and
+moisture, allowing the land to eventually be cultivated. This, along with the extension of the
+railways, allowed the development of what are now great inland wheat lands.
+The inland areas of Australia are less fertile than most other wheat-producing countries and yields
+per acre are lower. This slowed their development, but also led to the development of several labour
+saving devices. In 1843 John Ridley, a South Australian farmer, invented “the stripper”, a basic
+harvesting machine. By the 1860s its use was widespread. H. V. McKay, then only nineteen,
+modified the machine so that it was a complete harvester: cutting, collecting and sorting. McKay
+developed this early innovation into a large harvester manufacturing industry centred near
+Melbourne and exporting worldwide. Robert Bowyer Smith invented the “stump jump plough”,
+which let a farmer plough land which still had tree stumps on it. It did this by replacing the
+traditional plough shear with a set of wheels that could go over stumps, if necessary.
+The developments in farm machinery were supported by scientific research. During the late 19th
+century, South Australian wheat yields were declining. An agricultural scientist at the colony’s
+agricultural college, John Custance, found that this was due to a lack of phosphates and advised the
+use of soluble superphosphate fertilizer. The implementation of this scheme revitalised the industry.
+From early days it had been obvious that English and European sheep breeds had to be adapted to
+Australian conditions, but only near the end of the century was the same applied to crops. Prior to
+this, English and South African strains had been use, with varying degrees of success. WilliamFarrer, from Cambridge University, was the first to develop new wheat varieties that were better
+able to withstand dry Australian conditions. By 1914, Australia was no longer thought of as a land
+suitable only for sheep, but as a wheat-growing nation.
+        """,
+        "questions_mc": [
+            {"id": "q1", "q": "1. What is dry farming?", "options": ["A. Preserving nitrates and moisture.", "B. Ploughing the land again and again.", "C. Cultivating fallow land."], "a": "B. Ploughing the land again and again.", "exp": "Dẫn chứng (Đoạn 2): 'This was the discovery that repeated ploughing of fallow... could preserve nitrates...' -> Dry farming là phương pháp cày xới liên tục (repeated ploughing) để giữ ẩm."},
+            {"id": "q2", "q": "2. What did H. V. McKay do?", "options": ["A. Export the stripper.", "B. Improve the stripper.", "C. Cut, collect, and sort wheat."], "a": "B. Improve the stripper.", "exp": "Dẫn chứng (Đoạn 3): 'H. V. McKay... modified the machine so that it was a complete harvester...' -> Modified the machine = Improve the stripper."},
+            {"id": "q3", "q": "3. What did the 'stump jump plough’ innovation allow farmers to do?", "options": ["A. Cut through tree stumps.", "B. Change the wheels for a traditional plough.", "C. Allow farmers to cultivate land that hadn’t been fully cleared."], "a": "C. Allow farmers to cultivate land that hadn’t been fully cleared.", "exp": "Dẫn chứng (Đoạn 3): '...let a farmer plough land which still had tree stumps on it.' -> Cày trên đất vẫn còn gốc cây (chưa dọn sạch)."},
+            {"id": "q4", "q": "4. What did John Custance recommend?", "options": ["A. Improving wheat yields.", "B. Revitalizing the industry.", "C. Fertilizing the soil."], "a": "C. Fertilizing the soil.", "exp": "Dẫn chứng (Đoạn 4): '...advised the use of soluble superphosphate fertilizer.' -> Khuyên dùng phân bón."},
+            {"id": "q5", "q": "5. Why was William Farrer’s wheat better?", "options": ["A. It was drought-resistant.", "B. It wasn’t from England or South Africa.", "C. It was drier for Australian conditions."], "a": "A. It was drought-resistant.", "exp": "Dẫn chứng (Đoạn 5): '...better able to withstand dry Australian conditions.' -> Chịu hạn tốt (drought-resistant)."}
+        ]
     }
 }
-
+    
 # WRITING CONTENT (Chỉ lớp ELITE)
 WRITING_CONTENT = {
     "Lesson 3: Education & Society": {
@@ -937,8 +977,8 @@ else:
             st.session_state['reading_highlight'] = ""
             if 'reading_intro_text' in st.session_state: del st.session_state['reading_intro_text']
 
-        if "Marine Chronometer" in lesson_choice:
-            data = READING_CONTENT["Lesson 2: Marine Chronometer"]
+        if lesson_choice in READING_CONTENT:
+            data = READING_CONTENT[lesson_choice]
             
             tab1, tab2 = st.tabs(["Làm Bài Đọc Hiểu", "Bài Tập Từ Vựng AI"])
             
@@ -948,19 +988,16 @@ else:
                 if st.session_state['reading_session']['status'] == 'intro':
                     st.info(f"### {data['title']}")
                     
+                    # LOGIC INTRO MỚI
                     if 'reading_intro_text' not in st.session_state:
-                        with st.spinner("AI đang tạo giới thiệu..."):
-                            intro_prompt = f"""
-                            Bạn là một giáo viên IELTS. Hãy giới thiệu 3 điều thú vị nhất về chủ đề "{data['title']}" dựa trên nội dung bài đọc, và khuyến khích học viên làm bài đọc để hiểu thêm.
-                            
-                            YÊU CẦU:
-                            1. **Văn phong:** Đời thường, đơn giản hóa, dễ hiểu, không dùng thuật ngữ phức tạp, không dùng từ trong dấu ngoặc kép.
-                            2. **Hình thức:** Trả về trực tiếp 3 gạch đầu dòng (bullet points) không dùng icon.
-                            3. **CẤM:** Không được dùng các câu dẫn nhập như "Dựa trên bài đọc...", "Đây là tóm tắt...", "Chào bạn...". Hãy vào thẳng nội dung kiến thức luôn.
-                            
-                            Nội dung bài đọc (trích đoạn): {data['text'][:1000]}...
-                            """
-                            st.session_state['reading_intro_text'] = call_gemini(intro_prompt)
+                         # 1. Lesson 2 cho lớp PLA
+                        if "Lesson 2" in lesson_choice and user['class'].startswith("PLA"):
+                             st.session_state['reading_intro_text'] = "Thời chưa có vệ tinh, các thủy thủ rất sợ đi biển xa vì họ không biết mình đang ở đâu. Cách duy nhất để xác định vị trí là phải biết giờ chính xác. Nhưng khổ nỗi, đồng hồ quả lắc ngày xưa cứ mang lên tàu rung lắc là chạy sai hết. Bài này kể về hành trình chế tạo ra chiếc đồng hồ đi biển đầu tiên, thứ đã cứu mạng hàng ngàn thủy thủ."
+                        # 2. Lesson 3
+                        elif "Lesson 3" in lesson_choice:
+                             st.session_state['reading_intro_text'] = "Làm nông nghiệp ở Úc khó hơn nhiều so với ở Anh hay châu Âu vì đất đai ở đây rất khô và thiếu dinh dưỡng. Vào cuối thế kỷ 19, những người nông dân Úc đứng trước nguy cơ phá sản vì các phương pháp canh tác cũ không còn hiệu quả.\nBài đọc này sẽ cho các bạn thấy họ đã xoay sở như thế nào bằng công nghệ. Từ việc chế tạo ra chiếc cày đặc biệt có thể tự 'nhảy' qua gốc cây, cho đến việc lai tạo giống lúa mì chịu hạn. Chính những sáng kiến này đã biến nước Úc từ một nơi chỉ nuôi cừu thành một cường quốc xuất khẩu lúa mì thế giới."
+                        
+                        # Đã xóa phần tự động tạo Intro bằng AI
                     
                     if st.session_state.get('reading_intro_text'):
                         st.markdown(f"**Giới thiệu về bài đọc:**\n\n{st.session_state['reading_intro_text']}")
@@ -968,8 +1005,13 @@ else:
                     
                     st.write("**Thông tin bài thi:**")
                     col_info1, col_info2 = st.columns(2)
-                    col_info1.write("- **Dạng bài:** Fill in the blanks")
-                    col_info2.write("- **Số lượng:** 6 câu hỏi")
+                    if "questions_fill" in data:
+                        col_info1.write("- **Dạng bài:** Fill in the blanks")
+                        col_info2.write(f"- **Số lượng:** {len(data['questions_fill'])} câu hỏi")
+                    elif "questions_mc" in data:
+                        col_info1.write("- **Dạng bài:** Multiple Choice")
+                        col_info2.write(f"- **Số lượng:** {len(data['questions_mc'])} câu hỏi")
+                        
                     st.markdown("---")
                     c1, c2 = st.columns(2)
                     if c1.button("Luyện Tập (Không giới hạn thời gian)"):
@@ -1021,33 +1063,37 @@ else:
                     
                     with c_text:
                         st.subheader("Bài đọc")
-                        with st.expander("Highlight (Nhập từ)", expanded=True):
-                            hl = st.text_input("Nhập từ cần tô màu:", key="hl")
-                            c_h1, c_h2 = st.columns(2)
-                            if c_h1.button("Tô màu"): st.session_state['reading_highlight'] = hl
-                            if c_h2.button("Xóa"): st.session_state['reading_highlight'] = ""
+                        # --- Cập nhật UI: Hướng dẫn bôi đen highlight ---
+                        st.caption("💡 **Mẹo:** Bôi đen văn bản để highlight nhanh. (Lưu ý: Highlight sẽ mất khi nộp bài).")
 
                         display_text = data['text']
-                        if "### Timekeeper" in display_text:
-                             display_text = display_text.replace("### Timekeeper: Invention of Marine Chronometer", "")
+                        # Xóa title cũ trong text nếu có để tránh lặp
+                        if "###" in display_text:
+                             display_text = re.sub(r"###.*?\n", "", display_text)
                         
+                        # Hiển thị bài đọc
                         html_content = f"<h2>{data['title']}</h2>" + display_text.replace("\n", "<br>")
-                        if st.session_state['reading_highlight']:
-                            ptn = re.compile(re.escape(st.session_state['reading_highlight']), re.IGNORECASE)
-                            html_content = ptn.sub(lambda m: f"<span class='highlighted'>{m.group(0)}</span>", html_content)
                         st.markdown(f"<div class='scroll-container'><div class='reading-text'>{html_content}</div></div>", unsafe_allow_html=True)
 
                     with c_quiz:
                         st.subheader("Câu Hỏi")
                         with st.container(height=600):
-                            st.markdown("**Questions 1-6: Fill in the blanks (NO MORE THAN TWO WORDS)**")
                             with st.form("read_exam_form"):
                                 ans = {}
-                                for q in data['questions_fill']:
-                                    # --- SỬA Ở ĐÂY: DÙNG CLASS question-text ---
-                                    st.markdown(f"<div class='question-text'>{q['q']}</div>", unsafe_allow_html=True)
-                                    ans[q['id']] = st.text_input(f"Answer {q['id']}", label_visibility="collapsed")
-                                    st.write("")
+                                # DẠNG 1: ĐIỀN TỪ
+                                if "questions_fill" in data:
+                                    st.markdown("**Questions: Fill in the blanks (NO MORE THAN TWO WORDS)**")
+                                    for q in data['questions_fill']:
+                                        st.markdown(f"<div class='question-text'>{q['q']}</div>", unsafe_allow_html=True)
+                                        ans[q['id']] = st.text_input(f"Answer {q['id']}", label_visibility="collapsed")
+                                        st.write("")
+                                # DẠNG 2: TRẮC NGHIỆM (MULTIPLE CHOICE)
+                                elif "questions_mc" in data:
+                                    st.markdown("**Questions: Choose the correct letter, A, B or C.**")
+                                    for q in data['questions_mc']:
+                                        st.markdown(f"**{q['q']}**")
+                                        ans[q['id']] = st.radio(f"Select answer for {q['id']}", q['options'], key=q['id'], label_visibility="collapsed")
+                                        st.write("")
                                 
                                 if st.form_submit_button("NỘP BÀI"):
                                     st.session_state['reading_session']['status'] = 'result'
@@ -1068,27 +1114,40 @@ else:
                             st.markdown(data['text'])
                     
                     with col_res_R:
-                        for q in data['questions_fill']:
-                            u_ans = user_answers.get(q['id'], "").strip().lower()
-                            c_ans = q['a'].lower()
+                        # Xác định danh sách câu hỏi đang làm
+                        q_list = data.get('questions_fill') or data.get('questions_mc')
+                        
+                        for q in q_list:
+                            # Lấy đáp án người dùng (xử lý chữ hoa thường nếu là điền từ)
+                            u_ans_raw = user_answers.get(q['id'], "")
                             
-                            is_correct = u_ans == c_ans
+                            # Logic chấm điểm
+                            if "questions_fill" in data:
+                                u_ans = str(u_ans_raw).strip().lower()
+                                c_ans = q['a'].lower()
+                                is_correct = u_ans == c_ans
+                            else: # Trắc nghiệm
+                                # Đáp án trắc nghiệm lưu dạng "A. Text...", ta so sánh ký tự đầu
+                                u_ans = str(u_ans_raw)
+                                c_ans = q['a']
+                                is_correct = u_ans == c_ans
+                            
                             if is_correct: score += 1
                             
                             if is_correct:
-                                st.success(f"✅ {q['q']} -> Bạn trả lời: {u_ans}")
+                                st.success(f"✅ {q['q']}")
                             else:
                                 st.error(f"❌ {q['q']}")
-                                st.markdown(f"**Bạn trả lời:** {u_ans} | **Đáp án:** {q['a']}")
+                                st.markdown(f"**Bạn chọn:** {u_ans_raw} | **Đáp án đúng:** {q['a']}")
                             
                             # Luôn hiện giải thích
                             st.markdown(f"<div class='explanation-box'>💡 <b>Giải thích:</b> {q['exp']}</div>", unsafe_allow_html=True)
                             st.write("---")
 
-                        st.success(f"Tổng điểm: {score}/{len(data['questions_fill'])}")
+                        st.success(f"Tổng điểm: {score}/{len(q_list)}")
                         
                         # Lưu điểm
-                        save_reading_log(user['name'], user['class'], lesson_choice, score, len(data['questions_fill']), st.session_state['reading_session']['mode'])
+                        save_reading_log(user['name'], user['class'], lesson_choice, score, len(q_list), st.session_state['reading_session']['mode'])
                         
                         if st.button("Làm lại bài này"):
                             st.session_state['reading_session'] = {'status': 'intro', 'mode': None, 'end_time': None}
@@ -1098,7 +1157,7 @@ else:
             with tab2:
                 st.info(f"Dành cho trình độ: **{user['level']['level']}**. AI sẽ tạo bài tập trắc nghiệm giúp bạn hiểu sâu từ vựng.")
                 
-                if st.button("✨ Tạo Bài Tập Mới"):
+                if st.button("Tạo Bài Tập Mới"):
                     with st.spinner("AI đang soạn đề..."):
                         # Prompt tạo câu hỏi JSON CHẤT LƯỢNG CAO
                         prompt = f"""
