@@ -783,9 +783,9 @@ else:
                                 prompt = f"""
                                 Role: Senior IELTS Speaking Examiner (Friendly & Constructive), Output in Vietnamese.
                                 Student Level: {user['level']['level']} (Use as baseline, but grade based on actual performance in audio).
-                                Task: Assess speaking response for "{question}".
-                                
-                                Strictly follow this rubric
+                                Task: Assess speaking response for "{question}" based strictly on the rubric
+                                Chấp nhận các natural pauses mà không ảnh hưởng đến điểm fluency và pronunciation
+                    
 
                                 ## GRADING RUBRIC (TIÊU CHÍ PHÂN LOẠI CỐT LÕI):
                                 
