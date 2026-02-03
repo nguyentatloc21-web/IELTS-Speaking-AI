@@ -842,12 +842,12 @@ else:
                                 ### CẢI THIỆN (NÂNG BAND):
                                 *(Chỉ chọn ra tối đa 3-5 lỗi sai lớn nhất hoặc câu diễn đạt vụng về nhất để sửa. **TUYỆT ĐỐI KHÔNG** sửa những câu đã đúng/ổn).*
 
-                                * **Lỗi 1 (Grammar/Word Choice):**
+                                **Lỗi 1 (Grammar/Word Choice):**
                                 * **Gốc:** "[Trích văn bản gốc]"
                                 * **Sửa:** "[Viết lại tự nhiên hơn - Natural Speaking]"
                                 * **Lý do:** [Giải thích ngắn gọn]
 
-                                * **Lỗi 2 (Unnatural Phrasing):**
+                                **Lỗi 2 (Unnatural Phrasing):**
                                 * **Gốc:** "..."
                                 * **Sửa:** "..."
                                 * **Lý do:** ...
