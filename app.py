@@ -100,20 +100,48 @@ def get_leaderboard(class_code):
         sheet = connect_gsheet()
         if not sheet: return None, None, None # Thêm None cho Writing
 
-        # 1. Speaking
+        # 1. Speaking (ĐÃ SỬA LOGIC CHO LINH HOẠT)
         try:
             ws_s = sheet.worksheet("Speaking_Logs")
-            df_s = pd.DataFrame(ws_s.get_all_records())
-            if not df_s.empty and 'Class' in df_s.columns and 'Score_Num' in df_s.columns:
-                df_s = df_s[df_s['Class'] == class_code]
-                if not df_s.empty:
-                    df_s['Score_Num'] = pd.to_numeric(df_s['Score_Num'], errors='coerce').fillna(0)
-                    lb_s = df_s.groupby('Student')['Score_Num'].mean().reset_index()
-                    lb_s.columns = ['Học Viên', 'Điểm Speaking (TB)']
-                    lb_s = lb_s.sort_values(by='Điểm Speaking (TB)', ascending=False).head(10)
+            # Lấy toàn bộ dữ liệu (bảo đảm lấy cả header)
+            data = ws_s.get_all_values()
+            
+            if len(data) > 1:
+                headers = data[0]
+                df_s = pd.DataFrame(data[1:], columns=headers)
+                
+                if 'Class' in df_s.columns:
+                    df_s = df_s[df_s['Class'] == class_code]
+                    
+                    if not df_s.empty:
+                        # Tìm cột chứa điểm (Thử lần lượt các tên phổ biến)
+                        score_col = None
+                        for col in ['Score_Num', 'Band_Score', 'Band_Short', 'Score']:
+                            if col in df_s.columns:
+                                score_col = col
+                                break
+                        
+                        if score_col:
+                            # Hàm trích xuất số an toàn
+                            def extract_float(val):
+                                try:
+                                    found = re.search(r"(\d+\.?\d*)", str(val))
+                                    return float(found.group(1)) if found else 0.0
+                                except: return 0.0
+
+                            df_s['Final_Score'] = df_s[score_col].apply(extract_float)
+                            
+                            # Lọc bỏ điểm 0
+                            df_s = df_s[df_s['Final_Score'] > 0]
+                            
+                            lb_s = df_s.groupby('Student')['Final_Score'].mean().reset_index()
+                            lb_s.columns = ['Học Viên', 'Điểm Speaking (TB)']
+                            lb_s = lb_s.sort_values(by='Điểm Speaking (TB)', ascending=False).head(10)
+                        else: lb_s = None
+                    else: lb_s = None
                 else: lb_s = None
             else: lb_s = None
-        except: lb_s = None
+        except: lb_s = None 
 
         # 2. Reading
         try:
