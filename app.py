@@ -786,40 +786,37 @@ else:
                             
                                 
                                 **RUBRIC CHẤM ĐIỂM (BẮT BUỘC TUÂN THỦ):**
-                                1. **Band 9 (Expert):**
-                                - **Fluency:** Speaks fluently with only rare repetition or self-correction. Hesitation is ONLY for content, not language.
-                                - **Vocab:** Uses vocabulary with full flexibility and precision. Idiomatic language is natural and accurate.
-                                - **Grammar:** Full range of structures naturally and appropriately. consistent grammatical accuracy.
-                                - **Pronunciation:** Effortless, sustains flexible use of features throughout.
+                                ## GRADING RUBRIC (CRITICAL DIFFERENTIATORS):
+                                Evaluate based on the "lowest performance" principle.
+                                * **BAND 9 (Native-like):**
+                                * **Fluency:** Effortless, no language-related hesitation.
+                                * **Vocab:** Precise, sophisticated, stylistic control.
+                                * **Grammar:** Naturally flexible, completely error-free (slips only).
 
-                                2. **Band 8 (Very Good):**
-                                - **Fluency:** Speaks fluently with only occasional repetition/self-correction.
-                                - **Vocab:** Uses a wide vocab resource flexibly to convey precise meaning. Uses less common and idiomatic vocabulary skillfully but with occasional inaccuracies.
-                                - **Grammar:** Wide range of structures. The majority of sentences are error-free. Occasional non-systematic errors.
-                                - **Pronunciation:** Sustains flexible use of features, with only occasional lapses.
+                                * **BAND 8 (Very Good):**
+                                * **Fluency:** Rare repetition/correction. Coherence is easy.
+                                * **Vocab:** Skillful use of idioms/uncommon words (occasional inaccuracies).
+                                * **Grammar:** Majority of sentences are error-free. Errors are non-systematic (random).
 
-                                3. **Band 7 (Good) - *MỨC SÀN QUAN TRỌNG*:**
-                                - **Fluency:** Speaks at length without noticeable effort or loss of coherence. May demonstrate some language-related hesitation.
-                                - **Vocab:** Uses vocabulary resources flexibly. Uses some less common and idiomatic vocabulary and shows some awareness of style and collocation, though with some inappropriate choices.
-                                - **Grammar:** Uses a range of complex structures with some flexibility. Frequently produces error-free sentences, though some grammatical mistakes persist.
-                                - **Pronunciation:** Shows all the positive features of Band 6 and some of Band 8.
+                                * **BAND 7 (Good - TARGET):**
+                                * **Fluency:** Speaks at length. Connectives used flexibly (not just "Firstly/Secondly").
+                                * **Vocab:** Uses less common items & collocation awareness (some inappropriate choices allowed).
+                                * **Grammar:** FREQUENT error-free sentences. Good control of complex structures.
 
-                                4. **Band 6 (Competent):**
-                                - **Fluency:** Is willing to speak at length, though may lose coherence at times due to occasional repetition, self-correction, or hesitation. Uses a range of connectives and discourse markers but not always appropriately (**sometimes mechanical**).
-                                - **Vocab:** Has a wide enough vocabulary to discuss topics at length and make meaning clear in spite of inappropriacies. Successfully paraphrases.
-                                - **Grammar:** Uses a mix of simple and complex structures, but with limited flexibility. May make frequent mistakes with complex structures, though these rarely cause comprehension problems.
-                                - **Pronunciation:** Uses a range of pronunciation features with mixed control.
+                                * **BAND 6 (Competent):**
+                                * **Fluency:** Willing to speak but loses coherence. Connectives are MECHANICAL or faulty.
+                                * **Vocab:** Adequate topic vocab. Successfully paraphrases.
+                                * **Grammar:** Mix of simple & complex. Complex sentences frequently have errors (but meaning is clear).
 
-                                5. **Band 5 (Modest):**
-                                - **Fluency:** Usually maintains flow but uses repetition, self-correction and/or slow speech to keep going.
-                                - **Vocab:** Manages to talk about familiar and unfamiliar topics but uses vocabulary with limited flexibility.
-                                - **Grammar:** Produces basic sentences with reasonable accuracy. Uses a limited range of more complex structures, but these usually contain errors and may cause some comprehension problems.
-                                - **Pronunciation:** Shows all the positive features of Band 4 and some of Band 6.
+                                * **BAND 5 (Modest):**
+                                * **Fluency:** Slow, repetitive, over-use of certain connectives.
+                                * **Vocab:** Limited flexibility, minimal paraphrasing.
+                                * **Grammar:** Accurate ONLY in simple sentences. Complex structures are faulty.
 
-                                6. **Band 4 (Limited):**
-                                - **Fluency:** Cannot respond without noticeable pauses and may speak slowly, with frequent repetition and self-correction.
-                                - **Vocab:** Able to talk about familiar topics but can only convey basic meaning on unfamiliar topics. Frequent errors in word choice.
-                                - **Grammar:** Produces basic sentence forms and some correct simple sentences but subordinate structures are rare.
+                                * **BAND 4 (Limited):**
+                                * **Fluency:** Long pauses, cannot link sentences.
+                                * **Vocab:** Basic/Repetitive.
+                                * **Grammar:** Subordinate clauses are rare/wrong.
                                 
                                 **Input Audio Context:** This is a student from class level {user['level']['level']}. However, GRADE BASED ON PERFORMANCE, not just level. E.g., if they use high-level idioms like "bilingual MC", "on the side" correctly, they deserve Band 6.0+ regardless of their class.
                                 
