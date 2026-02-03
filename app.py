@@ -8,8 +8,22 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime, timedelta
 import streamlit.components.v1 as components
-# QUAN TRỌNG: Phải import timedelta để tính giờ làm bài
-from datetime import datetime, timedelta
+
+# ================= 0. HÀM HỖ TRỢ (TIỆN ÍCH) =================
+def get_current_time_str():
+    """Trả về thời gian hiện tại định dạng dễ đọc: DD/MM/YYYY HH:MM:SS"""
+    return datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+def normalize_name(name):
+    """
+    Chuẩn hóa tên học viên:
+    - Xóa khoảng trắng thừa ở đầu/cuối và giữa các từ.
+    - Viết hoa chữ cái đầu mỗi từ.
+    VD: "  nguyễn   văn  a " -> "Nguyễn Văn A"
+    """
+    if not name: return ""
+    # Tách các từ, bỏ khoảng trắng thừa, viết hoa chữ đầu, rồi ghép lại
+    return " ".join(name.strip().split()).title()
 
 # ================= 1. KẾT NỐI GOOGLE SHEETS (DATABASE) =================
 def connect_gsheet():
