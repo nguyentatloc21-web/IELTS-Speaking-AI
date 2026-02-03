@@ -787,6 +787,7 @@ else:
                                 
                                 **CRITICAL INSTRUCTIONS:**
                                 1. **IGNORE HESITATION:** Since this is spontaneous speech, **IGNORE** natural pauses, "um/ah", or self-corrections unless they destroy grammatical structure. Do not penalize "natural thinking time".
+                                
                                 2. **TRANSCRIPT:** You must transcribe the audio exactly as heard before grading.
 
                                 ## GRADING RUBRIC (TIÊU CHÍ PHÂN LOẠI CỐT LÕI):
