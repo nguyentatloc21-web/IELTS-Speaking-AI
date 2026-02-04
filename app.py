@@ -879,7 +879,7 @@ else:
                                     prompt = f"""
                                 Role: Senior IELTS Speaking Examiner.
                         
-                                Task: Assess speaking response for "{question}" based strictly on the rubric.
+                                Task: Assess speaking response for "{question}" based strictly on the rubric with encouraging tone.
                                 **🚨 CRITICAL INSTRUCTION FOR TRANSCRIPT (QUAN TRỌNG NHẤT):**
                                 1. **VERBATIM TRANSCRIPTION:** You must write EXACTLY what you hear, sound-by-sound.
                                 2. **NO AUTO-CORRECT:** Do NOT fix grammar or pronunciation errors. 
