@@ -1187,25 +1187,25 @@ else:
                                 * **Vocab:** Dùng điêu luyện Idioms/từ hiếm.
                                 * **Pronunciation:** Dễ hiểu xuyên suốt. Ngữ điệu tốt. Transcript chính xác 99%.
 
-                                * **BAND 7 (Tốt - Target):**
+                                * **BAND 7 (Tốt):**
                                 * **Fluency:** Nói dài dễ dàng. Từ nối linh hoạt.
                                 * **Vocab:** Dùng được Collocation tự nhiên.
                                 * **Grammar:** Thường xuyên có câu phức không lỗi.
                                 * **Pronunciation:** Dễ hiểu. *(Lưu ý: Chấp nhận một vài lỗi nhỏ, nhưng nếu Transcript xuất hiện từ lạ/sai ngữ cảnh, hãy trừ điểm nhẹ).*
 
                                 * **BAND 6 (Khá):**
-                                * **Fluency:** Đôi khi mất mạch, từ nối máy móc.
+                                * **Fluency:** Khá trôi chảy, nhưng đôi khi mất mạch lạc, từ nối máy móc.
                                 * **Vocab:** Đủ để bàn luận, biết Paraphrase.
                                 * **Grammar:** Có dùng câu phức nhưng thường xuyên sai.
                                 * **Pronunciation:** Rõ ràng phần lớn thời gian. *(Lưu ý: Nếu thấy từ vựng bị biến đổi thành từ khác nghe na ná - Sound-alike words - hoặc 1-2 đoạn vô nghĩa, hãy đánh dấu là Lỗi Phát Âm).*
 
                                 * **BAND 5 (Trung bình):**
                                 * **Fluency:** Ngắt quãng nhiều, lặp từ.
-                                * **Grammar:** Chỉ đúng khi dùng câu đơn.
-                                * **Pronunciation:** *(Dấu hiệu nhận biết: Transcript thường xuyên xuất hiện các từ vô nghĩa hoặc sai hoàn toàn ngữ cảnh do máy không nhận diện được âm).*
+                                * **Grammar:** Hầu như chỉ dùng câu đơn.
+                                * **Pronunciation:** Có nhiều từ vô nghĩa, không hợp ngữ cảnh *(Dấu hiệu nhận biết: Transcript thường xuyên xuất hiện các từ vô nghĩa hoặc sai hoàn toàn ngữ cảnh do máy không nhận diện được âm).*
 
                                 * **BAND 4 (Hạn chế):**
-                                * **Fluency:** Câu cụt, ngắt quãng dài.
+                                * **Fluency:** Câu cụt, ngắt quãng dài, nói còn dang dở.
                                 * **Pronunciation:** Khó hiểu. Transcript gãy vụn, chứa nhiều từ không liên quan đến chủ đề.
 
                                 ## OUTPUT FORMAT (Vietnamese Markdown):
@@ -1282,7 +1282,7 @@ else:
                                 * **Vocab:** Dùng điêu luyện Idioms/từ hiếm.
                                 * **Pronunciation:** Dễ hiểu xuyên suốt. Ngữ điệu tốt. Transcript chính xác 99%.
 
-                                * **BAND 7 (Tốt - Target):**
+                                * **BAND 7 (Tốt):**
                                 * **Fluency:** Nói dài dễ dàng. Từ nối linh hoạt.
                                 * **Vocab:** Dùng được Collocation tự nhiên.
                                 * **Grammar:** Thường xuyên có câu phức không lỗi.
@@ -1371,7 +1371,7 @@ else:
                                 * **Vocab:** Dùng điêu luyện Idioms/từ hiếm.
                                 * **Pronunciation:** Dễ hiểu xuyên suốt. Ngữ điệu tốt. Transcript chính xác 99%.
 
-                                * **BAND 7 (Tốt - Target):**
+                                * **BAND 7 (Tốt):**
                                 * **Fluency:** Nói dài dễ dàng. Từ nối linh hoạt.
                                 * **Vocab:** Dùng được Collocation tự nhiên.
                                 * **Grammar:** Thường xuyên có câu phức không lỗi.
@@ -1452,7 +1452,7 @@ else:
                                 * **Vocab:** Dùng điêu luyện Idioms/từ hiếm.
                                 * **Pronunciation:** Dễ hiểu xuyên suốt. Ngữ điệu tốt. Transcript chính xác 99%.
 
-                                * **BAND 7 (Tốt - Target):**
+                                * **BAND 7 (Tốt):**
                                 * **Fluency:** Nói dài dễ dàng. Từ nối linh hoạt.
                                 * **Vocab:** Dùng được Collocation tự nhiên.
                                 * **Grammar:** Thường xuyên có câu phức không lỗi.
