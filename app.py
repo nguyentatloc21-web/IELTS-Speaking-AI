@@ -211,7 +211,7 @@ CLASS_CONFIG = {
 
 HOMEWORK_CONFIG = {
     "PLA": {
-        "Speaking": ["Lesson 1: Work & Study", "Lesson 2: Habits & Lifestyle"],
+        "Speaking": ["Lesson 1: Work & Study", "Lesson 2: Habits & Lifestyle", "Lesson 3: Home & Transport"],
         "Reading":  ["Lesson 2: Marine Chronometer", "Lesson 3: Australian Agricultural Innovations"],
         "Writing":  [] 
     },
@@ -498,6 +498,14 @@ SPEAKING_CONTENT = {
         "6. Do you prefer spending time alone or with friends?",
         "7. Is there any new hobby you want to try in the future?",
         "8. How do you relax after a stressful day?"
+    ],    
+    "Lesson 3: Home & Transport": [
+        "1. Did you live in a house or an apartment when you were a child?",
+        "2. What was your favorite room in your childhood home?,
+        "3. Have you moved house many times?",
+        "4. How did you go to school when you were younger?",
+        "5. Did you enjoy traveling by bus/motorbike in the past?",
+        "6. Have you ever been stuck in a terrible traffic jam?"
     ]
 }
 
@@ -1259,36 +1267,41 @@ else:
 
                                 ## GRADING RUBRIC (TIÊU CHÍ PHÂN LOẠI CỐT LÕI):
 
-                                * **BAND 9 (Native-like):**
-                                * **Fluency:** Trôi chảy tự nhiên, không hề vấp váp.
-                                * **Vocab:** Chính xác tuyệt đối, tinh tế.
-                                * **Pronunciation:** Hoàn hảo. Transcript sạch bóng, không có bất kỳ từ nào sai ngữ cảnh hay vô nghĩa.
-
-                                * **BAND 8 (Rất tốt):**
-                                * **Fluency:** Mạch lạc, hiếm khi lặp lại.
-                                * **Vocab:** Dùng điêu luyện Idioms/từ hiếm.
-                                * **Pronunciation:** Dễ hiểu xuyên suốt. Ngữ điệu tốt. Transcript chính xác 99%.
-
-                                * **BAND 7 (Tốt):**
-                                * **Fluency:** Nói dài dễ dàng, khai thác sâu. Từ nối linh hoạt.
-                                * **Vocab:** Dùng được Collocation tự nhiên.
-                                * **Grammar:** Thường xuyên có câu phức không lỗi.
-                                * **Pronunciation:** Dễ hiểu. *(Lưu ý: Chấp nhận một vài lỗi nhỏ, nhưng nếu Transcript xuất hiện từ lạ/sai ngữ cảnh, hãy trừ điểm).*
-
-                                * **BAND 6 (Khá):**
-                                * **Fluency:** Nói dài, Khá trôi chảy, nhưng đôi khi mất mạch lạc, từ nối máy móc.
-                                * **Vocab:** Đủ để bàn luận, biết Paraphrase.
-                                * **Grammar:** Có dùng câu phức nhưng thường xuyên sai.
-                                * **Pronunciation:** Rõ ràng phần lớn thời gian. *(Lưu ý: Nếu thấy từ vựng bị biến đổi thành từ khác nghe na ná - Sound-alike words - hoặc 1-2 đoạn vô nghĩa, hãy đánh dấu là Lỗi Phát Âm và trừ điểm).*
-
-                                * **BAND 5 (Trung bình):**
-                                * **Fluency:** Nói ngắn, Ngắt quãng nhiều, lặp từ.
-                                * **Grammar:** Hầu như chỉ dùng câu đơn.
-                                * **Pronunciation:** Có nhiều từ vô nghĩa, không hợp ngữ cảnh *(Dấu hiệu nhận biết: Transcript thường xuyên xuất hiện các từ vô nghĩa hoặc sai hoàn toàn ngữ cảnh do máy không nhận diện được âm, và trừ điểm).*
-
                                 * **BAND 4 (Hạn chế):**
-                                * **Fluency:** Câu cụt, ngắt quãng dài, nói còn dang dở.
-                                * **Pronunciation:** Khó hiểu. Transcript gãy vụn, chứa nhiều từ không liên quan đến chủ đề.
+                                * **Fluency:** Câu cụt, ngắt quãng dài, nói còn dang dở.
+                                * **Vocab:** Vốn từ rất hạn chế, lặp lại thường xuyên, chỉ dùng từ đơn lẻ.
+                                * **Grammar:** Không biết chia thì quá khứ, sai lỗi hòa hợp chủ ngữ - động từ nghiêm trọng.
+                                * **Pronunciation:** Khó hiểu. Transcript gãy vụn, chứa nhiều từ không liên quan đến chủ đề.
+
+                                * **BAND 5 (Trung bình):**
+                                * **Fluency:** Nói khá ngắn, Ngắt quãng nhiều, lặp từ.
+                                * **Vocab:** Vốn từ đủ dùng cho chủ đề quen thuộc nhưng hạn chế, khó diễn đạt ý phức tạp.
+                                * **Grammar:** Hầu như chỉ dùng câu đơn. Thường xuyên quên chia thì quá khứ và sai hòa hợp chủ ngữ - động từ.
+                                * **Pronunciation:** Có nhiều từ vô nghĩa, không hợp ngữ cảnh *(Dấu hiệu nhận biết: Transcript thường xuyên xuất hiện các từ vô nghĩa hoặc sai hoàn toàn ngữ cảnh do máy không nhận diện được âm, và trừ điểm).*
+
+                                * **BAND 6 (Khá):**
+                                * **Fluency:** Nói dài, Khá trôi chảy, nhưng đôi khi mất mạch lạc, từ nối máy móc.
+                                * **Vocab:** Đủ để bàn luận, biết Paraphrase.
+                                * **Grammar:** Có dùng câu phức nhưng thường xuyên sai. Chia thì quá khứ chưa đều, còn lỗi hòa hợp chủ ngữ - động từ.
+                                * **Pronunciation:** Rõ ràng phần lớn thời gian. *(Lưu ý: Nếu thấy từ vựng bị biến đổi thành từ khác nghe na ná - Sound-alike words - hoặc 1-2 đoạn vô nghĩa, hãy đánh dấu là Lỗi Phát Âm và trừ điểm).*
+
+                                * **BAND 7 (Tốt):**
+                                * **Fluency:** Nói dài dễ dàng, khai thác sâu. Từ nối linh hoạt.
+                                * **Vocab:** Dùng được Collocation tự nhiên.
+                                * **Grammar:** Thường xuyên có câu phức không lỗi. Kiểm soát tốt thì quá khứ và hòa hợp chủ ngữ - động từ.
+                                * **Pronunciation:** Dễ hiểu. *(Lưu ý: Chấp nhận một vài lỗi nhỏ, nhưng nếu Transcript xuất hiện từ lạ/sai ngữ cảnh, hãy trừ điểm).*
+
+                                * **BAND 8 (Rất tốt):**
+                                * **Fluency:** Mạch lạc, hiếm khi lặp lại.
+                                * **Vocab:** Dùng điêu luyện Idioms/từ hiếm.
+                                * **Grammar:** Hoàn toàn chính xác về thì quá khứ và hòa hợp chủ ngữ - động từ.
+                                * **Pronunciation:** Dễ hiểu xuyên suốt. Ngữ điệu tốt. Transcript chính xác 99%.
+
+                                * **BAND 9 (Native-like):**
+                                * **Fluency:** Trôi chảy tự nhiên, không hề vấp váp.
+                                * **Vocab:** Chính xác tuyệt đối, tinh tế.
+                                * **Grammar:** Ngữ pháp và thì hoàn hảo tuyệt đối.
+                                * **Pronunciation:** Hoàn hảo. Transcript sạch bóng, không có bất kỳ từ nào sai ngữ cảnh hay vô nghĩa.
 
                                 ## OUTPUT FORMAT (Vietnamese Markdown):
                                 Trả về kết quả chi tiết:
