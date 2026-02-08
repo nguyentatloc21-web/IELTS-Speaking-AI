@@ -232,7 +232,7 @@ HOMEWORK_CONFIG = {
         "Speaking": [], 
         "Reading": [], 
         "Writing": [
-            "Lesson 5: Resource Depletion"
+            "Lesson 5: Resource Depletion (Task 2)"
         ]
     }
 }
