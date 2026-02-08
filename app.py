@@ -229,7 +229,11 @@ HOMEWORK_CONFIG = {
         "Speaking": [], "Reading": [], "Writing": []
     },
     "MAS": {
-        "Speaking": [], "Reading": [], "Writing": []
+        "Speaking": [], 
+        "Reading": [], 
+        "Writing": [
+            "Lesson 5: Resource Depletion"
+        ]
     }
 }
 
@@ -588,6 +592,13 @@ Do you agree or disagree?"""
         "question": """### 📝 IELTS Writing Task 1
 **The diagrams below show the town of Easternburg in 1995 and the present day.**
 Summarise the information by selecting and reporting the main features, and make comparisons where relevant."""
+    },
+    "Lesson 5: Resource Depletion (Task 2)": {
+        "type": "Task 2",
+        "time": 40,
+        "question": """### 📝 IELTS Writing Task 2
+**Some people believe that the depletion of natural resources is an unavoidable consequence of economic development.**
+To what extent do you agree or disagree?"""
     }
 }
 
@@ -1601,12 +1612,12 @@ else:
                 if st.session_state['reading_session']['status'] == 'intro':
                     st.info(f"### {data['title']}")
                     
-                    # LOGIC INTRO CỐ ĐỊNH (KHÔNG DÙNG AI)
+                    # LOGIC INTRO CỐ ĐỊNH
                     intro_text = ""
-                    # 1. Lesson 2 cho lớp PLA
+                    # 1. Lesson 2 
                     if "Lesson 2" in lesson_choice and user['class'].startswith("PLA"):
                          intro_text = "Thời chưa có vệ tinh, các thủy thủ rất sợ đi biển xa vì họ không biết mình đang ở đâu. Cách duy nhất để xác định vị trí là phải biết giờ chính xác. Nhưng khổ nỗi, đồng hồ quả lắc ngày xưa cứ mang lên tàu rung lắc là chạy sai hết. Bài này kể về hành trình chế tạo ra chiếc đồng hồ đi biển đầu tiên, thứ đã cứu mạng hàng ngàn thủy thủ."
-                    # 2. Lesson 3 (Cho mọi lớp hoặc PLA)
+                    # 2. Lesson 3
                     elif "Lesson 3" in lesson_choice:
                          intro_text = "Làm nông nghiệp ở Úc khó hơn nhiều so với ở Anh hay châu Âu vì đất đai ở đây rất khô và thiếu dinh dưỡng. Vào cuối thế kỷ 19, những người nông dân Úc đứng trước nguy cơ phá sản vì các phương pháp canh tác cũ không còn hiệu quả.\nBài đọc này sẽ cho các bạn thấy họ đã xoay sở như thế nào bằng công nghệ. Từ việc chế tạo ra chiếc cày đặc biệt có thể tự 'nhảy' qua gốc cây, cho đến việc lai tạo giống lúa mì chịu hạn. Chính những sáng kiến này đã biến nước Úc từ một nơi chỉ nuôi cừu thành một cường quốc xuất khẩu lúa mì thế giới."
                     
@@ -1632,14 +1643,14 @@ else:
 
                 # --- TRẠNG THÁI 2: DOING ---
                 elif st.session_state['reading_session']['status'] == 'doing':
-                    # Xử lý Timer (Javascript Realtime Countdown)
+                    # Xử lý Timer
                     timer_html = ""
                     if st.session_state['reading_session']['mode'] == 'exam':
                         end_time = st.session_state['reading_session']['end_time']
                         remaining_seconds = (end_time - datetime.now()).total_seconds()
                         
                         if remaining_seconds > 0:
-                            # Javascript để đếm ngược mượt mà không cần reload trang
+                            # Javascript
                             timer_html = f"""
                             <div style="font-size: 20px; font-weight: bold; color: #d35400; margin-bottom: 10px; font-family: 'Segoe UI', sans-serif;">
                                 ⏳ Thời gian còn lại: <span id="timer"></span>
@@ -1672,11 +1683,11 @@ else:
                     
                     with c_text:
                         st.subheader("Bài đọc")
-                        # --- Cập nhật UI: Hướng dẫn bôi đen highlight ---
+                        # Hướng dẫn bôi đen highlight
                         st.caption("💡 **Mẹo:** Bôi đen văn bản để highlight nhanh. (Lưu ý: Highlight sẽ mất khi nộp bài).")
 
                         display_text = data['text']
-                        # Xóa title cũ trong text nếu có để tránh lặp
+                        # Xóa title
                         if "###" in display_text:
                              display_text = re.sub(r"###.*?\n", "", display_text)
                         
