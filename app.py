@@ -501,7 +501,7 @@ SPEAKING_CONTENT = {
     ],    
     "Lesson 3: Home & Transport": [
         "1. Did you live in a house or an apartment when you were a child?",
-        "2. What was your favorite room in your childhood home?,
+        "2. What was your favorite room in your childhood home?",
         "3. Have you moved house many times?",
         "4. How did you go to school when you were younger?",
         "5. Did you enjoy traveling by bus/motorbike in the past?",
