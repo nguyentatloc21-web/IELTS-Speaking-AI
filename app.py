@@ -1034,7 +1034,7 @@ else:
                                 {{
                                     "TA": int, "CC": int, "LR": int, "GRA": int,
                                     "Overall": float,
-                                    "Feedback": "Detailed feedback in Vietnamese Markdown. \n\n**STRUCTURE FOR FEEDBACK:**\nFor each criterion (Task Achievement, Coherence & Cohesion, Lexical Resource, Grammar), you MUST provide:\n- **Lỗi cụ thể/Điểm cần cải thiện:** Quote the exact text from the essay.\n- **Đề xuất sửa lại:** Rewrite the sentence/phrase.\n- **Giải thích:** Explain why the change improves the score based on Band Descriptors."
+                                    "Feedback": "Detailed feedback in Vietnamese Markdown. For each criterion (Task Achievement, Coherence & Cohesion, Lexical Resource, Grammar), spot the exact mistakes or improvement points and suggestions to change for a higher band score." 
                                 }}
                                 """
                                 res = call_gemini(prompt_t1, expect_json=True, image_data=image_b64)
@@ -1234,7 +1234,7 @@ else:
                                 {{
                                     "TA": int, "CC": int, "LR": int, "GRA": int,
                                     "Overall": float,
-                                    "Feedback": "Detailed feedback in Vietnamese Markdown. \n\n**STRUCTURE FOR FEEDBACK:**\nFor each criterion (Task Achievement, Coherence & Cohesion, Lexical Resource, Grammar), you MUST provide:\n- **Lỗi cụ thể/Điểm cần cải thiện:** Quote the exact text from the essay.\n- **Đề xuất sửa lại:** Rewrite the sentence/phrase.\n- **Giải thích:** Explain why the change improves the score based on Band Descriptors."
+                                    "Feedback": "Detailed feedback in Vietnamese Markdown. For each criterion (Task Achievement, Coherence & Cohesion, Lexical Resource, Grammar), spot the exact mistakes or improvement points and suggestions to change for a higher band score."
                                 }}
                                 """
                                 res = call_gemini(prompt_t2, expect_json=True)
