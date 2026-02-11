@@ -27,6 +27,15 @@ def normalize_name(name):
     # Tách các từ, bỏ khoảng trắng thừa, viết hoa chữ đầu, rồi ghép lại
     return " ".join(name.strip().split()).title()
 
+def extract_score(value):
+    """
+    Hàm an toàn để trích xuất điểm số.
+    Xử lý trường hợp AI trả về list [7] hoặc [7.5] thay vì số 7 hoặc 7.5
+    """
+    if isinstance(value, list):
+        return value[0] if len(value) > 0 else 0
+    return value
+
 # ================= 1. KẾT NỐI GOOGLE SHEETS (DATABASE) =================
 def connect_gsheet():
     """Kết nối Google Sheets an toàn"""
@@ -1023,8 +1032,8 @@ else:
 
                                 ## OUTPUT: JSON STRICTLY.
                                 {{
-                                    "TA": [int], "CC": [int], "LR": [int], "GRA": [int],
-                                    "Overall": [float],
+                                    "TA": int, "CC": int, "LR": int, "GRA": int,
+                                    "Overall": float,
                                     "Feedback": "Detailed feedback in Vietnamese Markdown. \n\n**STRUCTURE FOR FEEDBACK:**\nFor each criterion (Task Achievement, Coherence & Cohesion, Lexical Resource, Grammar), you MUST provide:\n- **Lỗi cụ thể/Điểm cần cải thiện:** Quote the exact text from the essay.\n- **Đề xuất sửa lại:** Rewrite the sentence/phrase.\n- **Giải thích:** Explain why the change improves the score based on Band Descriptors."
                                 }}
                                 """
@@ -1223,9 +1232,9 @@ else:
                                     * **Grammar:** Hoàn toàn chính xác, cấu trúc đa dạng và phức tạp.
                                 ## OUTPUT: JSON STRICTLY.
                                 {{
-                                    "TR": [int], "CC": [int], "LR": [int], "GRA": [int],
-                                    "Overall": [float],
-                                    "Feedback": "Detailed feedback in Vietnamese Markdown. \n\n**STRUCTURE FOR FEEDBACK:**\nFor each criterion (Task Response, Coherence & Cohesion, Lexical Resource, Grammar), you MUST provide:\n- **Lỗi cụ thể/Điểm cần cải thiện:** Quote the exact text from the essay.\n- **Đề xuất sửa lại:** Rewrite the sentence/phrase.\n- **Giải thích:** Explain why the change improves the score based on Band Descriptors."
+                                    "TA": int, "CC": int, "LR": int, "GRA": int,
+                                    "Overall": float,
+                                    "Feedback": "Detailed feedback in Vietnamese Markdown. \n\n**STRUCTURE FOR FEEDBACK:**\nFor each criterion (Task Achievement, Coherence & Cohesion, Lexical Resource, Grammar), you MUST provide:\n- **Lỗi cụ thể/Điểm cần cải thiện:** Quote the exact text from the essay.\n- **Đề xuất sửa lại:** Rewrite the sentence/phrase.\n- **Giải thích:** Explain why the change improves the score based on Band Descriptors."
                                 }}
                                 """
                                 res = call_gemini(prompt_t2, expect_json=True)
