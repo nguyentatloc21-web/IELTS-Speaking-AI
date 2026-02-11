@@ -1025,7 +1025,7 @@ else:
                                 {{
                                     "TA": [int], "CC": [int], "LR": [int], "GRA": [int],
                                     "Overall": [float],
-                                    "Feedback": "Markdown text detail..."
+                                    "Feedback": "Detailed feedback in Vietnamese Markdown..."
                                 }}
                                 """
                                 res = call_gemini(prompt_t1, expect_json=True, image_data=image_b64)
@@ -1179,7 +1179,7 @@ else:
                     if st.button("Nộp Bài Task 2"):
                         if len(essay.split()) < 50: st.warning("Bài viết quá ngắn.")
                         else:
-                            with st.spinner("Đang chấm điểm Task 2 (Task Response)..."):
+                            with st.spinner("Đang chấm điểm Task 2..."):
                                 prompt_t2 = f"""
                                 ## ROLE: Senior IELTS Examiner.
                                 ## TASK: Assess IELTS Writing Task 2 based on rubric provided.
@@ -1225,7 +1225,7 @@ else:
                                 {{
                                     "TR": [int], "CC": [int], "LR": [int], "GRA": [int],
                                     "Overall": [float],
-                                    "Feedback": "Markdown detail..."
+                                    "Feedback": "Detailed feedback in Vietnamese Markdown..."
                                 }}
                                 """
                                 res = call_gemini(prompt_t2, expect_json=True)
