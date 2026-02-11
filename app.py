@@ -1056,10 +1056,10 @@ else:
                     st.balloons()
                     st.success(f"OVERALL BAND: {res['Overall']}")
                     c1, c2, c3, c4 = st.columns(4)
-                    c1.metric("Task Achievement", res['TA'])
-                    c2.metric("Coherence", res['CC'])
-                    c3.metric("Lexical", res['LR'])
-                    c4.metric("Grammar", res['GRA'])
+                    c1.metric("Task Achievement", extract_score(res['TA']))
+                    c2.metric("Coherence", extract_score(res['CC']))
+                    c3.metric("Lexical", extract_score(res['LR']))
+                    c4.metric("Grammar", extract_score(res['GRA']))
                     with st.container(border=True):
                         st.markdown(res['Feedback'])
                     if st.button("Làm lại Task 1"):
@@ -1253,10 +1253,10 @@ else:
                     st.balloons()
                     st.success(f"OVERALL BAND: {res['Overall']}")
                     c1, c2, c3, c4 = st.columns(4)
-                    c1.metric("Task Response", res['TR'])
-                    c2.metric("Coherence", res['CC'])
-                    c3.metric("Lexical", res['LR'])
-                    c4.metric("Grammar", res['GRA'])
+                    c1.metric("Task Achievement", extract_score(res['TA']))
+                    c2.metric("Coherence", extract_score(res['CC']))
+                    c3.metric("Lexical", extract_score(res['LR']))
+                    c4.metric("Grammar", extract_score(res['GRA']))
                     with st.container(border=True):
                         st.markdown(res['Feedback'])
                     if st.button("Làm lại Task 2"):
