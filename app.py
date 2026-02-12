@@ -1034,7 +1034,7 @@ else:
                                 {{
                                     "TA": int, "CC": int, "LR": int, "GRA": int,
                                     "Overall": float,
-                                    "Feedback": "Detailed feedback in Vietnamese Markdown. \n\n**STRUCTURE FOR ERROR CORRECTION:**\nList specific errors using this EXACT format:\n\n**Lỗi 1 (Task Response):**\n* **Gốc:** \"[Original Text]\"\n* **Sửa:** \"[Improved Text]\"\n* **Lý do:** [Detailed Explanation]\n\n(Repeat for other errors across all criteria: Coherence & Cohesion, Lexical Resource, Grammar). Finally, provide a general comment."
+                                    "Feedback": "Nhận xét chi tiết bằng Tiếng Việt (Markdown). Cấu trúc linh hoạt nhưng cần đi qua từng tiêu chí (Task Response, Coherence & Cohesion, Lexical Resource, Grammar). Ở mỗi tiêu chí, hãy chỉ ra các điểm cần cải thiện dựa trên rubric và đưa ra cách sửa cụ thể (ví dụ: trích dẫn câu gốc của học viên và viết lại câu mới tốt hơn)."
                                 }}
                                 """
                                 res = call_gemini(prompt_t1, expect_json=True, image_data=image_b64)
@@ -1234,7 +1234,7 @@ else:
                                 {{
                                     "TA": int, "CC": int, "LR": int, "GRA": int,
                                     "Overall": float,
-                                    "Feedback": "Detailed feedback in Vietnamese Markdown. \n\n**STRUCTURE FOR ERROR CORRECTION:**\nList specific errors using this EXACT format:\n\n**Lỗi 1 (Task Response):**\n* **Gốc:** \"[Original Text]\"\n* **Sửa:** \"[Improved Text]\"\n* **Lý do:** [Detailed Explanation]\n\n(Repeat for other errors across all criteria: Coherence & Cohesion, Lexical Resource, Grammar). Finally, provide a general comment."
+                                    "Feedback": "Nhận xét chi tiết bằng Tiếng Việt (Markdown). Cấu trúc linh hoạt nhưng cần đi qua từng tiêu chí (Task Response, Coherence & Cohesion, Lexical Resource, Grammar). Ở mỗi tiêu chí, hãy chỉ ra các điểm cần cải thiện dựa trên rubric và đưa ra cách sửa cụ thể (ví dụ: trích dẫn câu gốc của học viên và viết lại câu mới tốt hơn)."
                                 }}
                                 """
                                 res = call_gemini(prompt_t2, expect_json=True)
