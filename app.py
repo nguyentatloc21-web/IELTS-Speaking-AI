@@ -1041,14 +1041,13 @@ else:
                                 if res:
                                     try:
                                         grade = json.loads(res)
-                                        # Save result to session to display
                                         st.session_state['writing_result_t1'] = grade
-                                        
-                                        # Map TA -> TR for storage consistency if needed, or just store as is
                                         crit = json.dumps({"TA": grade['TA'], "CC": grade['CC'], "LR": grade['LR'], "GRA": grade['GRA']})
                                         save_writing_log(user['name'], user['class'], lesson_w, "Task 1", grade['Overall'], crit, grade['Feedback'], mode=mode_w)
+                                    except Exception as e:
+                                        st.error(f"Lỗi chấm bài: {e}")
+                                    else:
                                         st.rerun()
-                                    except: st.error("Lỗi chấm bài.")
 
                 # Hiện kết quả Task 1
                 if 'writing_result_t1' in st.session_state:
@@ -1244,8 +1243,10 @@ else:
                                         st.session_state['writing_result_t2'] = grade
                                         crit = json.dumps({"TR": grade['TR'], "CC": grade['CC'], "LR": grade['LR'], "GRA": grade['GRA']})
                                         save_writing_log(user['name'], user['class'], lesson_w, "Task 2", grade['Overall'], crit, grade['Feedback'], mode=mode_w)
+                                    except Exception as e:
+                                        st.error(f"Lỗi chấm bài: {e}")
+                                    else:
                                         st.rerun()
-                                    except: st.error("Lỗi chấm bài.")
 
                 # Hiện kết quả Task 2
                 if 'writing_result_t2' in st.session_state:
@@ -1253,7 +1254,7 @@ else:
                     st.balloons()
                     st.success(f"OVERALL BAND: {res['Overall']}")
                     c1, c2, c3, c4 = st.columns(4)
-                    c1.metric("Task Achievement", extract_score(res['TA']))
+                    c1.metric("Task Response", extract_score(res['TR']))
                     c2.metric("Coherence", extract_score(res['CC']))
                     c3.metric("Lexical", extract_score(res['LR']))
                     c4.metric("Grammar", extract_score(res['GRA']))
