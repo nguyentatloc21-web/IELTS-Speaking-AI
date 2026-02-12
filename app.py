@@ -193,44 +193,44 @@ def get_leaderboard(class_code):
         except: lb_r = None
 
         # 3. Writing
-        try:
+try:
             ws_w = sheet.worksheet("Writing_Logs")
-            # Dùng get_all_values thay vì get_all_records để tránh lỗi header nếu file cũ thiếu cột
             data_w = ws_w.get_all_values()
             
             if len(data_w) > 1:
-                headers = data_w[0]
-                df_w = pd.DataFrame(data_w[1:], columns=headers)
+                df_w = pd.DataFrame(data_w[1:], columns=data_w[0])
+                df_w.columns = [c.strip() for c in df_w.columns] # Fix lỗi tên cột có dấu cách thừa
                 
                 if 'Class' in df_w.columns:
                     df_w = df_w[df_w['Class'] == class_code]
                     
                     if not df_w.empty:
-                        # Chuẩn hóa tên học viên
                         if 'Student' in df_w.columns:
                             df_w['Student'] = df_w['Student'].astype(str).apply(normalize_name)
 
-                        # Chuyển đổi điểm sang số thực (float) để tính toán
-                        if 'Overall_Band' in df_w.columns:
-                            df_w['Overall_Band'] = pd.to_numeric(df_w['Overall_Band'], errors='coerce')
+                        # Tự động tìm cột điểm Writing (Quét nhiều trường hợp tên cột)
+                        w_score_col = next((c for c in ['Overall_Band', 'Overall Band', 'Band', 'Score', 'Band_Score', 'Overall'] if c in df_w.columns), None)
+                        
+                        if w_score_col:
+                            # Dùng hàm extract_float để xử lý cả trường hợp điểm lưu dạng "Band 7.0"
+                            df_w['Final_Score'] = df_w[w_score_col].apply(extract_float)
+                            df_w = df_w[df_w['Final_Score'] > 0]
                             
-                            # Lọc bỏ các giá trị 0 hoặc lỗi
-                            df_w = df_w[df_w['Overall_Band'] > 0]
-
-                            # Tính điểm trung bình
-                            lb_w = df_w.groupby('Student')['Overall_Band'].mean().reset_index()
+                            lb_w = df_w.groupby('Student')['Final_Score'].mean().reset_index()
                             lb_w.columns = ['Học Viên', 'Điểm Writing (TB)']
                             lb_w = lb_w.sort_values(by='Điểm Writing (TB)', ascending=False).head(10)
                         else: lb_w = None
                     else: lb_w = None
                 else: lb_w = None
             else: lb_w = None
-        except Exception as e: 
+        except Exception as e:
             print(f"Leaderboard Writing Error: {e}")
             lb_w = None
 
         return lb_s, lb_r, lb_w
-    except: # <--- ...thì phải có cái này để đóng lại
+
+    except Exception as e:
+        print(f"Global Leaderboard Error: {e}")
         return None, None, None
 
 # ================= 1. CẤU HÌNH & DỮ LIỆU (TEACHER INPUT) =================
