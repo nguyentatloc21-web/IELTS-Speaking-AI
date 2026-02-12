@@ -1024,8 +1024,9 @@ else:
                         else:
                             with st.spinner("Đang chấm Task 1..."):
                                 prompt_t1 = f"""
-                                ## ROLE: Senior IELTS Writing Examiner.
-                                ## TASK: Assess IELTS Writing Task 1 Essay.
+                                ## ROLE: Senior IELTS Writing Examiner (Strict but Natural).
+                                ## TASK: Assess IELTS Writing Task 1 Essay and provide deep, insightful feedback in a natural, conversational tone like a real teacher.
+                                ## CRITICAL RULE: The ENTIRE "Feedback" string MUST be written in 100% Vietnamese (Tiếng Việt). DO NOT mix English and Vietnamese in your explanation. Only use English when quoting the student's text.
                                 ## INPUT:
                                 - Question: {data_w['question']}
                                 - Essay: {essay_t1}
@@ -1233,8 +1234,9 @@ else:
                         else:
                             with st.spinner("Đang chấm điểm Task 2..."):
                                 prompt_t2 = f"""
-                                ## ROLE: Senior IELTS Examiner.
-                                ## TASK: Assess IELTS Writing Task 2 based on rubric provided.
+                                ## ROLE: Senior IELTS Examiner (Strict but Natural).
+                                ## TASK: Assess IELTS Writing Task 2 and provide deep, insightful, strict feedback in a natural, conversational tone like a real teacher.
+                                ## CRITICAL RULE: The ENTIRE "Feedback" string MUST be written in 100% Vietnamese (Tiếng Việt). DO NOT mix English and Vietnamese in your explanation. Only use English when quoting the student's text.
                                 ## TOPIC: {data_w['question']}
                                 ## ESSAY: {essay}
                                 ## RUBRIC (TASK 2):
