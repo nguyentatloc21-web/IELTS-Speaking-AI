@@ -1462,7 +1462,7 @@ else:
                             prompt_full= f"""Role: Examiner. Assess IELTS Speaking Part 1 about "{q_p1}". Transcript EXACTLY what user said (no auto-correct). Give Band Score & Feedback, encouraging tone.
                                 ## GRADING RUBRIC (TIÊU CHÍ PHÂN LOẠI CỐT LÕI):
 
-* **BAND 4 (Hạn chế):**
+                                * **BAND 4 (Hạn chế):**
                                 * **Fluency:** Câu cụt, ngắt quãng dài, nói còn dang dở.
                                 * **Vocab:** Vốn từ rất hạn chế, lặp lại thường xuyên, chỉ dùng từ đơn lẻ.
                                 * **Grammar:** Không biết chia thì quá khứ, sai lỗi hòa hợp chủ ngữ - động từ nghiêm trọng.
@@ -1556,7 +1556,7 @@ else:
                             prompt_full_p2 = f"""Role: Examiner. Assess IELTS Speaking response for Part 2 "{data_p2['cue_card']}". Transcript EXACTLY what user said (no auto-correct). Give Band Score & Feedback, encouraging tone.
                                 ## GRADING RUBRIC (TIÊU CHÍ PHÂN LOẠI CỐT LÕI):
 
-* **BAND 4 (Hạn chế):**
+                                * **BAND 4 (Hạn chế):**
                                 * **Fluency:** Câu cụt, ngắt quãng dài, nói còn dang dở.
                                 * **Vocab:** Vốn từ rất hạn chế, lặp lại thường xuyên, chỉ dùng từ đơn lẻ.
                                 * **Grammar:** Không biết chia thì quá khứ, sai lỗi hòa hợp chủ ngữ - động từ nghiêm trọng.
@@ -1642,7 +1642,7 @@ else:
                             prompt_full_p3 = f"""Role: Examiner. Assess IELTS Speaking response for Part 3 "{data_p3['part3']}". Transcript EXACTLY what user said (no auto-correct). Give Band Score & Feedback, encouraging tone.
                                 ## GRADING RUBRIC (TIÊU CHÍ PHÂN LOẠI CỐT LÕI):
 
-* **BAND 4 (Hạn chế):**
+                                * **BAND 4 (Hạn chế):**
                                 * **Fluency:** Câu cụt, ngắt quãng dài, nói còn dang dở.
                                 * **Vocab:** Vốn từ rất hạn chế, lặp lại thường xuyên, chỉ dùng từ đơn lẻ.
                                 * **Grammar:** Không biết chia thì quá khứ, sai lỗi hòa hợp chủ ngữ - động từ nghiêm trọng.
