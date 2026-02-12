@@ -230,6 +230,8 @@ def get_leaderboard(class_code):
             lb_w = None
 
         return lb_s, lb_r, lb_w
+    except: # <--- ...thì phải có cái này để đóng lại
+        return None, None, None
 
 # ================= 1. CẤU HÌNH & DỮ LIỆU (TEACHER INPUT) =================
 
@@ -1839,59 +1841,6 @@ else:
                                     st.session_state['reading_session']['status'] = 'result'
                                     st.session_state['reading_session']['user_answers'] = ans
                                     st.rerun()
-
-                # --- TRẠNG THÁI 3: KẾT QUẢ & GIẢI THÍCH ---
-                elif st.session_state['reading_session']['status'] == 'result':
-                    st.subheader("Kết Quả Bài Làm")
-                    user_answers = st.session_state['reading_session']['user_answers']
-                    score = 0
-                    
-                    col_res_L, col_res_R = st.columns([1, 1])
-                    
-                    # Hiển thị lại bài đọc để đối chiếu
-                    with col_res_L:
-                        with st.expander("Xem lại bài đọc", expanded=False):
-                            st.markdown(data['text'])
-                    
-                    with col_res_R:
-                        # Xác định danh sách câu hỏi đang làm
-                        q_list = data.get('questions_fill') or data.get('questions_mc')
-                        
-                        for q in q_list:
-                            # Lấy đáp án người dùng (xử lý chữ hoa thường nếu là điền từ)
-                            u_ans_raw = user_answers.get(q['id'], "")
-                            
-                            # Logic chấm điểm
-                            if "questions_fill" in data:
-                                u_ans = str(u_ans_raw).strip().lower()
-                                c_ans = q['a'].lower()
-                                is_correct = u_ans == c_ans
-                            else: # Trắc nghiệm
-                                # Đáp án trắc nghiệm lưu dạng "A. Text...", ta so sánh ký tự đầu
-                                u_ans = str(u_ans_raw)
-                                c_ans = q['a']
-                                is_correct = u_ans == c_ans
-                            
-                            if is_correct: score += 1
-                            
-                            if is_correct:
-                                st.success(f"✅ {q['q']}")
-                            else:
-                                st.error(f"❌ {q['q']}")
-                                st.markdown(f"**Bạn chọn:** {u_ans_raw} | **Đáp án đúng:** {q['a']}")
-                            
-                            # Luôn hiện giải thích
-                            st.markdown(f"<div class='explanation-box'>💡 <b>Giải thích:</b> {q['exp']}</div>", unsafe_allow_html=True)
-                            st.write("---")
-
-                        st.success(f"Tổng điểm: {score}/{len(q_list)}")
-                        
-                        # Lưu điểm
-                        save_reading_log(user['name'], user['class'], lesson_choice, score, len(q_list), st.session_state['reading_session']['mode'])
-                        
-                        if st.button("Làm lại bài này"):
-                            st.session_state['reading_session'] = {'status': 'intro', 'mode': None, 'end_time': None}
-                            st.rerun()
 
                 # --- TRẠNG THÁI 3: KẾT QUẢ & GIẢI THÍCH ---
                 elif st.session_state['reading_session']['status'] == 'result':
