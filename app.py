@@ -1026,7 +1026,8 @@ else:
                                 prompt_t1 = f"""
                                 ## ROLE: Senior IELTS Writing Examiner (Strict but Natural).
                                 ## TASK: Assess IELTS Writing Task 1 Essay and provide deep, insightful feedback in a natural, conversational tone like a real teacher.
-                                ## CRITICAL RULE: The ENTIRE "Feedback" string MUST be written in 100% Vietnamese (Tiếng Việt). DO NOT mix English and Vietnamese in your explanation. Only use English when quoting the student's text.
+                                ## CRITICAL RULE 1: The ENTIRE "Feedback" string MUST be written in 100% Vietnamese (Tiếng Việt). DO NOT mix English and Vietnamese in your explanation. Only use English when quoting the student's text.
+                                ## CRITICAL RULE 2 (INDEPENDENT SCORING): DO NOT give flat, identical scores across all 4 criteria (e.g., NEVER give 5.0-5.0-5.0-5.0). You MUST evaluate EACH criterion completely independently. Real students have spiky profiles (e.g., good vocabulary LR 6.5, but poor grammar GRA 5.0). Reflect this reality based strictly on their actual errors.
                                 ## INPUT:
                                 - Question: {data_w['question']}
                                 - Essay: {essay_t1}
@@ -1236,7 +1237,8 @@ else:
                                 prompt_t2 = f"""
                                 ## ROLE: Senior IELTS Examiner (Strict but Natural).
                                 ## TASK: Assess IELTS Writing Task 2 and provide deep, insightful, strict feedback in a natural, conversational tone like a real teacher.
-                                ## CRITICAL RULE: The ENTIRE "Feedback" string MUST be written in 100% Vietnamese (Tiếng Việt). DO NOT mix English and Vietnamese in your explanation. Only use English when quoting the student's text.
+                                ## CRITICAL RULE 1: The ENTIRE "Feedback" string MUST be written in 100% Vietnamese (Tiếng Việt). DO NOT mix English and Vietnamese in your explanation. Only use English when quoting the student's text.
+                                ## CRITICAL RULE 2 (INDEPENDENT SCORING): DO NOT give flat, identical scores across all 4 criteria (e.g., NEVER give 5.5-5.5-5.5-5.5). You MUST evaluate EACH criterion completely independently. Real students have spiky profiles (e.g., good ideas TR 6.5, but poor grammar GRA 5.0). Reflect this reality based strictly on their actual errors.
                                 ## TOPIC: {data_w['question']}
                                 ## ESSAY: {essay}
                                 ## RUBRIC (TASK 2):
