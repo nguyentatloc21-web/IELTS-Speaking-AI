@@ -106,19 +106,24 @@ def save_reading_log(student, class_code, lesson, score, total, mode="Practice")
             st.toast("✅ Đã lưu kết quả Reading!", icon="💾")
     except: pass
 
-def save_writing_log(student, class_code, lesson, topic, band_score, criteria_scores, feedback):
-    """Lưu điểm Writing"""
+def save_writing_log(student, class_code, lesson, topic, band_score, criteria_scores, feedback, mode="Practice"):
+    """Lưu điểm Writing (Đã cập nhật thêm tham số mode)"""
     try:
         sheet = connect_gsheet()
         if sheet:
-            try: ws = sheet.worksheet("Writing_Logs")
+            try: 
+                ws = sheet.worksheet("Writing_Logs")
             except:
+                # Nếu chưa có sheet, tạo mới và thêm header có cột Mode
                 ws = sheet.add_worksheet(title="Writing_Logs", rows="1000", cols="10")
-                ws.append_row(["Timestamp", "Student", "Class", "Lesson", "Topic", "Overall_Band", "TR_CC_LR_GRA", "Feedback"])
+                ws.append_row(["Timestamp", "Student", "Class", "Lesson", "Topic", "Overall_Band", "TR_CC_LR_GRA", "Feedback", "Mode"])
             
-            ws.append_row([str(datetime.now()), student, class_code, lesson, topic, band_score, str(criteria_scores), feedback])
+            # Lưu dữ liệu bao gồm cả Mode
+            ws.append_row([str(datetime.now()), student, class_code, lesson, topic, band_score, str(criteria_scores), feedback, mode])
             st.toast("✅ Đã lưu bài Writing!", icon="💾")
-    except: pass
+    except Exception as e:
+        print(f"Save Writing Error: {e}")
+        st.error(f"Không thể lưu kết quả: {e}")
 
 def get_leaderboard(class_code):
     try:
@@ -190,24 +195,41 @@ def get_leaderboard(class_code):
         # 3. Writing
         try:
             ws_w = sheet.worksheet("Writing_Logs")
-            df_w = pd.DataFrame(ws_w.get_all_records())
-            if not df_w.empty and 'Class' in df_w.columns:
-                df_w = df_w[df_w['Class'] == class_code]
-                if not df_w.empty:
-                    # --- FIX LỖI: Chuẩn hóa tên ---
-                    if 'Student' in df_w.columns:
-                        df_w['Student'] = df_w['Student'].astype(str).apply(normalize_name)
+            # Dùng get_all_values thay vì get_all_records để tránh lỗi header nếu file cũ thiếu cột
+            data_w = ws_w.get_all_values()
+            
+            if len(data_w) > 1:
+                headers = data_w[0]
+                df_w = pd.DataFrame(data_w[1:], columns=headers)
+                
+                if 'Class' in df_w.columns:
+                    df_w = df_w[df_w['Class'] == class_code]
+                    
+                    if not df_w.empty:
+                        # Chuẩn hóa tên học viên
+                        if 'Student' in df_w.columns:
+                            df_w['Student'] = df_w['Student'].astype(str).apply(normalize_name)
 
-                    df_w['Overall_Band'] = pd.to_numeric(df_w['Overall_Band'], errors='coerce')
-                    lb_w = df_w.groupby('Student')['Overall_Band'].mean().reset_index()
-                    lb_w.columns = ['Học Viên', 'Điểm Writing (TB)']
-                    lb_w = lb_w.sort_values(by='Điểm Writing (TB)', ascending=False).head(10)
+                        # Chuyển đổi điểm sang số thực (float) để tính toán
+                        if 'Overall_Band' in df_w.columns:
+                            df_w['Overall_Band'] = pd.to_numeric(df_w['Overall_Band'], errors='coerce')
+                            
+                            # Lọc bỏ các giá trị 0 hoặc lỗi
+                            df_w = df_w[df_w['Overall_Band'] > 0]
+
+                            # Tính điểm trung bình
+                            lb_w = df_w.groupby('Student')['Overall_Band'].mean().reset_index()
+                            lb_w.columns = ['Học Viên', 'Điểm Writing (TB)']
+                            lb_w = lb_w.sort_values(by='Điểm Writing (TB)', ascending=False).head(10)
+                        else: lb_w = None
+                    else: lb_w = None
                 else: lb_w = None
             else: lb_w = None
-        except: lb_w = None
+        except Exception as e: 
+            print(f"Leaderboard Writing Error: {e}")
+            lb_w = None
 
         return lb_s, lb_r, lb_w
-    except: return None, None, None
 
 # ================= 1. CẤU HÌNH & DỮ LIỆU (TEACHER INPUT) =================
 
