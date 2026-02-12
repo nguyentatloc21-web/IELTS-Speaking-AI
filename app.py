@@ -199,7 +199,7 @@ def get_leaderboard(class_code):
             
             if len(data_w) > 1:
                 df_w = pd.DataFrame(data_w[1:], columns=data_w[0])
-                df_w.columns = [c.strip() for c in df_w.columns] # Fix lỗi tên cột có dấu cách thừa
+                df_w.columns = [c.strip() for c in df_w.columns] # 1. Xóa khoảng trắng thừa
                 
                 if 'Class' in df_w.columns:
                     df_w = df_w[df_w['Class'] == class_code]
@@ -208,12 +208,14 @@ def get_leaderboard(class_code):
                         if 'Student' in df_w.columns:
                             df_w['Student'] = df_w['Student'].astype(str).apply(normalize_name)
 
-                        # Tự động tìm cột điểm Writing (Quét nhiều trường hợp tên cột)
+                        # 2. Áp dụng logic tìm cột linh hoạt giống Speaking (thay vì chỉ tìm Overall_Band)
                         w_score_col = next((c for c in ['Overall_Band', 'Overall Band', 'Band', 'Score', 'Band_Score', 'Overall'] if c in df_w.columns), None)
                         
                         if w_score_col:
-                            # Dùng hàm extract_float để xử lý cả trường hợp điểm lưu dạng "Band 7.0"
+                            # 3. Áp dụng logic bóc tách số thông minh (extract_float) giống Speaking
+                            # Giúp xử lý được cả trường hợp điểm lưu là "Band 6.0" hay "6.0"
                             df_w['Final_Score'] = df_w[w_score_col].apply(extract_float)
+                            
                             df_w = df_w[df_w['Final_Score'] > 0]
                             
                             lb_w = df_w.groupby('Student')['Final_Score'].mean().reset_index()
