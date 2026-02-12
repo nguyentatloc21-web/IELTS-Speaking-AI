@@ -1027,7 +1027,7 @@ else:
                                 ## ROLE: Senior IELTS Writing Examiner (Strict but Natural).
                                 ## TASK: Assess IELTS Writing Task 1 Essay and provide deep, insightful feedback in a natural, conversational tone like a real teacher.
                                 ## CRITICAL RULE 1: The ENTIRE "Feedback" string MUST be written in 100% Vietnamese (Tiếng Việt). DO NOT mix English and Vietnamese in your explanation. Only use English when quoting the student's text.
-                                ## CRITICAL RULE 2 (INDEPENDENT SCORING): DO NOT give flat, identical scores across all 4 criteria (e.g., NEVER give 5.0-5.0-5.0-5.0). You MUST evaluate EACH criterion completely independently. Real students have spiky profiles (e.g., good vocabulary LR 6.5, but poor grammar GRA 5.0). Reflect this reality based strictly on their actual errors.
+                                ## CRITICAL RULE 2 (INDEPENDENT & WHOLE NUMBER SCORING): DO NOT give flat, identical scores across all 4 criteria. You MUST evaluate EACH criterion completely independently. MOREOVER, individual criteria (TA, CC, LR, GRA) MUST be WHOLE NUMBERS ONLY (e.g., 5.0, 6.0, 7.0, 8.0). DO NOT give half bands (like 6.5 or 5.5) for individual criteria. ONLY the Overall score can be a half band (e.g., 6.5) calculated by averaging the 4 criteria. Reflect a realistic spiky profile.
                                 ## INPUT:
                                 - Question: {data_w['question']}
                                 - Essay: {essay_t1}
@@ -1238,7 +1238,7 @@ else:
                                 ## ROLE: Senior IELTS Examiner (Strict but Natural).
                                 ## TASK: Assess IELTS Writing Task 2 and provide deep, insightful, strict feedback in a natural, conversational tone like a real teacher.
                                 ## CRITICAL RULE 1: The ENTIRE "Feedback" string MUST be written in 100% Vietnamese (Tiếng Việt). DO NOT mix English and Vietnamese in your explanation. Only use English when quoting the student's text.
-                                ## CRITICAL RULE 2 (INDEPENDENT SCORING): DO NOT give flat, identical scores across all 4 criteria (e.g., NEVER give 5.5-5.5-5.5-5.5). You MUST evaluate EACH criterion completely independently. Real students have spiky profiles (e.g., good ideas TR 6.5, but poor grammar GRA 5.0). Reflect this reality based strictly on their actual errors.
+                                ## CRITICAL RULE 2 (INDEPENDENT & WHOLE NUMBER SCORING): DO NOT give flat, identical scores across all 4 criteria. You MUST evaluate EACH criterion completely independently. MOREOVER, individual criteria (TR, CC, LR, GRA) MUST be WHOLE NUMBERS ONLY (e.g., 5.0, 6.0, 7.0, 8.0). DO NOT give half bands (like 6.5 or 5.5) for individual criteria. ONLY the Overall score can be a half band (e.g., 6.5) calculated by averaging the 4 criteria. Reflect a realistic spiky profile.
                                 ## TOPIC: {data_w['question']}
                                 ## ESSAY: {essay}
                                 ## RUBRIC (TASK 2):
