@@ -193,7 +193,7 @@ def get_leaderboard(class_code):
         except: lb_r = None
 
         # 3. Writing
-try:
+        try:
             ws_w = sheet.worksheet("Writing_Logs")
             data_w = ws_w.get_all_values()
             
