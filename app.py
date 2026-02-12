@@ -129,7 +129,13 @@ def get_leaderboard(class_code):
     try:
         sheet = connect_gsheet()
         if not sheet: return None, None, None
-
+# --- ĐƯA HÀM XỬ LÝ LÊN ĐẦU ĐỂ CẢ 3 KỸ NĂNG ĐỀU DÙNG ĐƯỢC ---
+        def extract_float(val):
+            try:
+                # Tự động trích xuất số (VD: "Band 6.5" -> 6.5, "7" -> 7.0)
+                found = re.search(r"(\d+\.?\d*)", str(val))
+                return float(found.group(1)) if found else 0.0
+            except: return 0.0
         # 1. Speaking
         try:
             ws_s = sheet.worksheet("Speaking_Logs")
@@ -176,18 +182,26 @@ def get_leaderboard(class_code):
         # 2. Reading
         try:
             ws_r = sheet.worksheet("Reading_Logs")
-            df_r = pd.DataFrame(ws_r.get_all_records())
-            if not df_r.empty and 'Class' in df_r.columns:
-                df_r = df_r[df_r['Class'] == class_code]
-                if not df_r.empty:
-                    # --- FIX LỖI: Chuẩn hóa tên ---
-                    if 'Student' in df_r.columns:
-                        df_r['Student'] = df_r['Student'].astype(str).apply(normalize_name)
+            data_r = ws_r.get_all_values()
+            if len(data_r) > 1:
+                df_r = pd.DataFrame(data_r[1:], columns=data_r[0])
+                df_r.columns = [c.strip() for c in df_r.columns]
 
-                    df_r['Score'] = pd.to_numeric(df_r['Score'], errors='coerce')
-                    lb_r = df_r.groupby('Student')['Score'].max().reset_index()
-                    lb_r.columns = ['Học Viên', 'Điểm Reading (Max)']
-                    lb_r = lb_r.sort_values(by='Điểm Reading (Max)', ascending=False).head(10)
+                if 'Class' in df_r.columns:
+                    df_r = df_r[df_r['Class'] == class_code]
+                    if not df_r.empty:
+                        if 'Student' in df_r.columns:
+                            df_r['Student'] = df_r['Student'].astype(str).apply(normalize_name)
+                        
+                        r_score_col = next((c for c in ['Score', 'Total_Score', 'Points', 'Percentage'] if c in df_r.columns), None)
+
+                        if r_score_col:
+                            df_r['Final_Score'] = df_r[r_score_col].apply(extract_float)
+                            lb_r = df_r.groupby('Student')['Final_Score'].max().reset_index()
+                            lb_r.columns = ['Học Viên', 'Điểm Reading (Max)']
+                            lb_r = lb_r.sort_values(by='Điểm Reading (Max)', ascending=False).head(10)
+                        else: lb_r = None
+                    else: lb_r = None
                 else: lb_r = None
             else: lb_r = None
         except: lb_r = None
@@ -199,7 +213,7 @@ def get_leaderboard(class_code):
             
             if len(data_w) > 1:
                 df_w = pd.DataFrame(data_w[1:], columns=data_w[0])
-                df_w.columns = [c.strip() for c in df_w.columns] # 1. Xóa khoảng trắng thừa
+                df_w.columns = [c.strip() for c in df_w.columns]
                 
                 if 'Class' in df_w.columns:
                     df_w = df_w[df_w['Class'] == class_code]
@@ -208,14 +222,11 @@ def get_leaderboard(class_code):
                         if 'Student' in df_w.columns:
                             df_w['Student'] = df_w['Student'].astype(str).apply(normalize_name)
 
-                        # 2. Áp dụng logic tìm cột linh hoạt giống Speaking (thay vì chỉ tìm Overall_Band)
                         w_score_col = next((c for c in ['Overall_Band', 'Overall Band', 'Band', 'Score', 'Band_Score', 'Overall'] if c in df_w.columns), None)
                         
                         if w_score_col:
-                            # 3. Áp dụng logic bóc tách số thông minh (extract_float) giống Speaking
-                            # Giúp xử lý được cả trường hợp điểm lưu là "Band 6.0" hay "6.0"
+                            # Lúc này hàm extract_float đã luôn tồn tại để sẵn sàng sử dụng
                             df_w['Final_Score'] = df_w[w_score_col].apply(extract_float)
-                            
                             df_w = df_w[df_w['Final_Score'] > 0]
                             
                             lb_w = df_w.groupby('Student')['Final_Score'].mean().reset_index()
