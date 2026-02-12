@@ -1042,8 +1042,15 @@ else:
                                     try:
                                         grade = json.loads(res)
                                         st.session_state['writing_result_t1'] = grade
-                                        crit = json.dumps({"TA": grade['TA'], "CC": grade['CC'], "LR": grade['LR'], "GRA": grade['GRA']})
-                                        save_writing_log(user['name'], user['class'], lesson_w, "Task 1", grade['Overall'], crit, grade['Feedback'], mode=mode_w)
+                                        
+                                        # Use .get() defensively in case AI forgets keys
+                                        crit = json.dumps({
+                                            "TA": grade.get('TA', grade.get('TR', 0)), 
+                                            "CC": grade.get('CC', 0), 
+                                            "LR": grade.get('LR', 0), 
+                                            "GRA": grade.get('GRA', 0)
+                                        })
+                                        save_writing_log(user['name'], user['class'], lesson_w, "Task 1", grade.get('Overall', 0), crit, grade.get('Feedback', ''), mode=mode_w)
                                     except Exception as e:
                                         st.error(f"Lỗi chấm bài: {e}")
                                     else:
@@ -1053,14 +1060,14 @@ else:
                 if 'writing_result_t1' in st.session_state:
                     res = st.session_state['writing_result_t1']
                     st.balloons()
-                    st.success(f"OVERALL BAND: {res['Overall']}")
+                    st.success(f"OVERALL BAND: {res.get('Overall', 0)}")
                     c1, c2, c3, c4 = st.columns(4)
-                    c1.metric("Task Achievement", extract_score(res['TA']))
-                    c2.metric("Coherence", extract_score(res['CC']))
-                    c3.metric("Lexical", extract_score(res['LR']))
-                    c4.metric("Grammar", extract_score(res['GRA']))
+                    c1.metric("Task Achievement", extract_score(res.get('TA', res.get('TR', 0))))
+                    c2.metric("Coherence", extract_score(res.get('CC', 0)))
+                    c3.metric("Lexical", extract_score(res.get('LR', 0)))
+                    c4.metric("Grammar", extract_score(res.get('GRA', 0)))
                     with st.container(border=True):
-                        st.markdown(res['Feedback'])
+                        st.markdown(res.get('Feedback', ''))
                     if st.button("Làm lại Task 1"):
                         del st.session_state['writing_result_t1']
                         st.rerun()
@@ -1241,8 +1248,15 @@ else:
                                     try:
                                         grade = json.loads(res)
                                         st.session_state['writing_result_t2'] = grade
-                                        crit = json.dumps({"TR": grade['TR'], "CC": grade['CC'], "LR": grade['LR'], "GRA": grade['GRA']})
-                                        save_writing_log(user['name'], user['class'], lesson_w, "Task 2", grade['Overall'], crit, grade['Feedback'], mode=mode_w)
+                                        
+                                        # Use .get() defensively in case AI forgets keys
+                                        crit = json.dumps({
+                                            "TR": grade.get('TR', grade.get('TA', 0)), 
+                                            "CC": grade.get('CC', 0), 
+                                            "LR": grade.get('LR', 0), 
+                                            "GRA": grade.get('GRA', 0)
+                                        })
+                                        save_writing_log(user['name'], user['class'], lesson_w, "Task 2", grade.get('Overall', 0), crit, grade.get('Feedback', ''), mode=mode_w)
                                     except Exception as e:
                                         st.error(f"Lỗi chấm bài: {e}")
                                     else:
@@ -1252,14 +1266,14 @@ else:
                 if 'writing_result_t2' in st.session_state:
                     res = st.session_state['writing_result_t2']
                     st.balloons()
-                    st.success(f"OVERALL BAND: {res['Overall']}")
+                    st.success(f"OVERALL BAND: {res.get('Overall', 0)}")
                     c1, c2, c3, c4 = st.columns(4)
-                    c1.metric("Task Response", extract_score(res['TR']))
-                    c2.metric("Coherence", extract_score(res['CC']))
-                    c3.metric("Lexical", extract_score(res['LR']))
-                    c4.metric("Grammar", extract_score(res['GRA']))
+                    c1.metric("Task Response", extract_score(res.get('TR', res.get('TA', 0))))
+                    c2.metric("Coherence", extract_score(res.get('CC', 0)))
+                    c3.metric("Lexical", extract_score(res.get('LR', 0)))
+                    c4.metric("Grammar", extract_score(res.get('GRA', 0)))
                     with st.container(border=True):
-                        st.markdown(res['Feedback'])
+                        st.markdown(res.get('Feedback', ''))
                     if st.button("Làm lại Task 2"):
                         del st.session_state['writing_result_t2']
                         st.rerun()
