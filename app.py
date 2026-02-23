@@ -974,6 +974,10 @@ else:
                 st.dataframe(lb_w.style.format({"Điểm Writing (TB)": "{:.2f}"}), use_container_width=True)
             else: st.info("Chưa có dữ liệu.")
 
+    # --- MODULE 6: DỊCH CÂU (TRANSLATION PRACTICE) ---
+    elif menu == "🔄 Dịch Câu":
+        st.title("🔄 Luyện Dịch Câu (IELTS Style)")
+        st.markdown("Cải thiện khả năng tư duy song ngữ và mở rộng vốn từ vựng với các câu hỏi chuẩn văn phong IELTS.")
         # DANH SÁCH CÁC CHỦ ĐỀ IELTS NGẮN GỌN VÀ HIỂN THỊ LÊN GIAO DIỆN
         TOPICS_LIST = [
             "Ngẫu nhiên (Random)", 
