@@ -976,8 +976,22 @@ else:
 
     # --- MODULE 6: DỊCH CÂU (TRANSLATION PRACTICE) ---
     elif menu == "🔄 Dịch Câu":
-        st.title("🔄 Luyện Dịch Câu IELTS")
+        st.title("🔄 Luyện Dịch Câu")
         st.markdown("Cải thiện khả năng tư duy song ngữ và mở rộng vốn từ vựng với các câu hỏi chuẩn văn phong IELTS.")
+
+        # DANH SÁCH CÁC CHỦ ĐỀ IELTS CỤ THỂ ĐỂ TRÁNH TRÙNG LẶP
+        IELTS_RANDOM_TOPICS = [
+            "Space exploration & Universe", "Artificial Intelligence & Robots", 
+            "Traditional Culture vs Modernity", "Fast Food & Public Health", 
+            "Urbanization & Traffic Congestion", "Gender Equality in the Workplace", 
+            "Public Transport vs Private Cars", "Remote Work & Telecommuting", 
+            "Mental Health & Stress", "Wildlife Conservation", 
+            "Renewable Energy & Fossil Fuels", "Social Media impacts on youth", 
+            "Aging Population & Healthcare", "Online Education vs Traditional Classrooms", 
+            "Global Tourism & Environment", "History & Heritage Preservation", 
+            "Crime, Punishment & Rehabilitation", "Space Travel Commercialization",
+            "Childhood Obesity", "The gap between Rich and Poor"
+        ]
 
         col1, col2 = st.columns(2)
         with col1:
@@ -988,17 +1002,20 @@ else:
         # Nút tạo câu mới (chủ động gọi hàm)
         if st.button("🎲 Tạo câu mới"):
             with st.spinner("Đang tạo câu hỏi..."):
+                chosen_topic = random.choice(IELTS_RANDOM_TOPICS)
                 prompt_gen = f"""
                 Role: IELTS Teacher.
-                Task: Generate exactly ONE single sentence for translation practice.
+                Task: Generate exactly ONE single, highly unique sentence for translation practice.
                 Level: {trans_level}
                 Condition: The sentence must be in {'English' if trans_direction == 'Anh -> Việt' else 'Vietnamese'}.
-                Topic: Common IELTS topics (Education, Environment, Technology, Society, etc.).
-                Style: Academic or semi-academic.
+                Specific Topic: {chosen_topic}.
+                Style: Academic or semi-academic (IELTS Style).
+                Constraint: Make it highly creative, specific, and DIFFERENT from standard generic examples. Do NOT just say "It is important to...". Use rich vocabulary related to {chosen_topic}.
                 OUTPUT EXACTLY AND ONLY THE SENTENCE. NO EXTRA TEXT, NO QUOTATION MARKS.
                 """
                 new_sentence = call_gemini(prompt_gen)
                 if new_sentence:
+                    # FIX: Thêm .strip() để xóa khoảng trắng và dòng trống ở đầu/cuối chuỗi
                     st.session_state['trans_current_sentence'] = new_sentence.strip()
                     st.session_state['trans_feedback'] = ""
                     st.rerun()
