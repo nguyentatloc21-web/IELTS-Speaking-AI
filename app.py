@@ -976,7 +976,7 @@ else:
 
     # --- MODULE 6: DỊCH CÂU (TRANSLATION PRACTICE) ---
     elif menu == "🔄 Dịch Câu":
-        st.title("🔄 Luyện Dịch Câu (IELTS Style)")
+        st.title("🔄 Luyện Dịch Câu IELTS")
         st.markdown("Cải thiện khả năng tư duy song ngữ và mở rộng vốn từ vựng với các câu hỏi chuẩn văn phong IELTS.")
         # DANH SÁCH CÁC CHỦ ĐỀ IELTS NGẮN GỌN VÀ HIỂN THỊ LÊN GIAO DIỆN
         TOPICS_LIST = [
