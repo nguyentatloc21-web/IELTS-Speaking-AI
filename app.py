@@ -976,7 +976,7 @@ else:
 
     # --- MODULE 6: DỊCH CÂU (TRANSLATION PRACTICE) ---
     elif menu == "🔄 Dịch Câu":
-        st.title("🔄 Luyện Dịch Câu (IELTS Style)")
+        st.title("🔄 Luyện Dịch Câu IELTS")
         st.markdown("Cải thiện khả năng tư duy song ngữ và mở rộng vốn từ vựng với các câu hỏi chuẩn văn phong IELTS.")
 
         col1, col2 = st.columns(2)
@@ -999,7 +999,7 @@ else:
                 """
                 new_sentence = call_gemini(prompt_gen)
                 if new_sentence:
-                    st.session_state['trans_current_sentence'] = new_sentence
+                    st.session_state['trans_current_sentence'] = new_sentence.strip()
                     st.session_state['trans_feedback'] = ""
                     st.rerun()
 
@@ -1008,7 +1008,7 @@ else:
         # Nếu đã có câu hỏi được tạo ra
         if st.session_state['trans_current_sentence']:
             st.markdown(f"### 📝 Dịch câu sau sang tiếng {'Việt' if trans_direction == 'Anh -> Việt' else 'Anh'}:")
-            st.info(f"**{st.session_state['trans_current_sentence']}**")
+            st.info(f"**{st.session_state['trans_current_sentence'].strip()}**")
             
             user_translation = st.text_area("Nhập bản dịch của bạn:", height=100)
             
@@ -1031,16 +1031,16 @@ else:
                         3. Be encouraging. Focus on major grammatical issues or wrong word choices that alter the meaning or are unnatural for the level.
 
                         Output format (Vietnamese Markdown):
-                        ### 🎯 Đánh giá chung
+                        ### Đánh giá chung
                         [Đúng/Sai cơ bản? Khen ngợi nếu làm tốt, chỉ ra lỗi sai lớn nếu có]
 
-                        ### 🔍 Lỗi cần lưu ý (Nếu có)
+                        ### Lỗi cần lưu ý (Nếu có)
                         [Chỉ ra các điểm dịch sai nghĩa, hoặc sai ngữ pháp nghiêm trọng. Nếu không có lỗi, ghi "Bản dịch rất tốt, không có lỗi nghiêm trọng!"]
 
-                        ### 💡 Đáp án tham khảo (IELTS Style)
+                        ### Đáp án tham khảo
                         [Cung cấp 1-2 cách dịch chuẩn, tự nhiên và học thuật nhất]
 
-                        ### 📚 Từ vựng / Cấu trúc hay từ câu gốc
+                        ### Từ vựng / Cấu trúc hay từ câu gốc
                         [Liệt kê 2-3 từ/cụm từ đắt giá từ câu gốc kèm nghĩa và ví dụ ngắn]
                         """
                         feedback = call_gemini(prompt_check)
@@ -1053,7 +1053,7 @@ else:
             st.markdown(st.session_state['trans_feedback'])
             
             st.divider()
-            st.warning("⚠️ **Khoan đã!** Bạn đã note lại những từ vựng mới hoặc lỗi sai của mình vào sổ tay chưa?")
+            st.warning("⚠️ Bạn đã note lại những từ vựng mới hoặc lỗi sai của mình vào sổ tay chưa?")
             
             if st.button("✅ Đã note xong! Chuyển sang câu tiếp theo"):
                 with st.spinner("Đang chuẩn bị câu tiếp theo..."):
