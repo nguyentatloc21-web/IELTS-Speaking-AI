@@ -1017,7 +1017,6 @@ else:
                 Condition: The sentence must be in {'English' if trans_direction == 'Anh -> Việt' else 'Vietnamese'}.
                 Specific Topic: {chosen_topic}.
                 Style: Academic or semi-academic (IELTS Style).
-                Constraint: Make it highly creative, specific, and DIFFERENT from standard generic examples. Do NOT just say "It is important to...". Use rich vocabulary related to {chosen_topic}.
                 OUTPUT EXACTLY AND ONLY THE SENTENCE. NO EXTRA TEXT, NO QUOTATION MARKS.
                 """
                 new_sentence = call_gemini(prompt_gen)
