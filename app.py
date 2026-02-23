@@ -974,10 +974,12 @@ else:
                 st.dataframe(lb_w.style.format({"Điểm Writing (TB)": "{:.2f}"}), use_container_width=True)
             else: st.info("Chưa có dữ liệu.")
 
+
     # --- MODULE 6: DỊCH CÂU (TRANSLATION PRACTICE) ---
     elif menu == "🔄 Dịch Câu":
         st.title("🔄 Luyện Dịch Câu IELTS")
         st.markdown("Cải thiện khả năng tư duy song ngữ và mở rộng vốn từ vựng với các câu hỏi chuẩn văn phong IELTS.")
+
         # DANH SÁCH CÁC CHỦ ĐỀ IELTS NGẮN GỌN VÀ HIỂN THỊ LÊN GIAO DIỆN
         TOPICS_LIST = [
             "Ngẫu nhiên (Random)", 
@@ -991,6 +993,15 @@ else:
             "Du lịch (Travel)",
             "Truyền thông (Media)"
         ]
+
+        LEVEL_DESCRIPTIONS = {
+            "A1": "Beginner (IELTS 2.0-3.0): Very short, simple sentences (5-8 words). Basic vocabulary for everyday needs. Simple tenses only.",
+            "A2": "Elementary (IELTS 3.5-4.5): Simple compound sentences (8-12 words). Familiar daily topics. Basic grammatical structures.",
+            "B1": "Intermediate (IELTS 5.0-5.5): Mixed simple and complex sentences (12-18 words). Good everyday vocabulary. Can express opinions.",
+            "B2": "Upper-Intermediate (IELTS 6.0-6.5): Clear, detailed, complex sentences (15-22 words). Good control of grammar. Wide range of vocabulary, some academic words.",
+            "C1": "Advanced (IELTS 7.0-8.0): Highly complex and well-structured sentences (20-30 words). Rich, academic, and idiomatic vocabulary. Nuanced meanings.",
+            "C2": "Proficient (IELTS 8.5-9.0): Expert level. Sophisticated, precise, and highly natural language (long, academic sentences). Mastery of complex grammar and rare vocabulary."
+        }
 
         col1, col2, col3 = st.columns(3)
         with col1:
@@ -1012,11 +1023,12 @@ else:
 
                 prompt_gen = f"""
                 Role: IELTS Teacher.
-                Task: Generate exactly ONE single, highly unique sentence for translation practice.
-                Level: {trans_level}
+                Task: Generate exactly ONE single sentence for translation practice.
+                Level Target: {LEVEL_DESCRIPTIONS[trans_level]}
                 Condition: The sentence must be in {'English' if trans_direction == 'Anh -> Việt' else 'Vietnamese'}.
                 Specific Topic: {chosen_topic}.
                 Style: Academic or semi-academic (IELTS Style).
+                Constraint: Strictly adhere to the grammar and vocabulary complexity expected for the Level Target. 
                 OUTPUT EXACTLY AND ONLY THE SENTENCE. NO EXTRA TEXT, NO QUOTATION MARKS.
                 """
                 new_sentence = call_gemini(prompt_gen)
@@ -1047,7 +1059,7 @@ else:
                         Direction: {trans_direction}
                         Original Sentence: {st.session_state['trans_current_sentence']}
                         Student's Translation: {user_translation}
-                        Level Expected: {trans_level}
+                        Level Expected: {LEVEL_DESCRIPTIONS[trans_level]}
 
                         Rules for Evaluation:
                         1. Ignore minor typos (e.g., missing a comma, slight misspellings) if the core meaning is fully intact.
@@ -1058,13 +1070,13 @@ else:
                         ### Đánh giá chung
                         [Đúng/Sai cơ bản? Khen ngợi nếu làm tốt, chỉ ra lỗi sai lớn nếu có]
 
-                        ### Lỗi cần lưu ý (Nếu có)
+                        ### Lỗi cần lưu ý
                         [Chỉ ra các điểm dịch sai nghĩa, hoặc sai ngữ pháp nghiêm trọng. Nếu không có lỗi, ghi "Bản dịch rất tốt, không có lỗi nghiêm trọng!"]
 
-                        ### Đáp án tham khảo
+                        ### Đáp án tham khảo 
                         [Cung cấp 1-2 cách dịch chuẩn, tự nhiên và học thuật nhất]
 
-                        ### Từ vựng / Cấu trúc hay từ câu gốc
+                        ### Từ vựng / Cấu trúc hay
                         [Liệt kê 2-3 từ/cụm từ đắt giá từ câu gốc kèm nghĩa và ví dụ ngắn]
                         """
                         feedback = call_gemini(prompt_check)
@@ -1077,7 +1089,7 @@ else:
             st.markdown(st.session_state['trans_feedback'])
             
             st.divider()
-            st.warning("Nhớ note lại từ vựng mới, lỗi sai của mình nha tình iu")
+            st.warning("Nhớ note lại từ vựng rồi mới chuyển câu khác nha tình iu 💖")
             
             if st.button("✅ Đã note xong! Chuyển sang câu tiếp theo"):
                 with st.spinner("Đang chuẩn bị câu tiếp theo..."):
@@ -1090,12 +1102,12 @@ else:
 
                     prompt_gen = f"""
                     Role: IELTS Teacher.
-                    Task: Generate exactly ONE single, highly unique sentence for translation practice.
-                    Level: {trans_level}
+                    Task: Generate exactly ONE single sentence for translation practice.
+                    Level Target: {LEVEL_DESCRIPTIONS[trans_level]}
                     Condition: The sentence must be in {'English' if trans_direction == 'Anh -> Việt' else 'Vietnamese'}.
                     Specific Topic: {chosen_topic}.
                     Style: Academic or semi-academic (IELTS Style).
-                    Constraint: Make it highly creative, specific, and DIFFERENT from standard generic examples. Do NOT just say "It is important to...". Use rich vocabulary related to {chosen_topic}.
+                    Constraint: Strictly adhere to the grammar and vocabulary complexity expected for the Level Target. 
                     OUTPUT EXACTLY AND ONLY THE SENTENCE. NO EXTRA TEXT, NO QUOTATION MARKS.
                     """
                     new_sentence = call_gemini(prompt_gen)
@@ -1104,7 +1116,6 @@ else:
                         st.session_state['trans_current_sentence'] = new_sentence.strip()
                         st.session_state['trans_feedback'] = ""
                         st.rerun()
-
 
     # --- MODULE 5: WRITING ---
     elif menu == "✍️ Writing":
