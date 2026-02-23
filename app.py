@@ -974,35 +974,38 @@ else:
                 st.dataframe(lb_w.style.format({"Điểm Writing (TB)": "{:.2f}"}), use_container_width=True)
             else: st.info("Chưa có dữ liệu.")
 
-    # --- MODULE 6: DỊCH CÂU (TRANSLATION PRACTICE) ---
-    elif menu == "🔄 Dịch Câu":
-        st.title("🔄 Luyện Dịch Câu")
-        st.markdown("Cải thiện khả năng tư duy song ngữ và mở rộng vốn từ vựng với các câu hỏi chuẩn văn phong IELTS.")
-
-        # DANH SÁCH CÁC CHỦ ĐỀ IELTS CỤ THỂ ĐỂ TRÁNH TRÙNG LẶP
-        IELTS_RANDOM_TOPICS = [
-            "Space exploration & Universe", "Artificial Intelligence & Robots", 
-            "Traditional Culture vs Modernity", "Fast Food & Public Health", 
-            "Urbanization & Traffic Congestion", "Gender Equality in the Workplace", 
-            "Public Transport vs Private Cars", "Remote Work & Telecommuting", 
-            "Mental Health & Stress", "Wildlife Conservation", 
-            "Renewable Energy & Fossil Fuels", "Social Media impacts on youth", 
-            "Aging Population & Healthcare", "Online Education vs Traditional Classrooms", 
-            "Global Tourism & Environment", "History & Heritage Preservation", 
-            "Crime, Punishment & Rehabilitation", "Space Travel Commercialization",
-            "Childhood Obesity", "The gap between Rich and Poor"
+        # DANH SÁCH CÁC CHỦ ĐỀ IELTS NGẮN GỌN VÀ HIỂN THỊ LÊN GIAO DIỆN
+        TOPICS_LIST = [
+            "Ngẫu nhiên (Random)", 
+            "Giáo dục (Education)", 
+            "Môi trường (Environment)", 
+            "Công nghệ (Technology)", 
+            "Sức khỏe (Health)", 
+            "Xã hội (Society)", 
+            "Kinh doanh & Việc làm (Work & Business)", 
+            "Nghệ thuật & Văn hóa (Art & Culture)", 
+            "Du lịch (Travel)",
+            "Truyền thông (Media)"
         ]
 
-        col1, col2 = st.columns(2)
+        col1, col2, col3 = st.columns(3)
         with col1:
             trans_direction = st.selectbox("Chọn chiều dịch:", ["Anh -> Việt", "Việt -> Anh"])
         with col2:
             trans_level = st.selectbox("Chọn cấp độ:", ["A1", "A2", "B1", "B2", "C1", "C2"])
+        with col3:
+            trans_topic_selection = st.selectbox("Chọn chủ đề:", TOPICS_LIST)
         
         # Nút tạo câu mới (chủ động gọi hàm)
         if st.button("🎲 Tạo câu mới"):
             with st.spinner("Đang tạo câu hỏi..."):
-                chosen_topic = random.choice(IELTS_RANDOM_TOPICS)
+                # Xử lý chủ đề cho prompt
+                if "Ngẫu nhiên" in trans_topic_selection:
+                    english_topics = [t.split("(")[1].strip(")") for t in TOPICS_LIST[1:]]
+                    chosen_topic = random.choice(english_topics)
+                else:
+                    chosen_topic = trans_topic_selection.split("(")[1].strip(")")
+
                 prompt_gen = f"""
                 Role: IELTS Teacher.
                 Task: Generate exactly ONE single, highly unique sentence for translation practice.
@@ -1025,6 +1028,7 @@ else:
         # Nếu đã có câu hỏi được tạo ra
         if st.session_state['trans_current_sentence']:
             st.markdown(f"### 📝 Dịch câu sau sang tiếng {'Việt' if trans_direction == 'Anh -> Việt' else 'Anh'}:")
+            # FIX: Gọi lại .strip() 1 lần nữa cho an toàn khi in ra định dạng Markdown
             st.info(f"**{st.session_state['trans_current_sentence'].strip()}**")
             
             user_translation = st.text_area("Nhập bản dịch của bạn:", height=100)
@@ -1070,23 +1074,31 @@ else:
             st.markdown(st.session_state['trans_feedback'])
             
             st.divider()
-            st.warning("⚠️ Bạn đã note lại những từ vựng mới hoặc lỗi sai của mình vào sổ tay chưa?")
+            st.warning("Nhớ note lại từ vựng mới, lỗi sai của mình nha tình iu")
             
             if st.button("✅ Đã note xong! Chuyển sang câu tiếp theo"):
                 with st.spinner("Đang chuẩn bị câu tiếp theo..."):
-                    # Tự động generate câu mới
+                    # Tự động generate câu mới với logic chủ đề tương tự
+                    if "Ngẫu nhiên" in trans_topic_selection:
+                        english_topics = [t.split("(")[1].strip(")") for t in TOPICS_LIST[1:]]
+                        chosen_topic = random.choice(english_topics)
+                    else:
+                        chosen_topic = trans_topic_selection.split("(")[1].strip(")")
+
                     prompt_gen = f"""
                     Role: IELTS Teacher.
-                    Task: Generate exactly ONE single sentence for translation practice.
+                    Task: Generate exactly ONE single, highly unique sentence for translation practice.
                     Level: {trans_level}
                     Condition: The sentence must be in {'English' if trans_direction == 'Anh -> Việt' else 'Vietnamese'}.
-                    Topic: Common IELTS topics (Education, Environment, Technology, Society, etc.).
-                    Style: Academic or semi-academic.
+                    Specific Topic: {chosen_topic}.
+                    Style: Academic or semi-academic (IELTS Style).
+                    Constraint: Make it highly creative, specific, and DIFFERENT from standard generic examples. Do NOT just say "It is important to...". Use rich vocabulary related to {chosen_topic}.
                     OUTPUT EXACTLY AND ONLY THE SENTENCE. NO EXTRA TEXT, NO QUOTATION MARKS.
                     """
                     new_sentence = call_gemini(prompt_gen)
                     if new_sentence:
-                        st.session_state['trans_current_sentence'] = new_sentence
+                        # FIX: Thêm .strip() khi gán biến để làm sạch câu sinh ra
+                        st.session_state['trans_current_sentence'] = new_sentence.strip()
                         st.session_state['trans_feedback'] = ""
                         st.rerun()
 
