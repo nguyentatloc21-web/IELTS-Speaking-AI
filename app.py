@@ -880,6 +880,10 @@ if 'reading_highlight' not in st.session_state: st.session_state['reading_highli
 if 'writing_step' not in st.session_state: st.session_state['writing_step'] = 'outline' 
 if 'writing_outline_score' not in st.session_state: st.session_state['writing_outline_score'] = 0
 
+# State mới cho module Dịch câu
+if 'trans_current_sentence' not in st.session_state: st.session_state['trans_current_sentence'] = ""
+if 'trans_feedback' not in st.session_state: st.session_state['trans_feedback'] = ""
+
 # --- SỬA LẠI: HÀM LẤY BÀI TẬP VỚI CỜ BÁO TRẠNG THÁI ---
 def get_assignments_status(user_class_code):
     """
@@ -940,7 +944,8 @@ else:
         st.write(f"👤 **{user['name']}**")
         st.caption(f"Lớp: {user['class']} | Level: {user['level']['level']}")
         st.divider()
-        menu = st.radio("CHỌN KỸ NĂNG:", ["🏆 Bảng Xếp Hạng", "🗣️ Speaking", "📖 Reading", "🎧 Listening", "✍️ Writing"])
+        # Đã cập nhật Menu thêm chức năng Dịch Câu
+        menu = st.radio("CHỌN KỸ NĂNG:", ["🏆 Bảng Xếp Hạng", "🗣️ Speaking", "📖 Reading", "🎧 Listening", "✍️ Writing", "🔄 Dịch Câu"])
         st.divider()
         if st.button("Đăng xuất"): logout()
 
@@ -968,6 +973,106 @@ else:
                 # Đã xóa .background_gradient để fix lỗi
                 st.dataframe(lb_w.style.format({"Điểm Writing (TB)": "{:.2f}"}), use_container_width=True)
             else: st.info("Chưa có dữ liệu.")
+
+    # --- MODULE 6: DỊCH CÂU (TRANSLATION PRACTICE) ---
+    elif menu == "🔄 Dịch Câu":
+        st.title("🔄 Luyện Dịch Câu (IELTS Style)")
+        st.markdown("Cải thiện khả năng tư duy song ngữ và mở rộng vốn từ vựng với các câu hỏi chuẩn văn phong IELTS.")
+
+        col1, col2 = st.columns(2)
+        with col1:
+            trans_direction = st.selectbox("Chọn chiều dịch:", ["Anh -> Việt", "Việt -> Anh"])
+        with col2:
+            trans_level = st.selectbox("Chọn cấp độ:", ["A1", "A2", "B1", "B2", "C1", "C2"])
+        
+        # Nút tạo câu mới (chủ động gọi hàm)
+        if st.button("🎲 Tạo câu mới"):
+            with st.spinner("Đang tạo câu hỏi..."):
+                prompt_gen = f"""
+                Role: IELTS Teacher.
+                Task: Generate exactly ONE single sentence for translation practice.
+                Level: {trans_level}
+                Condition: The sentence must be in {'English' if trans_direction == 'Anh -> Việt' else 'Vietnamese'}.
+                Topic: Common IELTS topics (Education, Environment, Technology, Society, etc.).
+                Style: Academic or semi-academic.
+                OUTPUT EXACTLY AND ONLY THE SENTENCE. NO EXTRA TEXT, NO QUOTATION MARKS.
+                """
+                new_sentence = call_gemini(prompt_gen)
+                if new_sentence:
+                    st.session_state['trans_current_sentence'] = new_sentence
+                    st.session_state['trans_feedback'] = ""
+                    st.rerun()
+
+        st.divider()
+
+        # Nếu đã có câu hỏi được tạo ra
+        if st.session_state['trans_current_sentence']:
+            st.markdown(f"### 📝 Dịch câu sau sang tiếng {'Việt' if trans_direction == 'Anh -> Việt' else 'Anh'}:")
+            st.info(f"**{st.session_state['trans_current_sentence']}**")
+            
+            user_translation = st.text_area("Nhập bản dịch của bạn:", height=100)
+            
+            if st.button("✅ Kiểm tra đáp án"):
+                if not user_translation.strip():
+                    st.warning("Vui lòng nhập bản dịch của bạn trước khi kiểm tra.")
+                else:
+                    with st.spinner("Đang kiểm tra bản dịch..."):
+                        prompt_check = f"""
+                        Role: Expert IELTS Bilingual Tutor.
+                        Task: Evaluate the student's translation.
+                        Direction: {trans_direction}
+                        Original Sentence: {st.session_state['trans_current_sentence']}
+                        Student's Translation: {user_translation}
+                        Level Expected: {trans_level}
+
+                        Rules for Evaluation:
+                        1. Ignore minor typos (e.g., missing a comma, slight misspellings) if the core meaning is fully intact.
+                        2. Accept synonymous phrasing. If it's English to Vietnamese, accept different natural Vietnamese expressions as long as the semantic meaning and tone match. If Vietnamese to English, accept valid paraphrasing.
+                        3. Be encouraging. Focus on major grammatical issues or wrong word choices that alter the meaning or are unnatural for the level.
+
+                        Output format (Vietnamese Markdown):
+                        ### 🎯 Đánh giá chung
+                        [Đúng/Sai cơ bản? Khen ngợi nếu làm tốt, chỉ ra lỗi sai lớn nếu có]
+
+                        ### 🔍 Lỗi cần lưu ý (Nếu có)
+                        [Chỉ ra các điểm dịch sai nghĩa, hoặc sai ngữ pháp nghiêm trọng. Nếu không có lỗi, ghi "Bản dịch rất tốt, không có lỗi nghiêm trọng!"]
+
+                        ### 💡 Đáp án tham khảo (IELTS Style)
+                        [Cung cấp 1-2 cách dịch chuẩn, tự nhiên và học thuật nhất]
+
+                        ### 📚 Từ vựng / Cấu trúc hay từ câu gốc
+                        [Liệt kê 2-3 từ/cụm từ đắt giá từ câu gốc kèm nghĩa và ví dụ ngắn]
+                        """
+                        feedback = call_gemini(prompt_check)
+                        if feedback:
+                            st.session_state['trans_feedback'] = feedback
+                            st.rerun()
+
+        # Hiển thị feedback và nhắc nhở
+        if st.session_state['trans_feedback']:
+            st.markdown(st.session_state['trans_feedback'])
+            
+            st.divider()
+            st.warning("⚠️ **Khoan đã!** Bạn đã note lại những từ vựng mới hoặc lỗi sai của mình vào sổ tay chưa?")
+            
+            if st.button("✅ Đã note xong! Chuyển sang câu tiếp theo"):
+                with st.spinner("Đang chuẩn bị câu tiếp theo..."):
+                    # Tự động generate câu mới
+                    prompt_gen = f"""
+                    Role: IELTS Teacher.
+                    Task: Generate exactly ONE single sentence for translation practice.
+                    Level: {trans_level}
+                    Condition: The sentence must be in {'English' if trans_direction == 'Anh -> Việt' else 'Vietnamese'}.
+                    Topic: Common IELTS topics (Education, Environment, Technology, Society, etc.).
+                    Style: Academic or semi-academic.
+                    OUTPUT EXACTLY AND ONLY THE SENTENCE. NO EXTRA TEXT, NO QUOTATION MARKS.
+                    """
+                    new_sentence = call_gemini(prompt_gen)
+                    if new_sentence:
+                        st.session_state['trans_current_sentence'] = new_sentence
+                        st.session_state['trans_feedback'] = ""
+                        st.rerun()
+
 
     # --- MODULE 5: WRITING ---
     elif menu == "✍️ Writing":
