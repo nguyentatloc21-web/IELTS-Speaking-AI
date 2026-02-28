@@ -1488,32 +1488,19 @@ else:
                     q_list = SPEAKING_CONTENT[lesson_choice]
                     question = st.selectbox("Câu hỏi:", q_list, key="class_q")
                 
-                # Logic cũ (Record & Feedback ngay lập tức)
                 attempts = st.session_state['speaking_attempts'].get(question, 0)
                 remaining = 5 - attempts
                 
                 st.markdown(f"**Topic:** {question}")
                 
-                if remaining > 0:
-                    st.info(f"⚡ Bạn còn **{remaining}** lượt trả lời cho câu này.")
-                    audio = st.audio_input("Ghi âm câu trả lời:", key=f"rec_class_{question}")
-                    
-                    if audio:
-                        # ... (Logic xử lý audio cũ giữ nguyên) ...
-                        audio.seek(0)
-                        audio_bytes = audio.read()
-                        audio_sig = hash(audio_bytes)
-                        state_key = f"proc_class_{question}"
-                        if state_key not in st.session_state: st.session_state[state_key] = {"sig": None, "result": None}
-                        proc = st.session_state[state_key]
-                        
-                        if proc["sig"] != audio_sig:
-                            if len(audio_bytes) < 1000: st.warning("File quá ngắn.")
-                            else:
-                                with st.spinner("Đang chấm điểm..."):
-                                    audio_b64 = base64.b64encode(audio_bytes).decode('utf-8')
-                                    # === PROMPT RUBRIC CHUẨN XÁC ===
-                                    prompt = f"""
+                # Cấu trúc lưu trữ trạng thái cho từng câu hỏi
+                state_key = f"proc_class_{question}"
+                if state_key not in st.session_state: 
+                    st.session_state[state_key] = {"sig": None, "result": None, "audio_bytes": None, "audio_b64": None}
+                proc = st.session_state[state_key]
+
+                # --- LƯU TRỮ PROMPT GỐC ĐỂ DÙNG CHUNG CHO LẦN ĐẦU & RETRY ---
+                prompt_class = f"""
                                 Role: Senior IELTS Speaking Examiner.
                         
                                 Task: Assess speaking response for "{question}" based strictly on the rubric with encouraging tone.
@@ -1590,18 +1577,56 @@ else:
                                 * **Sửa:** "..."
                                 * **Lý do:** ...
                                 """
-                                    # Gọi API
+                if remaining > 0:
+                    st.info(f"⚡ Bạn còn **{remaining}** lượt trả lời cho câu này.")
+                    audio = st.audio_input("Ghi âm câu trả lời:", key=f"rec_class_{question}")
+                    
+                    if audio:
+                        audio_bytes = audio.read()
+                        audio_sig = hash(audio_bytes)
                         
-                                    text_result = call_gemini(prompt, audio_data=audio_b64)
+                        # Khi phát hiện người dùng thu âm FILE MỚI
+                        if proc["sig"] != audio_sig:
+                            if len(audio_bytes) < 1000: 
+                                st.warning("File quá ngắn.")
+                            else:
+                                proc["sig"] = audio_sig
+                                proc["audio_bytes"] = audio_bytes
+                                proc["audio_b64"] = base64.b64encode(audio_bytes).decode('utf-8')
+                                proc["result"] = None # Reset kết quả cũ
+                                
+                                with st.spinner("Đang chấm điểm..."):
+                                    text_result = call_gemini(prompt_class, audio_data=proc["audio_b64"])
                                     if text_result:
                                         proc["result"] = text_result
-                                        proc["sig"] = audio_sig
                                         st.session_state['speaking_attempts'][question] = attempts + 1
                                         save_speaking_log(user['name'], user['class'], lesson_choice, question, text_result)
                                         st.rerun()
-                        if proc["result"]: st.markdown(proc["result"])
-                else: st.warning("Hết lượt.")
-            else: st.info("Chưa có bài.")
+
+                    # NẾU ĐÃ CÓ AUDIO TRONG BỘ NHỚ -> HIỂN THỊ NÚT CHẤM LẠI
+                    if proc["audio_bytes"]:
+                        col_retry, _ = st.columns([1, 3])
+                        with col_retry:
+                            if st.button("🔄 Chấm lại (Retry - Không trừ lượt)", key=f"retry_class_{question}"):
+                                with st.spinner("Hệ thống đang chấm lại file ghi âm cũ..."):
+                                    text_result = call_gemini(prompt_class, audio_data=proc["audio_b64"])
+                                    if text_result:
+                                        proc["result"] = text_result
+                                        save_speaking_log(user['name'], user['class'], lesson_choice, question, text_result)
+                                        st.rerun()
+                                    else:
+                                        st.error("Lỗi API hoặc mạng. Vui lòng thử lại lần nữa.")
+
+                    # HIỂN THỊ KẾT QUẢ
+                    if proc["result"]: 
+                        st.markdown(proc["result"])
+                    elif proc["audio_bytes"] and not proc["result"]:
+                        st.error("Chưa có kết quả hoặc hệ thống trả về lỗi rỗng. Vui lòng nhấn nút **🔄 Chấm lại** ở trên.")
+
+                else: 
+                    st.warning("Hết lượt trả lời cho câu này.")
+            else: 
+                st.info("Chưa có bài.")
 
         # === TAB 2: FORECAST & LUYỆN TẬP (MỚI) ===
         with tab_forecast:
