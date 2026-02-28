@@ -250,7 +250,7 @@ def get_leaderboard(class_code):
 
 CLASS_CONFIG = {
     "PLA1601": {"level": "3.0 - 4.0", "desc": "Lớp Platinum"},
-    "DIA2024": {"level": "4.0 - 5.0", "desc": "Lớp Diamond"},
+    "DIA2702": {"level": "4.0 - 5.0", "desc": "Lớp Diamond"},
     "MAS0901": {"level": "5.0 - 6.0", "desc": "Lớp Master"},
     "ELITE1912": {"level": "6.5 - 7.0", "desc": "Lớp Elite"}
 }
@@ -272,7 +272,7 @@ HOMEWORK_CONFIG = {
         ]
     },
     "DIA": {
-        "Speaking": [], "Reading": [], "Writing": []
+        "Speaking": ["Lesson 1: Work & Study"], "Reading": [], "Writing": []
     },
     "MAS": {
         "Speaking": [], 
