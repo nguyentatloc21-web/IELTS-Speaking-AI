@@ -258,7 +258,7 @@ CLASS_CONFIG = {
 HOMEWORK_CONFIG = {
     "PLA": {
         "Speaking": ["Lesson 1: Work & Study", "Lesson 2: Habits & Lifestyle", "Lesson 3: Home & Transport", "Lesson 4: Describing People"],
-        "Reading":  ["Lesson 2: Marine Chronometer", "Lesson 3: Australian Agricultural Innovations"],
+        "Reading":  ["Lesson 2: Marine Chronometer", "Lesson 3: Australian Agricultural Innovations", "Lesson 4: The lost giants of Australian fauna"],
         "Writing":  [] 
     },
     "ELITE": {
@@ -609,10 +609,71 @@ From early days it had been obvious that English and European sheep breeds had t
             {"id": "q4", "q": "4. What did John Custance recommend?", "options": ["A. Improving wheat yields.", "B. Revitalizing the industry.", "C. Fertilizing the soil."], "a": "C. Fertilizing the soil.", "exp": "Dẫn chứng (Đoạn 4): '...advised the use of soluble superphosphate fertilizer.' -> Khuyên dùng phân bón."},
             {"id": "q5", "q": "5. Why was William Farrer’s wheat better?", "options": ["A. It was drought-resistant.", "B. It wasn’t from England or South Africa.", "C. It was drier for Australian conditions."], "a": "A. It was drought-resistant.", "exp": "Dẫn chứng (Đoạn 5): '...better able to withstand dry Australian conditions.' -> Chịu hạn tốt (drought-resistant)."}
         ]
+    },
+    "Lesson 4: The lost giants of Australian fauna": {
+        "status": "Active",
+        "title": "The lost giants of Australian fauna",
+        "intro_text": "Cùng khám phá thế giới động vật hoang dã độc đáo của Úc vào 1 triệu năm trước thời kỷ Pleistocene - kỷ nguyên của những loài thú có vú khổng lồ. Bài đọc sẽ đưa bạn tìm hiểu về sự biến mất bí ẩn của chúng và bài học về bảo vệ động vật ngày nay.",
+        "text": """
+(A) Australia's wildlife is unique. The vast majority of the animals that live there are not found anywhere else – and things were no different 1 million years ago during the Pleistocene: the age of the super-sized mammal. Before humanity became Earth's undisputed superpower, giant beasts of all shapes and sizes dominated every continent, but the Pleistocene mammals of Australia were different. Some of them could grow to the size of small cars, or possessed teeth longer than knife blades.
+
+(B) None of these animals survive today – although exactly why that's the case is a mystery. Humans, with their advanced hunting techniques and use of fire to modify the landscape, may have played a central role in the megafauna's disappearance, but this idea is still a matter of heated debate.
+
+(C) Even if we cannot be sure that the arrival of Australian Aboriginals on the continent had catastrophic effects on its native animals, it seems that the animals had a rather spiritual effect on the humans. The Aboriginal mythological "Dreamtime" includes a cast of monstrous creatures, many of which bear a close resemblance to some of the real-life monsters that once stalked Australia's plains. Are the myths based on fact? Perhaps: after all, these creatures are far stranger than anything dreamed up by humans.
+
+(D) For instance, the two-tonne weighting Diprotodon comfortably holds the title of largest marsupial ever. In size and appearance, it looked superficially like a modern rhinoceros, but the Diprotodon seems to have had a social lifestyle more like that of an elephant, another mammal with which it shares anatomical similarities. What the Diprotodon most resembles, however, is exactly what it is: an enormous wombat.
+
+(E) Another record breaker, this time a world champion; Varanus priscus, commonly known by its antiquated genus name Megalania – was the largest terrestrial lizard the world has ever known. Megalania was a goanna lizard, a relative of today's infamous Komodo dragon, and conservative estimates have predicted that it was at least 5.5m long.
+
+(F) These monster marsupials were not the only giants. Their numbers were swelled by half tonne birds and dinosaur-like tortoises. Although this biological assemblage was truly nightmarish for humans, it greatly enriched Australia's fauna and contributed to the world’s biological diversity. Unfortunately, all of these species are extinct nowadays. This fact shows us that even strong, monstrous creatures can easily die out. So we need to care about the animals that surround us today and don’t let them disappear as it happened to their distant ancestors.
+        """,
+        "questions_mc": [
+            {
+                "id": "q1", 
+                "q": "Paragraph A", 
+                "options": ["i. Extinction of monstrous creatures", "ii. The largest mammal", "iii. Myths and reality", "iv. Incredible creatures of Pleistocene Australia", "v. Importance of animal protection", "vi. Giant lizards", "vii. Arrival of Australian Aboriginals", "viii. Mystery the giants' disappearance"], 
+                "a": "iv. Incredible creatures of Pleistocene Australia", 
+                "exp": "Sau khi đọc đoạn này, ta có thể thấy rõ ý chính là mô tả động vật hoang dã ở Úc thời Pleistocene. Ý này được viết ngắn gọn ở câu đầu tiên: 'Australia's wildlife is unique.' Mặc dù thú có vú khổng lồ có được nhắc đến, nhưng trọng tâm chính của đoạn văn này là những sinh vật phi thường ở Úc thời Pleistocene. Vì vậy, đáp án đúng là iv."
+            },
+            {
+                "id": "q2", 
+                "q": "Paragraph B", 
+                "options": ["i. Extinction of monstrous creatures", "ii. The largest mammal", "iii. Myths and reality", "iv. Incredible creatures of Pleistocene Australia", "v. Importance of animal protection", "vi. Giant lizards", "vii. Arrival of Australian Aboriginals", "viii. Mystery the giants' disappearance"], 
+                "a": "viii. Mystery the giants' disappearance", 
+                "exp": "Đoạn văn này nói rằng chúng ta không biết tại sao những sinh vật này lại biến mất. Và một lần nữa, câu đầu tiên của đoạn văn đã tóm tắt ý chính của nó: 'None of these animals survive today – although exactly why that's the case is a mystery.' (Không một loài nào sống sót đến nay - mặc dù lý do chính xác vẫn là một bí ẩn). Do đó, đáp án đúng là viii."
+            },
+            {
+                "id": "q3", 
+                "q": "Paragraph C", 
+                "options": ["i. Extinction of monstrous creatures", "ii. The largest mammal", "iii. Myths and reality", "iv. Incredible creatures of Pleistocene Australia", "v. Importance of animal protection", "vi. Giant lizards", "vii. Arrival of Australian Aboriginals", "viii. Mystery the giants' disappearance"], 
+                "a": "iii. Myths and reality", 
+                "exp": "Những câu sau chứa ý chính của đoạn văn: '...Are the myths based on fact? Perhaps...' (Những huyền thoại có dựa trên sự thật không? Có lẽ...). Đoạn văn nói về sự liên hệ giữa thần thoại (myths) và thực tế (reality), do đó tiêu đề đúng là iii. Lưu ý rằng sự xuất hiện của thổ dân Úc (Aboriginals) cũng được nhắc đến nhưng không đóng vai trò then chốt."
+            },
+            {
+                "id": "q4", 
+                "q": "Paragraph D", 
+                "options": ["i. Extinction of monstrous creatures", "ii. The largest mammal", "iii. Myths and reality", "iv. Incredible creatures of Pleistocene Australia", "v. Importance of animal protection", "vi. Giant lizards", "vii. Arrival of Australian Aboriginals", "viii. Mystery the giants' disappearance"], 
+                "a": "ii. The largest mammal", 
+                "exp": "Đoạn văn này miêu tả rõ ràng về loài động vật có vú khổng lồ Diprotodon: 'The two-tonne weighting Diprotodon comfortably holds the title of largest marsupial ever.' (Loài Diprotodon nặng hai tấn thoải mái giữ danh hiệu loài thú có túi lớn nhất từng tồn tại). Vì vậy, ý chính của đoạn D là ii. The largest mammal."
+            },
+            {
+                "id": "q5", 
+                "q": "Paragraph E", 
+                "options": ["i. Extinction of monstrous creatures", "ii. The largest mammal", "iii. Myths and reality", "iv. Incredible creatures of Pleistocene Australia", "v. Importance of animal protection", "vi. Giant lizards", "vii. Arrival of Australian Aboriginals", "viii. Mystery the giants' disappearance"], 
+                "a": "vi. Giant lizards", 
+                "exp": "Toàn bộ đoạn văn được dành riêng để nói về loài thằn lằn khổng lồ Megalania: '... Megalania – was the largest terrestrial lizard ...' (...Megalania – là loài thằn lằn trên cạn lớn nhất...). Do đó, 'vi. Giant lizards' là lựa chọn tiêu đề chính xác."
+            },
+            {
+                "id": "q6", 
+                "q": "Paragraph F", 
+                "options": ["i. Extinction of monstrous creatures", "ii. The largest mammal", "iii. Myths and reality", "iv. Incredible creatures of Pleistocene Australia", "v. Importance of animal protection", "vi. Giant lizards", "vii. Arrival of Australian Aboriginals", "viii. Mystery the giants' disappearance"], 
+                "a": "v. Importance of animal protection", 
+                "exp": "Đoạn F kể thêm một chút về các loài tuyệt chủng khác và kết thúc bằng một kết luận: 'Unfortunately, all of these species are extinct nowadays. This fact shows us that even strong, monstrous creatures can easily die out. So we need to care about animals that surround us today and don't let them disappear...' (Thật không may, tất cả các loài này nay đã tuyệt chủng... Vì vậy chúng ta cần quan tâm đến các loài động vật xung quanh ta ngày nay và đừng để chúng biến mất...). Kết luận này là ý chính của đoạn văn - chúng ta cần bảo vệ động vật. Do đó tiêu đề đúng là v."
+            }
+        ]
     }
 }
 
-    
 # WRITING CONTENT (Chỉ lớp ELITE)
 # WRITING CONTENT
 # WRITING CONTENT
@@ -2013,16 +2074,14 @@ else:
                         with st.container(height=600):
                             with st.form("read_exam_form"):
                                 ans = {}
-                                # DẠNG 1: ĐIỀN TỪ
                                 if "questions_fill" in data:
                                     st.markdown("**Questions: Fill in the blanks (NO MORE THAN TWO WORDS)**")
                                     for q in data['questions_fill']:
                                         st.markdown(f"<div class='question-text'>{q['q']}</div>", unsafe_allow_html=True)
                                         ans[q['id']] = st.text_input(f"Answer {q['id']}", label_visibility="collapsed")
                                         st.write("")
-                                # DẠNG 2: TRẮC NGHIỆM (MULTIPLE CHOICE)
                                 elif "questions_mc" in data:
-                                    st.markdown("**Questions: Choose the correct letter, A, B or C.**")
+                                    st.markdown("**Questions: Choose the correct option.**")
                                     for q in data['questions_mc']:
                                         st.markdown(f"<div class='question-text'><strong>{q['q']}</strong></div>", unsafe_allow_html=True)
                                         ans[q['id']] = st.radio(f"Select answer for {q['id']}", q['options'], key=q['id'], label_visibility="collapsed")
