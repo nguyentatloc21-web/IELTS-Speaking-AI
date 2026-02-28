@@ -257,7 +257,7 @@ CLASS_CONFIG = {
 
 HOMEWORK_CONFIG = {
     "PLA": {
-        "Speaking": ["Lesson 1: Work & Study", "Lesson 2: Habits & Lifestyle", "Lesson 3: Home & Transport"],
+        "Speaking": ["Lesson 1: Work & Study", "Lesson 2: Habits & Lifestyle", "Lesson 3: Home & Transport", "Lesson 4: Describing People"],
         "Reading":  ["Lesson 2: Marine Chronometer", "Lesson 3: Australian Agricultural Innovations"],
         "Writing":  [] 
     },
@@ -1607,8 +1607,8 @@ else:
                     if proc["audio_bytes"]:
                         col_retry, _ = st.columns([1, 3])
                         with col_retry:
-                            if st.button("🔄 Chấm lại (Retry - Không trừ lượt)", key=f"retry_class_{question}"):
-                                with st.spinner("Hệ thống đang chấm lại file ghi âm cũ..."):
+                            if st.button("🔄 Chấm lại (Không trừ lượt)", key=f"retry_class_{question}"):
+                                with st.spinner("Đang chấm lại..."):
                                     text_result = call_gemini(prompt_class, audio_data=proc["audio_b64"])
                                     if text_result:
                                         proc["result"] = text_result
