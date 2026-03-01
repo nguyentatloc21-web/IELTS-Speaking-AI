@@ -552,6 +552,9 @@ SPEAKING_CONTENT = {
         "4. How did you go to school when you were younger?",
         "5. Did you enjoy traveling by bus/motorbike in the past?",
         "6. Have you ever been stuck in a terrible traffic jam?"
+    ],
+    "Lesson 4: Describing People": [
+        "Describe a family member or a friend that you spend a lot of time with.\nYou should say:\n- Who this person is\n- What they look like\n- What their personality is\n- And explain why you like spending time with them."
     ]
 }
 
