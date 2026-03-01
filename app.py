@@ -554,8 +554,12 @@ SPEAKING_CONTENT = {
         "6. Have you ever been stuck in a terrible traffic jam?"
     ],
     "Lesson 4: Describing People": [
-        "Describe a family member or a friend that you spend a lot of time with.\nYou should say:\n- Who this person is\n- What they look like\n- What their personality is\n- And explain why you like spending time with them."
+        "Describe a family member or a friend that you spend a lot of time with (Part 2)"
     ]
+}
+
+CLASS_CUE_CARDS = {
+    "Describe a family member or a friend that you spend a lot of time with (Part 2)": "Describe a family member or a friend that you spend a lot of time with.\n\nYou should say:\n- Who this person is\n- What they look like\n- What their personality is\n- And explain why you like spending time with them."
 }
 
 # READING: Lesson 2 Full Passage & Questions
