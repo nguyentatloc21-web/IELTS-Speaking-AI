@@ -257,7 +257,7 @@ CLASS_CONFIG = {
 
 HOMEWORK_CONFIG = {
     "PLA": {
-        "Speaking": ["Lesson 1: Work & Study", "Lesson 2: Habits & Lifestyle", "Lesson 3: Home & Transport", "Lesson 4: Describing People"],
+        "Speaking": ["Lesson 1: Work & Study", "Lesson 2: Habits & Lifestyle", "Lesson 3: Home & Transport", "Lesson 4: Describing People", "Lesson 5: Describing Objects", "Lesson 6: Describing Places"],
         "Reading":  ["Lesson 2: Marine Chronometer", "Lesson 3: Australian Agricultural Innovations", "Lesson 4: The lost giants of Australian fauna"],
         "Writing":  [] 
     },
@@ -272,7 +272,7 @@ HOMEWORK_CONFIG = {
         ]
     },
     "DIA": {
-        "Speaking": ["Lesson 1: Work & Study", "Lesson 2: Habits & Lifestyle"], "Reading": [], "Writing": []
+        "Speaking": ["Lesson 1: Work & Study", "Lesson 2: Habits & Lifestyle", "Lesson 3: Home & Transport"], "Reading": [], "Writing": []
     },
     "MAS": {
         "Speaking": [], 
@@ -555,6 +555,12 @@ SPEAKING_CONTENT = {
     ],
     "Lesson 4: Describing People": [
         "Describe a family member or a friend that you spend a lot of time with (Part 2)"
+    ],
+    "Lesson 5: Describing Objects": [
+        "Describe a memorable gift you received (Part 2)"
+    ],
+    "Lesson 6: Describing Places": [
+        "Describe a city or town you really liked visiting (Part 2)"
     ]
 }
 
