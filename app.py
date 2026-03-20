@@ -129,14 +129,14 @@ def get_leaderboard(class_code):
     try:
         sheet = connect_gsheet()
         if not sheet: return None, None, None
-# --- ĐƯA HÀM XỬ LÝ LÊN ĐẦU ĐỂ CẢ 3 KỸ NĂNG ĐỀU DÙNG ĐƯỢC ---
+
         def extract_float(val):
             try:
-                # Tự động trích xuất số (VD: "Band 6.5" -> 6.5, "7" -> 7.0)
                 found = re.search(r"(\d+\.?\d*)", str(val))
                 return float(found.group(1)) if found else 0.0
             except: return 0.0
-        # 1. Speaking
+
+        # 1. Speaking (Trung bình 5 lần gần nhất)
         try:
             ws_s = sheet.worksheet("Speaking_Logs")
             data = ws_s.get_all_values()
@@ -144,12 +144,12 @@ def get_leaderboard(class_code):
             if len(data) > 1:
                 headers = data[0]
                 df_s = pd.DataFrame(data[1:], columns=headers)
+                df_s.columns = [str(c).strip() for c in df_s.columns]
                 
                 if 'Class' in df_s.columns:
                     df_s = df_s[df_s['Class'] == class_code]
                     
                     if not df_s.empty:
-                        # --- FIX LỖI: Chuẩn hóa tên học viên trước khi Group ---
                         if 'Student' in df_s.columns:
                             df_s['Student'] = df_s['Student'].astype(str).apply(normalize_name)
 
@@ -160,32 +160,31 @@ def get_leaderboard(class_code):
                                 break
                         
                         if score_col:
-                            def extract_float(val):
-                                try:
-                                    found = re.search(r"(\d+\.?\d*)", str(val))
-                                    return float(found.group(1)) if found else 0.0
-                                except: return 0.0
-
                             df_s['Final_Score'] = df_s[score_col].apply(extract_float)
                             df_s = df_s[df_s['Final_Score'] > 0]
                             
-                            # Group by tên đã chuẩn hóa
-                            lb_s = df_s.groupby('Student')['Final_Score'].mean().reset_index()
+                            # LOGIC MỚI: Lấy 5 dòng cuối cùng (5 lần nộp gần nhất) của mỗi học sinh
+                            last_5_s = df_s.groupby('Student').tail(5)
+                            
+                            # Tính điểm trung bình dựa trên 5 lần này
+                            lb_s = last_5_s.groupby('Student')['Final_Score'].mean().reset_index()
                             lb_s.columns = ['Học Viên', 'Điểm Speaking (TB)']
                             lb_s = lb_s.sort_values(by='Điểm Speaking (TB)', ascending=False).head(10)
                         else: lb_s = None
                     else: lb_s = None
                 else: lb_s = None
             else: lb_s = None
-        except: lb_s = None 
+        except Exception as e: 
+            print(f"Leaderboard Speaking Error: {e}")
+            lb_s = None 
 
-        # 2. Reading
+        # 2. Reading (Giữ nguyên Max cao nhất)
         try:
             ws_r = sheet.worksheet("Reading_Logs")
             data_r = ws_r.get_all_values()
             if len(data_r) > 1:
                 df_r = pd.DataFrame(data_r[1:], columns=data_r[0])
-                df_r.columns = [c.strip() for c in df_r.columns]
+                df_r.columns = [str(c).strip() for c in df_r.columns]
 
                 if 'Class' in df_r.columns:
                     df_r = df_r[df_r['Class'] == class_code]
@@ -206,14 +205,14 @@ def get_leaderboard(class_code):
             else: lb_r = None
         except: lb_r = None
 
-        # 3. Writing
+        # 3. Writing (Trung bình 5 lần gần nhất)
         try:
             ws_w = sheet.worksheet("Writing_Logs")
             data_w = ws_w.get_all_values()
             
             if len(data_w) > 1:
                 df_w = pd.DataFrame(data_w[1:], columns=data_w[0])
-                df_w.columns = [c.strip() for c in df_w.columns]
+                df_w.columns = [str(c).strip() for c in df_w.columns]
                 
                 if 'Class' in df_w.columns:
                     df_w = df_w[df_w['Class'] == class_code]
@@ -225,11 +224,14 @@ def get_leaderboard(class_code):
                         w_score_col = next((c for c in ['Overall_Band', 'Overall Band', 'Band', 'Score', 'Band_Score', 'Overall'] if c in df_w.columns), None)
                         
                         if w_score_col:
-                            # Lúc này hàm extract_float đã luôn tồn tại để sẵn sàng sử dụng
                             df_w['Final_Score'] = df_w[w_score_col].apply(extract_float)
                             df_w = df_w[df_w['Final_Score'] > 0]
                             
-                            lb_w = df_w.groupby('Student')['Final_Score'].mean().reset_index()
+                            # LOGIC MỚI: Lấy 5 dòng cuối cùng (5 lần nộp gần nhất) của mỗi học sinh
+                            last_5_w = df_w.groupby('Student').tail(5)
+                            
+                            # Tính điểm trung bình dựa trên 5 lần này
+                            lb_w = last_5_w.groupby('Student')['Final_Score'].mean().reset_index()
                             lb_w.columns = ['Học Viên', 'Điểm Writing (TB)']
                             lb_w = lb_w.sort_values(by='Điểm Writing (TB)', ascending=False).head(10)
                         else: lb_w = None
