@@ -16,16 +16,35 @@ def get_current_time_str():
     """Trả về thời gian hiện tại định dạng dễ đọc: DD/MM/YYYY HH:MM:SS"""
     return datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
+# --- TỪ ĐIỂN GỘP TÊN (MỚI THÊM) ---
+# Quy tắc: "tên viết sai/không dấu/viết tắt viết thường": "Tên Chuẩn Xác Viết Hoa"
+NAME_MAPPING = {
+    "bui hoang minh nhat": "Bùi Hoàng Minh Nhật",
+    "tâm huỳnh": "Huỳnh Ngọc Tài Tâm",
+    "tam huynh": "Huỳnh Ngọc Tài Tâm",
+    "khánh trần": "Trần Lê Gia Khánh",
+    "khanh tran": "Trần Lê Gia Khánh",
+    "fiona": "Fiona" # (Nếu Fiona là nickname của ai đó trong lớp, bạn có thể sửa chữ "Fiona" bên phải thành tên thật)
+    # Bạn có thể tự thêm các bạn khác vào đây nếu phát hiện trùng lặp...
+}
+
 def normalize_name(name):
     """
     Chuẩn hóa tên học viên:
     - Xóa khoảng trắng thừa ở đầu/cuối và giữa các từ.
+    - Gộp các tên gõ không dấu / tên viết tắt thành 1 tên chuẩn.
     - Viết hoa chữ cái đầu mỗi từ.
-    VD: "  nguyễn   văn  a " -> "Nguyễn Văn A"
     """
     if not name: return ""
     # Tách các từ, bỏ khoảng trắng thừa, viết hoa chữ đầu, rồi ghép lại
-    return " ".join(name.strip().split()).title()
+    clean_name = " ".join(name.strip().split()).title()
+    
+    # Kiểm tra xem tên có nằm trong danh sách cần gộp không (chuyển về chữ thường để so sánh)
+    lower_name = clean_name.lower()
+    if lower_name in NAME_MAPPING:
+        return NAME_MAPPING[lower_name]
+        
+    return clean_name
 
 def extract_score(value):
     """
