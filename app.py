@@ -278,7 +278,7 @@ CLASS_CONFIG = {
 
 HOMEWORK_CONFIG = {
     "PLA": {
-        "Speaking": ["Lesson 1: Work & Study", "Lesson 2: Habits & Lifestyle", "Lesson 3: Home & Transport", "Lesson 4: Describing People", "Lesson 5: Describing Objects", "Lesson 6: Describing Places"],
+        "Speaking": ["Lesson 1: Work & Study", "Lesson 2: Habits & Lifestyle", "Lesson 3: Home & Transport", "Lesson 4: Describing People", "Lesson 5: Describing Objects", "Lesson 6: Describing Places", "Lesson 7: Describing Events"],
         "Reading":  ["Lesson 2: Marine Chronometer", "Lesson 3: Australian Agricultural Innovations", "Lesson 4: The lost giants of Australian fauna"],
         "Writing":  [] 
     },
@@ -582,6 +582,9 @@ SPEAKING_CONTENT = {
     ],
     "Lesson 6: Describing Places": [
         "Describe a city or town you really liked visiting (Part 2)"
+    ],
+    "Lesson 7: Describing Events": [
+        "Describe a time when you tried to do something you had never done before (Part 2)"
     ]
 }
 
