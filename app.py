@@ -293,7 +293,7 @@ HOMEWORK_CONFIG = {
         ]
     },
     "DIA": {
-        "Speaking": ["Lesson 1: Work & Study", "Lesson 2: Habits & Lifestyle", "Lesson 3: Home & Transport"], "Reading": [], "Writing": []
+        "Speaking": ["Lesson 1: Work & Study", "Lesson 2: Habits & Lifestyle", "Lesson 3: Home & Transport", "Lesson 4: Describing People"], "Reading": [], "Writing": []
     },
     "MAS": {
         "Speaking": [], 
