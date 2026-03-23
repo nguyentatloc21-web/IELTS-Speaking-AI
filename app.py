@@ -270,6 +270,7 @@ def get_leaderboard(class_code):
 # ================= 1. CẤU HÌNH & DỮ LIỆU (TEACHER INPUT) =================
 
 CLASS_CONFIG = {
+    "ELITE2103": {"level": "6.5 - 7.0", "desc": "Lớp Elite"},
     "PLA1601": {"level": "3.0 - 4.0", "desc": "Lớp Platinum"},
     "DIA2702": {"level": "4.0 - 5.0", "desc": "Lớp Diamond"},
     "MAS0901": {"level": "5.0 - 6.0", "desc": "Lớp Master"},
@@ -283,7 +284,7 @@ HOMEWORK_CONFIG = {
         "Writing":  [] 
     },
     "ELITE": {
-        "Speaking": [], 
+        "Speaking": ["Lesson 1: Ambition & Success"], 
         "Reading":  [], 
         "Writing":  [
             "Lesson 3: Education & Society",
@@ -585,6 +586,12 @@ SPEAKING_CONTENT = {
     ],
     "Lesson 7: Describing Events": [
         "Describe a time when you tried to do something you had never done before (Part 2)"
+    ],
+    "Lesson 1: Ambition & Success": [
+        "Describe a success you have achieved in your life (Part 2)",
+        "Q1: Do you think society places too much emphasis on financial success? (Part 3)",
+        "Q2: How has the definition of success changed compared to your parents' generation? (Part 3)",
+        "Q3: Is it possible to climb the career ladder while maintaining a healthy work-life balance? (Part 3)"
     ]
 }
 
