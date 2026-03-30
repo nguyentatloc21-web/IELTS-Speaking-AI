@@ -279,12 +279,12 @@ CLASS_CONFIG = {
 
 HOMEWORK_CONFIG = {
     "PLA": {
-        "Speaking": ["Lesson 1: Work & Study", "Lesson 2: Habits & Lifestyle", "Lesson 3: Home & Transport", "Lesson 4: Describing People", "Lesson 5: Describing Objects", "Lesson 6: Describing Places", "Lesson 7: Describing Events"],
+        "Speaking": ["Lesson 1: Work & Study", "Lesson 2: Habits & Lifestyle", "Lesson 3: Home & Transport", "Lesson 4: Describing People", "Lesson 5: Describing Objects", "Lesson 6: Describing Places", "Lesson 7: Describing Events","Lesson 8: Describing Media Preferences"],
         "Reading":  ["Lesson 2: Marine Chronometer", "Lesson 3: Australian Agricultural Innovations", "Lesson 4: The lost giants of Australian fauna"],
         "Writing":  [] 
     },
     "ELITE": {
-        "Speaking": ["Lesson 1: Ambition & Success"], 
+        "Speaking": ["Lesson 1: Ambition & Success", "Lesson 2: Interpersonal Relationships"], 
         "Reading":  [], 
         "Writing":  [
             "Lesson 3: Education & Society",
@@ -592,6 +592,18 @@ SPEAKING_CONTENT = {
         "Q1: Do you think society places too much emphasis on financial success? (Part 3)",
         "Q2: How has the definition of success changed compared to your parents' generation? (Part 3)",
         "Q3: Is it possible to climb the career ladder while maintaining a healthy work-life balance? (Part 3)"
+    ],
+    "Lesson 8: Describing Media Preferences": [
+        "Option 1: Describe a movie you watched recently and liked.",
+        "Option 2: Describe a TV program that you usually watch.",
+        "Option 3: Describe a song you enjoy listening to."    
+    ],
+    "Lesson 2: Interpersonal Relationships": [
+        "Describe a time when you had a disagreement with someone (Part 2)",
+        "Describe a person who you enjoy working or studying with (Part 2)",
+        "Do you think avoiding conflict is always the best way to maintain a relationship (Part 3)",
+        "What are the most common causes of disagreements in the workplace? (Part 3)",
+        "Why do parents and children often fail to see eye to eye on certain issues? (Part 3)"
     ]
 }
 
