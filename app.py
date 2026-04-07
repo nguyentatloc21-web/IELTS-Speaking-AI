@@ -284,7 +284,7 @@ HOMEWORK_CONFIG = {
         "Writing":  [] 
     },
     "ELITE": {
-        "Speaking": ["Lesson 1: Ambition & Success", "Lesson 2: Interpersonal Relationships"], 
+        "Speaking": ["Lesson 1: Ambition & Success", "Lesson 2: Interpersonal Relationships", "Lesson 3: Urbanization & Environment"], 
         "Reading":  [], 
         "Writing":  [
             "Lesson 3: Education & Society",
@@ -604,6 +604,13 @@ SPEAKING_CONTENT = {
         "Do you think avoiding conflict is always the best way to maintain a relationship (Part 3)",
         "What are the most common causes of disagreements in the workplace? (Part 3)",
         "Why do parents and children often fail to see eye to eye on certain issues? (Part 3)"
+    ],
+    "Lesson 3: Urbanization & Environment": [
+        "What are the main causes of air pollution in big cities today?",
+        "Do you think individuals or the government should be responsible for protecting the environment?",
+        "Why do so many people migrate from the countryside to urban areas despite the pollution?",
+        "What are the negative impacts of living in a megacity on people's physical and mental health?",
+        "How can cities be designed better in the future?"
     ]
 }
 
