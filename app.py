@@ -1693,7 +1693,7 @@ else:
 
                                 **Lỗi 1 (Grammar/Word Choice):**
                                 * **Gốc:** "[Trích văn bản gốc]"
-                                * **Sửa:** "[Viết lại tự nhiên hơn - Natural Speaking]"
+                                * **Sửa:** "[Viết lại với collocation và ngữ pháp tự nhiên hơn]"
                                 * **Lý do:** [Giải thích ngắn gọn, nghĩa tiếng Việt]
 
                                 **Lỗi 2 (Unnatural Phrasing):**
