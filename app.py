@@ -279,7 +279,7 @@ CLASS_CONFIG = {
 
 HOMEWORK_CONFIG = {
     "PLA": {
-        "Speaking": ["Lesson 1: Work & Study", "Lesson 2: Habits & Lifestyle", "Lesson 3: Home & Transport", "Lesson 4: Describing People", "Lesson 5: Describing Objects", "Lesson 6: Describing Places", "Lesson 7: Describing Events","Lesson 8: Describing Media Preferences"],
+        "Speaking": ["Lesson 1: Work & Study", "Lesson 2: Habits & Lifestyle", "Lesson 3: Home & Transport", "Lesson 4: Describing People", "Lesson 5: Describing Objects", "Lesson 6: Describing Places", "Lesson 7: Describing Events","Lesson 8: Describing Media Preferences", "Lesson 9: Health & Sports", "Lesson 10: Revision"],
         "Reading":  ["Lesson 2: Marine Chronometer", "Lesson 3: Australian Agricultural Innovations", "Lesson 4: The lost giants of Australian fauna"],
         "Writing":  [] 
     },
@@ -597,6 +597,16 @@ SPEAKING_CONTENT = {
         "Option 1: Describe a movie you watched recently and liked.",
         "Option 2: Describe a TV program that you usually watch.",
         "Option 3: Describe a song you enjoy listening to."    
+    ],
+    "Lesson 9: Health & Sports": [
+        "1. Do you think people today do enough exercise?",
+        "2. What are the benefits of playing team sports for children?",
+        "2. What are the benefits of playing team sports for children?"  
+    ],
+    "Lesson 10: Revision": [
+        "Describe a water sport you would like to try in the future (Part 2)",
+        "1. What kinds of water sports are popular nowadays? (Part 3)",
+        "2. Do you think it is good to teach swimming in schools? (Part 3)"  
     ],
     "Lesson 2: Interpersonal Relationships": [
         "Describe a time when you had a disagreement with someone (Part 2)",
