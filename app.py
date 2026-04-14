@@ -284,7 +284,7 @@ HOMEWORK_CONFIG = {
         "Writing":  [] 
     },
     "ELITE": {
-        "Speaking": ["Lesson 1: Ambition & Success", "Lesson 2: Interpersonal Relationships", "Lesson 3: Urbanization & Environment"], 
+        "Speaking": ["Lesson 1: Ambition & Success", "Lesson 2: Interpersonal Relationships", "Lesson 3: Urbanization & Environment", "Lesson 4: Education & Learning"], 
         "Reading":  [], 
         "Writing":  [
             "Lesson 3: Education & Society",
@@ -601,7 +601,7 @@ SPEAKING_CONTENT = {
     "Lesson 9: Health & Sports": [
         "1. Do you think people today do enough exercise?",
         "2. What are the benefits of playing team sports for children?",
-        "2. What are the benefits of playing team sports for children?"  
+        "3. How can the government encourage citizens to be more active?"  
     ],
     "Lesson 10: Revision": [
         "Describe a water sport you would like to try in the future (Part 2)",
@@ -621,6 +621,12 @@ SPEAKING_CONTENT = {
         "Why do so many people migrate from the countryside to urban areas despite the pollution?",
         "What are the negative impacts of living in a megacity on people's physical and mental health?",
         "How can cities be designed better in the future?"
+    ],
+    "Lesson 4: Education & Learning": [
+        "Describe a practical skill you learned recently that you think is very important (Part 2)",
+        "1. In what ways is the modern education system different from the past? (Part 3)",
+        "2. Why do students nowadays suffer from higher stress levels compared to previous generations? (Part 3)",
+        "3. Do you think practical skills will become more important than academic degrees in the future? (Part 3)"
     ]
 }
 
