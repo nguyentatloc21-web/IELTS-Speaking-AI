@@ -644,7 +644,7 @@ SPEAKING_CONTENT = {
         "Why do many young people today have bad health? (Part 3)",
         "How has the food people eat changed compared to the past?"
     ],     
-    "Lesson 5: Techonology & Innovation": [
+    "Lesson 5: Technology & Innovation": [
         "Do you use any gadgets on a daily basis? (Part 1)",
         "Are you good at using computers? (Part 1)",
         "What kind of technology do you want to buy in the future? (Part 1)",
