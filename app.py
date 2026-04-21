@@ -284,7 +284,7 @@ HOMEWORK_CONFIG = {
         "Writing":  [] 
     },
     "ELITE": {
-        "Speaking": ["Lesson 1: Ambition & Success", "Lesson 2: Interpersonal Relationships", "Lesson 3: Urbanization & Environment", "Lesson 4: Education & Learning"], 
+        "Speaking": ["Lesson 1: Ambition & Success", "Lesson 2: Interpersonal Relationships", "Lesson 3: Urbanization & Environment", "Lesson 4: Education & Learning", "Lesson 5: Technology & Innovation"], 
         "Reading":  [], 
         "Writing":  [
             "Lesson 3: Education & Society",
@@ -294,7 +294,7 @@ HOMEWORK_CONFIG = {
         ]
     },
     "DIA": {
-        "Speaking": ["Lesson 1: Work & Study", "Lesson 2: Habits & Lifestyle", "Lesson 3: Home & Transport", "Lesson 4: Describing People"], "Reading": [], "Writing": []
+        "Speaking": ["Lesson 1: Work & Study", "Lesson 2: Habits & Lifestyle", "Lesson 3: Home & Transport", "Lesson 4: Describing People", "Lesson 5: Describing Places", "Lesson 6: Education & School Life", "Lesson 7: Health & Diet"], "Reading": [], "Writing": []
     },
     "MAS": {
         "Speaking": [], 
@@ -627,7 +627,33 @@ SPEAKING_CONTENT = {
         "1. In what ways is the modern education system different from the past? (Part 3)",
         "2. Why do students nowadays suffer from higher stress levels compared to previous generations? (Part 3)",
         "3. Do you think practical skills will become more important than academic degrees in the future? (Part 3)"
-    ]
+    ],
+    "Lesson 5: Describing Places": [
+        "Describe a city or town you really liked visiting (Part 2)"
+    ],    
+    "Lesson 6: Education & School Life": [
+        "1. Why do people write by hand less often nowadays?",
+        "2. Why do some students dislike wearing school uniforms?",
+        "3. Do you think universities should focus more on practical skills or theoretical knowledge?",
+        "4. Does academic pressure have a negative impact on young people?",
+        "5. Do you think school uniforms are still necessary today?",
+        "6. Do you think handwriting will be completely replaced by typing in the future?"
+    ],       
+    "Lesson 7: Health & Diet": [
+        "Describe a healthy habit you want to start in the future (Part 2)",
+        "Why do many young people today have bad health? (Part 3)",
+        "How has the food people eat changed compared to the past?"
+    ],     
+    "Lesson 5: Techonology & Innovation": [
+        "Do you use any gadgets on a daily basis? (Part 1)",
+        "Are you good at using computers? (Part 1)",
+        "What kind of technology do you want to buy in the future? (Part 1)",
+        "What makes a good technological device? (Part 1)",
+        "Do you think people spend too much time on their phones? (Part 1)",
+        "Describe a piece of technology you cannot live without (Part 2)",
+        "How has technology changed the way we communicate? (Part 3)",
+        "What are the disadvantages of children using too much technology? (Part 3)"
+    ] 
 }
 
 CLASS_CUE_CARDS = {
