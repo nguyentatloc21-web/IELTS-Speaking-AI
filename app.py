@@ -1744,7 +1744,7 @@ else:
                                 * **Sửa:** "..."
                                 * **Lý do:** ...
                                 """
-if remaining > 0:
+                if remaining > 0:
                     st.info(f"⚡ Bạn còn **{remaining}** lượt trả lời cho câu này.")
                     audio = st.audio_input("Ghi âm câu trả lời:", key=f"rec_class_{question}")
                     
