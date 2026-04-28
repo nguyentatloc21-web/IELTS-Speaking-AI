@@ -1007,16 +1007,14 @@ def call_gemini(prompt, expect_json=False, audio_data=None, image_data=None, aud
                         text = re.sub(r"```json|```", "", text).strip()
                     return text
                 except KeyError:
-                    # Bắt lỗi Safety Filter
                     st.error("⚠️ AI từ chối chấm bài do nghi ngờ có từ ngữ nhạy cảm (hoặc do tạp âm quá ồn). Em hãy ghi âm lại chỗ yên tĩnh nhé!")
                     return None
                     
             elif resp.status_code == 429: 
-                st.warning(f"⏳ Server đang bận do nhiều bạn nộp bài cùng lúc. Đang tự động nộp lại (Lần {attempt+1}/4)...")
-                time.sleep(5) # Tăng thời gian chờ lên 5 giây mỗi lần
+                st.warning(f"⏳ Server đang bận. Đang tự động nộp lại (Lần {attempt+1}/4)...")
+                time.sleep(5)
                 continue
             else: 
-                # Hiện lỗi cụ thể ra web
                 st.error(f"⚠️ Lỗi từ máy chủ Google ({resp.status_code}): {resp.text}")
                 return None
         except Exception as e:
