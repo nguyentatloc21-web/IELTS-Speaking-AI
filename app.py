@@ -1749,7 +1749,7 @@ else:
                     if audio:
                         audio_bytes = audio.read()
                         audio_sig = hash(audio_bytes)
-                        audio_mime = audio.type # <--- QUAN TRỌNG: Lấy định dạng thật (mp4, webm...) của thiết bị học sinh
+                        audio_mime = audio.type # Lấy định dạng thật của thiết bị
                         
                         if proc["sig"] != audio_sig:
                             if len(audio_bytes) < 1000: 
@@ -1758,13 +1758,12 @@ else:
                                 proc["sig"] = audio_sig
                                 proc["audio_bytes"] = audio_bytes
                                 proc["audio_b64"] = base64.b64encode(audio_bytes).decode('utf-8')
+                                proc["audio_mime"] = audio_mime # <--- ĐÃ THÊM: Lưu định dạng vào bộ nhớ
                                 proc["result"] = None 
                                 
                                 with st.spinner("Đang chấm điểm..."):
-                                    # Truyền thêm audio_mime vào hàm
                                     text_result = call_gemini(prompt_class, audio_data=proc["audio_b64"], audio_mime=audio_mime)
                                     if text_result:
-                                        # ... (giữ nguyên phần sau)
                                         proc["result"] = text_result
                                         st.session_state['speaking_attempts'][question] = attempts + 1
                                         save_speaking_log(user['name'], user['class'], lesson_choice, question, text_result)
@@ -1776,7 +1775,10 @@ else:
                         with col_retry:
                             if st.button("🔄 Chấm lại (Không trừ lượt)", key=f"retry_class_{question}"):
                                 with st.spinner("Đang chấm lại..."):
-                                    text_result = call_gemini(prompt_class, audio_data=proc["audio_b64"])
+                                    # <--- ĐÃ SỬA: Lấy lại định dạng đã lưu và truyền vào hàm
+                                    saved_mime = proc.get("audio_mime", "audio/wav")
+                                    text_result = call_gemini(prompt_class, audio_data=proc["audio_b64"], audio_mime=saved_mime)
+                                    
                                     if text_result:
                                         proc["result"] = text_result
                                         save_speaking_log(user['name'], user['class'], lesson_choice, question, text_result)
