@@ -977,13 +977,7 @@ except:
     st.error("⚠️ Lỗi: Chưa có API Key.")
     st.stop()
 
-def call_gemini(prompt, expect_json=False, audio_data=None, image_data=None):
-    """
-    Hàm gọi Gemini API hỗ trợ:
-    - Text Prompt
-    - Audio (Speaking)
-    - Image (Writing Task 1)
-    """
+def call_gemini(prompt, expect_json=False, audio_data=None, image_data=None, audio_mime="audio/wav"):
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
     headers = {'Content-Type': 'application/json'}
     
@@ -991,14 +985,12 @@ def call_gemini(prompt, expect_json=False, audio_data=None, image_data=None):
     if expect_json:
         final_prompt += "\n\nIMPORTANT: Output STRICTLY JSON without Markdown formatting (no ```json or ```)."
     
-    # Tạo nội dung text
     parts = [{"text": final_prompt}]
     
-    # Nếu có Audio (Speaking)
     if audio_data:
-        parts.append({"inline_data": {"mime_type": "audio/wav", "data": audio_data}})
+        # Sử dụng audio_mime linh hoạt thay vì fix cứng
+        parts.append({"inline_data": {"mime_type": audio_mime, "data": audio_data}})
         
-    # Nếu có Image (Writing Task 1) - Input là Base64 string của ảnh
     if image_data:
         parts.append({"inline_data": {"mime_type": "image/png", "data": image_data}})
 
@@ -1008,19 +1000,28 @@ def call_gemini(prompt, expect_json=False, audio_data=None, image_data=None):
         try:
             resp = requests.post(url, headers=headers, data=json.dumps(data))
             if resp.status_code == 200:
-                text = resp.json()['candidates'][0]['content']['parts'][0]['text']
-                if expect_json: 
-                    text = re.sub(r"```json|```", "", text).strip()
-                return text
+                res_json = resp.json()
+                try:
+                    text = res_json['candidates'][0]['content']['parts'][0]['text']
+                    if expect_json: 
+                        text = re.sub(r"```json|```", "", text).strip()
+                    return text
+                except KeyError:
+                    # Bắt lỗi Safety Filter
+                    st.error("⚠️ AI từ chối chấm bài do nghi ngờ có từ ngữ nhạy cảm (hoặc do tạp âm quá ồn). Em hãy ghi âm lại chỗ yên tĩnh nhé!")
+                    return None
+                    
             elif resp.status_code == 429: 
-                time.sleep(2 ** attempt)
+                st.warning(f"⏳ Server đang bận do nhiều bạn nộp bài cùng lúc. Đang tự động nộp lại (Lần {attempt+1}/4)...")
+                time.sleep(5) # Tăng thời gian chờ lên 5 giây mỗi lần
                 continue
             else: 
-                print(f"Error {resp.status_code}: {resp.text}")
+                # Hiện lỗi cụ thể ra web
+                st.error(f"⚠️ Lỗi từ máy chủ Google ({resp.status_code}): {resp.text}")
                 return None
         except Exception as e:
-            print(f"Exception: {e}")
-            time.sleep(1)
+            st.error(f"⚠️ Lỗi kết nối mạng: {e}")
+            time.sleep(2)
             continue
             
     return None
@@ -1743,15 +1744,15 @@ else:
                                 * **Sửa:** "..."
                                 * **Lý do:** ...
                                 """
-                if remaining > 0:
+if remaining > 0:
                     st.info(f"⚡ Bạn còn **{remaining}** lượt trả lời cho câu này.")
                     audio = st.audio_input("Ghi âm câu trả lời:", key=f"rec_class_{question}")
                     
                     if audio:
                         audio_bytes = audio.read()
                         audio_sig = hash(audio_bytes)
+                        audio_mime = audio.type # <--- QUAN TRỌNG: Lấy định dạng thật (mp4, webm...) của thiết bị học sinh
                         
-                        # Khi phát hiện người dùng thu âm FILE MỚI
                         if proc["sig"] != audio_sig:
                             if len(audio_bytes) < 1000: 
                                 st.warning("File quá ngắn.")
@@ -1759,11 +1760,13 @@ else:
                                 proc["sig"] = audio_sig
                                 proc["audio_bytes"] = audio_bytes
                                 proc["audio_b64"] = base64.b64encode(audio_bytes).decode('utf-8')
-                                proc["result"] = None # Reset kết quả cũ
+                                proc["result"] = None 
                                 
                                 with st.spinner("Đang chấm điểm..."):
-                                    text_result = call_gemini(prompt_class, audio_data=proc["audio_b64"])
+                                    # Truyền thêm audio_mime vào hàm
+                                    text_result = call_gemini(prompt_class, audio_data=proc["audio_b64"], audio_mime=audio_mime)
                                     if text_result:
+                                        # ... (giữ nguyên phần sau)
                                         proc["result"] = text_result
                                         st.session_state['speaking_attempts'][question] = attempts + 1
                                         save_speaking_log(user['name'], user['class'], lesson_choice, question, text_result)
