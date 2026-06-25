@@ -53,8 +53,44 @@ st.markdown("""
         line-height: 1.6; 
         color: #334155; 
     }
+    
+    /* Highlighted Student Selection Box */
+    .student-selector-highlight {
+        background-color: #F0F9FF;
+        border: 2px solid #3B82F6;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 25px;
+    }
+    .student-selector-highlight h3 {
+        margin-top: 0;
+        color: #0F172A;
+        font-size: 22px;
+        font-weight: 800;
+    }
+    .student-selector-highlight p {
+        color: #475569;
+        margin-bottom: 15px;
+    }
     </style>
 """, unsafe_allow_html=True)
+
+def clean_student_name(name):
+    """Normalize and map student names to eliminate duplicates in stats."""
+    if pd.isna(name): return name
+    
+    # Capitalize correctly and strip spaces
+    clean_name = str(name).strip().title()
+    
+    # Dictionary to map unaccented or alternate names to official ones
+    mapping = {
+        "Nguyen Thi Nhu Quynh": "Nguyễn Thị Như Quỳnh",
+        "Nhu Quynh": "Nguyễn Thị Như Quỳnh",
+        "Như Quỳnh": "Nguyễn Thị Như Quỳnh",
+        "Bui Hoang Minh Nhat": "Bùi Hoàng Minh Nhật",
+        "Tam Huynh": "Tâm Huỳnh"
+    }
+    return mapping.get(clean_name, clean_name)
 
 @st.cache_data(ttl=5) # Refresh every 5 seconds
 def fetch_real_sheet_data():
@@ -73,6 +109,14 @@ def fetch_real_sheet_data():
             
         if 'Student' in df.columns:
             df = df.dropna(subset=['Student'])
+            # Clean and unify student names
+            df['Student'] = df['Student'].apply(clean_student_name)
+            
+        # Extract Column H (Index 7) for detailed feedback
+        if len(df.columns) > 7:
+            df['Feedback_Detail'] = df.iloc[:, 7]
+        else:
+            df['Feedback_Detail'] = "No detailed feedback available."
             
         return df, None
     except Exception as e:
@@ -139,7 +183,7 @@ if menu == "🏆 Leaderboard":
         st.subheader("🥇 Top Students")
         
         try:
-            lb_df = df.groupby(['Student', 'Class']).agg(
+            lb_df = df.groupby('Student').agg(
                 Tests=('Band_Score', 'count'),
                 Average_Score=('Band_Score', 'mean'),
             ).reset_index()
@@ -148,8 +192,7 @@ if menu == "🏆 Leaderboard":
             lb_df = lb_df.sort_values(by='Average_Score', ascending=False).reset_index(drop=True)
             lb_df.index += 1
             
-            # Simple column names for students
-            lb_df.columns = ['Student', 'Class', 'Tests Taken', 'Average Score']
+            lb_df.columns = ['Student', 'Tests Taken', 'Average Score']
             st.dataframe(lb_df, use_container_width=True)
         except Exception as e:
             st.dataframe(df) # Fallback to raw data
@@ -166,9 +209,17 @@ elif menu == "📊 Student Reports":
     elif df is not None and not df.empty and 'Student' in df.columns:
         student_list = df['Student'].dropna().unique().tolist()
         
-        selected_student = st.selectbox("🔍 Select Student:", sorted(student_list))
+        # --- NỔI BẬT KHU VỰC TÌM KIẾM HỌC VIÊN ---
+        st.markdown("""
+            <div class='student-selector-highlight'>
+                <h3>🔍 Lựa Chọn Học Viên</h3>
+                <p>Tra cứu báo cáo chi tiết, điểm số và nhận xét từ AI cho từng cá nhân.</p>
+            </div>
+        """, unsafe_allow_html=True)
         
-        st.subheader(f"🎓 Profile: {selected_student}")
+        selected_student = st.selectbox("Select Student:", sorted(student_list), label_visibility="collapsed")
+        
+        st.subheader(f"🎓 Academic Profile: {selected_student}")
         
         student_data = df[df['Student'] == selected_student]
         if 'Timestamp' in student_data.columns:
@@ -185,7 +236,8 @@ elif menu == "📊 Student Reports":
                     lesson_str = str(row.get('Lesson', 'N/A'))
                     topic_str = str(row.get('Question', 'N/A'))
                     band_str = str(row.get('Band_Score', 'N/A'))
-                    feedback_str = str(row.get('Feedback_Summary', 'No feedback available.'))
+                    # Lấy feedback từ cột H đã gán thành 'Feedback_Detail'
+                    feedback_str = str(row.get('Feedback_Detail', 'No detailed feedback available.'))
                     
                     with cols[0]:
                         st.markdown(f"**🕒 Date:** {date_str} &nbsp;|&nbsp; **Lesson:** {lesson_str}")
@@ -193,7 +245,7 @@ elif menu == "📊 Student Reports":
                     with cols[1]:
                         st.markdown(f"<h2 style='text-align: right; color: #3B82F6; margin:0;'>Band {band_str}</h2>", unsafe_allow_html=True)
                     
-                    with st.expander("View AI Feedback", expanded=True):
+                    with st.expander("View Detailed AI Feedback (Column H)", expanded=True):
                         st.markdown(f"<div class='ai-report-box'>\n\n{feedback_str}\n\n</div>", unsafe_allow_html=True)
     else:
         st.info("No student data available. Please check your Google Sheet.")
@@ -202,42 +254,49 @@ elif menu == "🗣️ Speaking Practice":
     st.title("🗣️ Speaking Practice")
     st.markdown("Practice your IELTS Speaking with our AI and get instant feedback.")
     
-    st.info("""
-    **Topic (Part 1):**
-    Let's talk about what you do. Do you work or are you a student?
-    """)
+    # Kho đề Demo đa dạng
+    topics = {
+        "Part 1: Work or Study": "Let's talk about what you do. Do you work or are you a student?",
+        "Part 1: Hometown": "Tell me a little about where you live. What do you like most about your hometown?",
+        "Part 2: Describe a Person": "Describe a family member or a friend that you spend a lot of time with.\n\nYou should say:\n- Who this person is\n- What they look like\n- What their personality is\n- And explain why you like spending time with them.",
+        "Part 2: A Memorable Journey": "Describe a long journey you had and would like to take again.\n\nYou should say:\n- When/where you went\n- Who you went with\n- Why you went there\n- And explain why you would like to have it again."
+    }
+    
+    selected_topic_key = st.selectbox("📚 Choose a Topic Category:", list(topics.keys()))
+    
+    st.info(f"**{selected_topic_key}**\n\n{topics[selected_topic_key]}")
     
     audio_data = st.audio_input("🎙️ Click to record your answer:")
     
     if audio_data:
-        with st.spinner("🤖 AI is analyzing your speech..."):
+        with st.spinner("🤖 AI is analyzing your pronunciation, grammar, and fluency..."):
             time.sleep(3) # Simulate loading time for demo
             
         st.success("✅ Analysis Complete!")
         st.balloons()
         
+        # Feedback hiển thị sẽ linh hoạt để phù hợp với cả Part 1 và Part 2
         st.markdown("""
         <div class="ai-report-box">
             <h4>🎯 OVERALL BAND: 7.0</h4>
             <hr>
             <h4>📝 DETAILED FEEDBACK:</h4>
             <ul>
-                <li><b>Fluency & Coherence (7.0):</b> You speak clearly and answer the question directly. Good use of linking words like "currently" and "therefore".</li>
-                <li><b>Lexical Resource (7.0):</b> Good vocabulary for work and study. You used nice phrases like <i>"fast-paced environment"</i>.</li>
-                <li><b>Grammatical Range (6.5):</b> Most sentences are correct. Be careful with present perfect tense.</li>
-                <li><b>Pronunciation (7.5):</b> Very easy to understand. Good natural rhythm.</li>
+                <li><b>Fluency & Coherence (7.0):</b> You spoke clearly and maintained a very good pace throughout your answer. Excellent use of linking phrases to connect your ideas logically.</li>
+                <li><b>Lexical Resource (7.5):</b> Appropriate and somewhat advanced vocabulary used. You deployed relevant topic-specific words accurately.</li>
+                <li><b>Grammatical Range (6.5):</b> Most sentences are well-structured. However, pay attention to the consistency of your past tense verbs when describing past events.</li>
+                <li><b>Pronunciation (7.0):</b> Very easy to understand with a natural rhythm and good chunking of phrases.</li>
             </ul>
             <br>
             <h4>💡 HOW TO IMPROVE:</h4>
-            <b>1. Grammar mistake</b><br>
-            ❌ <i>You said:</i> "I have work there for 2 years."<br>
-            ✅ <i>Better:</i> "I have <b>been working</b> there for 2 years."<br><br>
+            <b>1. Grammar Accuracy</b><br>
+            ❌ <i>Common error detected:</i> Missing articles (a/an/the) in complex sentences.<br>
+            ✅ <i>Advice:</i> Review the rules for definite and indefinite articles, especially before specific nouns.<br><br>
             
-            <b>2. Better Vocabulary</b><br>
-            ❌ <i>You said:</i> "My job is very busy."<br>
-            ✅ <i>Better:</i> "My job is quite <b>demanding and hectic</b>."<br>
+            <b>2. Vocabulary Upgrade</b><br>
+            Instead of repeating the word "good" or "nice", try using higher-level alternatives like <b>"outstanding"</b>, <b>"phenomenal"</b>, or <b>"captivating"</b> depending on the context.<br>
         </div>
         """, unsafe_allow_html=True)
         
-        if st.button("🔄 Try Again"):
+        if st.button("🔄 Try Another Topic"):
             st.rerun()
