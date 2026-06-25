@@ -5,6 +5,13 @@ from datetime import datetime
 
 st.set_page_config(page_title="Mr. Tat Loc | AI Platform", page_icon="🎓", layout="wide")
 
+# --- KHỞI TẠO STATE ĐIỀU HƯỚNG CHO NÚT BẤM ---
+if 'active_tab' not in st.session_state:
+    st.session_state.active_tab = "🏆 Leaderboard"
+
+def navigate_to(tab_name):
+    st.session_state.active_tab = tab_name
+
 st.markdown("""
     <style>
     /* Global Font & Aesthetics */
@@ -140,11 +147,12 @@ with st.sidebar:
     st.caption("Welcome back, Mr. Tat Loc")
     st.divider()
     
+    # Gắn key="active_tab" để đồng bộ với nút bấm ở màn hình chính
     menu = st.radio("Choose a section:", [
         "🏆 Leaderboard", 
         "📊 Student Reports", 
         "🗣️ Speaking Practice"
-    ])
+    ], key="active_tab")
 
 st.markdown("""
 <div class="brand-header">
@@ -158,6 +166,16 @@ df, error_msg = fetch_real_sheet_data()
 if menu == "🏆 Leaderboard":
     st.title("🏆 Class Leaderboard")
     st.markdown("Check out the top students in our classes!")
+    
+    # --- QUICK MENU CHO GIAO DIỆN ĐIỆN THOẠI ---
+    st.markdown("### 🚀 Quick Menu")
+    nav_col1, nav_col2 = st.columns(2)
+    with nav_col1:
+        st.button("📊 Student Reports ➔", type="primary", use_container_width=True, on_click=navigate_to, args=("📊 Student Reports",))
+    with nav_col2:
+        st.button("🗣️ Speaking Practice ➔", type="primary", use_container_width=True, on_click=navigate_to, args=("🗣️ Speaking Practice",))
+    
+    st.write("---")
     
     col1, col2 = st.columns([3, 1])
     with col2:
