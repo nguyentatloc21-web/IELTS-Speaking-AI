@@ -163,19 +163,33 @@ st.markdown("""
 
 df, error_msg = fetch_real_sheet_data()
 
+# --- GLOBAL QUICK NAVIGATION FOR MOBILE ---
+st.markdown("### 🚀 Quick Navigation")
+nav_col1, nav_col2 = st.columns(2)
+
+if menu == "🏆 Leaderboard":
+    with nav_col1:
+        st.button("📊 Student Reports ➔", use_container_width=True, on_click=navigate_to, args=("📊 Student Reports",))
+    with nav_col2:
+        st.button("🗣️ Speaking Practice ➔", type="primary", use_container_width=True, on_click=navigate_to, args=("🗣️ Speaking Practice",))
+        
+elif menu == "📊 Student Reports":
+    with nav_col1:
+        st.button("⬅️ Leaderboard", use_container_width=True, on_click=navigate_to, args=("🏆 Leaderboard",))
+    with nav_col2:
+        st.button("🗣️ Speaking Practice ➔", type="primary", use_container_width=True, on_click=navigate_to, args=("🗣️ Speaking Practice",))
+        
+elif menu == "🗣️ Speaking Practice":
+    with nav_col1:
+        st.button("⬅️ Leaderboard", use_container_width=True, on_click=navigate_to, args=("🏆 Leaderboard",))
+    with nav_col2:
+        st.button("⬅️ Student Reports", use_container_width=True, on_click=navigate_to, args=("📊 Student Reports",))
+
+st.divider()
+
 if menu == "🏆 Leaderboard":
     st.title("🏆 Class Leaderboard")
     st.markdown("Check out the top students in our classes!")
-    
-    # --- QUICK MENU CHO GIAO DIỆN ĐIỆN THOẠI ---
-    st.markdown("### 🚀 Quick Menu")
-    nav_col1, nav_col2 = st.columns(2)
-    with nav_col1:
-        st.button("📊 Student Reports ➔", type="primary", use_container_width=True, on_click=navigate_to, args=("📊 Student Reports",))
-    with nav_col2:
-        st.button("🗣️ Speaking Practice ➔", type="primary", use_container_width=True, on_click=navigate_to, args=("🗣️ Speaking Practice",))
-    
-    st.write("---")
     
     col1, col2 = st.columns([3, 1])
     with col2:
