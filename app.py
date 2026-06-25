@@ -57,19 +57,21 @@ st.markdown("""
     /* Highlighted Student Selection Box */
     .student-selector-highlight {
         background-color: #F0F9FF;
-        border: 2px solid #3B82F6;
+        border: 3px solid #3B82F6;
         border-radius: 12px;
-        padding: 20px;
+        padding: 25px;
         margin-bottom: 25px;
+        box-shadow: 0 8px 16px rgba(59, 130, 246, 0.15);
     }
     .student-selector-highlight h3 {
         margin-top: 0;
         color: #0F172A;
-        font-size: 22px;
+        font-size: 24px;
         font-weight: 800;
     }
     .student-selector-highlight p {
         color: #475569;
+        font-size: 16px;
         margin-bottom: 15px;
     }
     </style>
@@ -209,11 +211,11 @@ elif menu == "📊 Student Reports":
     elif df is not None and not df.empty and 'Student' in df.columns:
         student_list = df['Student'].dropna().unique().tolist()
         
-        # --- NỔI BẬT KHU VỰC TÌM KIẾM HỌC VIÊN ---
+        # --- HIGHLIGHTED STUDENT SELECTOR ---
         st.markdown("""
             <div class='student-selector-highlight'>
-                <h3>🔍 Lựa Chọn Học Viên</h3>
-                <p>Tra cứu báo cáo chi tiết, điểm số và nhận xét từ AI cho từng cá nhân.</p>
+                <h3>🔍 Find a Student</h3>
+                <p>Select a student's name below to see their test scores and detailed AI feedback.</p>
             </div>
         """, unsafe_allow_html=True)
         
@@ -245,7 +247,7 @@ elif menu == "📊 Student Reports":
                     with cols[1]:
                         st.markdown(f"<h2 style='text-align: right; color: #3B82F6; margin:0;'>Band {band_str}</h2>", unsafe_allow_html=True)
                     
-                    with st.expander("View Detailed AI Feedback (Column H)", expanded=True):
+                    with st.expander("View Detailed AI Feedback", expanded=True):
                         st.markdown(f"<div class='ai-report-box'>\n\n{feedback_str}\n\n</div>", unsafe_allow_html=True)
     else:
         st.info("No student data available. Please check your Google Sheet.")
@@ -254,12 +256,18 @@ elif menu == "🗣️ Speaking Practice":
     st.title("🗣️ Speaking Practice")
     st.markdown("Practice your IELTS Speaking with our AI and get instant feedback.")
     
-    # Kho đề Demo đa dạng
+    # 10 Intensive Speaking Topics (Part 1, 2, and 3)
     topics = {
         "Part 1: Work or Study": "Let's talk about what you do. Do you work or are you a student?",
         "Part 1: Hometown": "Tell me a little about where you live. What do you like most about your hometown?",
+        "Part 1: Hobbies & Free Time": "What do you usually do in your free time? Have your hobbies changed since you were a child?",
+        "Part 1: Food & Cooking": "What is your favorite food? Do you prefer eating at home or eating out?",
         "Part 2: Describe a Person": "Describe a family member or a friend that you spend a lot of time with.\n\nYou should say:\n- Who this person is\n- What they look like\n- What their personality is\n- And explain why you like spending time with them.",
-        "Part 2: A Memorable Journey": "Describe a long journey you had and would like to take again.\n\nYou should say:\n- When/where you went\n- Who you went with\n- Why you went there\n- And explain why you would like to have it again."
+        "Part 2: A Memorable Journey": "Describe a long journey you had and would like to take again.\n\nYou should say:\n- When/where you went\n- Who you went with\n- Why you went there\n- And explain why you would like to have it again.",
+        "Part 2: A Book You Enjoyed": "Describe a book that you enjoyed reading.\n\nYou should say:\n- What this book is about\n- Why you decided to read it\n- What you learned from it\n- And explain why you enjoyed reading it.",
+        "Part 2: A Useful Website": "Describe a useful website you often visit.\n\nYou should say:\n- What the website is\n- How you found it\n- What you do on this website\n- And explain why you think it is useful.",
+        "Part 3: Technology & Communication": "How has technology changed the way people communicate with each other? Do you think these changes are mostly positive or negative?",
+        "Part 3: Environment & Pollution": "What are the main environmental problems in your country? What can individuals do to help protect the environment?"
     }
     
     selected_topic_key = st.selectbox("📚 Choose a Topic Category:", list(topics.keys()))
@@ -275,7 +283,7 @@ elif menu == "🗣️ Speaking Practice":
         st.success("✅ Analysis Complete!")
         st.balloons()
         
-        # Feedback hiển thị sẽ linh hoạt để phù hợp với cả Part 1 và Part 2
+        # Simulated Feedback
         st.markdown("""
         <div class="ai-report-box">
             <h4>🎯 OVERALL BAND: 7.0</h4>
