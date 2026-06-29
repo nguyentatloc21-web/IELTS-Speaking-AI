@@ -244,7 +244,10 @@ st.markdown("""
 st.markdown("<div class='quick-nav-container'>", unsafe_allow_html=True)
 col_nav1, col_nav2 = st.columns([1, 1])
 
-if st.session_state['active_tab'] == "🏆 Leaderboard":
+# SỬ DỤNG HÀM .get() ĐỂ CHỐNG LỖI KEYERROR TUYỆT ĐỐI
+current_tab = st.session_state.get('active_tab', '🏆 Leaderboard')
+
+if current_tab == "🏆 Leaderboard":
     if col_nav1.button("📊 Go to Student Reports", use_container_width=True):
         st.session_state['active_tab'] = "📊 Student Reports"
         st.rerun()
@@ -252,7 +255,7 @@ if st.session_state['active_tab'] == "🏆 Leaderboard":
         st.session_state['active_tab'] = "🗣️ Speaking Practice"
         st.rerun()
 
-elif st.session_state['active_tab'] == "📊 Student Reports":
+elif current_tab == "📊 Student Reports":
     if col_nav1.button("🏆 Back to Leaderboard", use_container_width=True):
         st.session_state['active_tab'] = "🏆 Leaderboard"
         st.rerun()
@@ -260,7 +263,7 @@ elif st.session_state['active_tab'] == "📊 Student Reports":
         st.session_state['active_tab'] = "🗣️ Speaking Practice"
         st.rerun()
 
-elif st.session_state['active_tab'] == "🗣️ Speaking Practice":
+elif current_tab == "🗣️ Speaking Practice":
     if col_nav1.button("🏆 Back to Leaderboard", use_container_width=True):
         st.session_state['active_tab'] = "🏆 Leaderboard"
         st.rerun()
@@ -276,7 +279,7 @@ df, error_msg = fetch_real_sheet_data()
 # ==========================================
 # TRANG 1: LEADERBOARD
 # ==========================================
-if st.session_state['active_tab'] == "🏆 Leaderboard":
+if current_tab == "🏆 Leaderboard":
     st.markdown("<h2 style='margin-top: 0;'>Class Leaderboard</h2>", unsafe_allow_html=True)
     st.markdown("<p style='color: #6B7280; font-size: 16px; margin-bottom: 24px;'>Check out the top students in our classes based on AI scores!</p>", unsafe_allow_html=True)
     
@@ -316,7 +319,7 @@ if st.session_state['active_tab'] == "🏆 Leaderboard":
 # ==========================================
 # TRANG 2: STUDENT REPORTS
 # ==========================================
-elif st.session_state['active_tab'] == "📊 Student Reports":
+elif current_tab == "📊 Student Reports":
     st.markdown("<h2 style='margin-top: 0;'>Student Reports</h2>", unsafe_allow_html=True)
     st.markdown("<p style='color: #6B7280; font-size: 16px; margin-bottom: 24px;'>Deep-dive analytics into individual performance.</p>", unsafe_allow_html=True)
     
@@ -367,7 +370,7 @@ elif st.session_state['active_tab'] == "📊 Student Reports":
 # ==========================================
 # TRANG 3: SPEAKING PRACTICE
 # ==========================================
-elif st.session_state['active_tab'] == "🗣️ Speaking Practice":
+elif current_tab == "🗣️ Speaking Practice":
     st.markdown("<h2 style='margin-top: 0;'>Speaking Practice</h2>", unsafe_allow_html=True)
     st.markdown("<p style='color: #6B7280; font-size: 16px; margin-bottom: 24px;'>Practice your IELTS Speaking with our AI and get instant feedback.</p>", unsafe_allow_html=True)
     
