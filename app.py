@@ -6,13 +6,6 @@ from datetime import datetime
 st.set_page_config(page_title="Mr. Tat Loc | AI Platform", page_icon="🎓", layout="wide")
 
 # ==========================================
-# KHỞI TẠO BỘ NHỚ TẠM CHO ĐIỀU HƯỚNG
-# ==========================================
-# Đảm bảo đoạn này luôn nằm trên cùng để tránh lỗi KeyError
-if 'active_tab' not in st.session_state:
-    st.session_state['active_tab'] = "🏆 Leaderboard"
-
-# ==========================================
 # GIAO DIỆN CHUẨN SAAS (MODERN CLEAN UI)
 # ==========================================
 st.markdown("""
@@ -36,7 +29,7 @@ st.markdown("""
         padding: 32px 24px;
         border-radius: 16px;
         text-align: center;
-        margin-bottom: 24px;
+        margin-bottom: 32px;
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     }
     .brand-header h1 {
@@ -55,32 +48,7 @@ st.markdown("""
         font-weight: 500;
     }
 
-    /* Quick Navigation Buttons (SaaS Style) */
-    .quick-nav-container {
-        display: flex;
-        gap: 12px;
-        justify-content: center;
-        margin-bottom: 32px;
-        flex-wrap: wrap;
-    }
-    div[data-testid="stButton"] button {
-        background-color: #FFFFFF !important;
-        border: 1px solid #E5E7EB !important;
-        color: #374151 !important;
-        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
-        font-weight: 600 !important;
-        border-radius: 8px !important;
-        padding: 0.5rem 1rem !important;
-        transition: all 0.2s ease !important;
-    }
-    div[data-testid="stButton"] button:hover {
-        border-color: #4F46E5 !important;
-        color: #4F46E5 !important;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
-        transform: translateY(-1px);
-    }
-
-    /* Metric Cards (Left Aligned, White Background, Soft Shadow) */
+    /* Metric Cards */
     .metric-container { 
         display: flex; 
         gap: 24px; 
@@ -227,8 +195,7 @@ with st.sidebar:
     
     menu = st.radio(
         "Choose a section:", 
-        ["🏆 Leaderboard", "📊 Student Reports", "🗣️ Speaking Practice"],
-        key="active_tab" # ĐỒNG BỘ VỚI SESSION STATE
+        ["🏆 Leaderboard", "📊 Student Reports", "🗣️ Speaking Practice"]
     )
 
 # ==========================================
@@ -241,45 +208,13 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown("<div class='quick-nav-container'>", unsafe_allow_html=True)
-col_nav1, col_nav2 = st.columns([1, 1])
-
-# SỬ DỤNG HÀM .get() ĐỂ CHỐNG LỖI KEYERROR TUYỆT ĐỐI
-current_tab = st.session_state.get('active_tab', '🏆 Leaderboard')
-
-if current_tab == "🏆 Leaderboard":
-    if col_nav1.button("📊 Go to Student Reports", use_container_width=True):
-        st.session_state['active_tab'] = "📊 Student Reports"
-        st.rerun()
-    if col_nav2.button("🗣️ Go to Speaking Practice", use_container_width=True):
-        st.session_state['active_tab'] = "🗣️ Speaking Practice"
-        st.rerun()
-
-elif current_tab == "📊 Student Reports":
-    if col_nav1.button("🏆 Back to Leaderboard", use_container_width=True):
-        st.session_state['active_tab'] = "🏆 Leaderboard"
-        st.rerun()
-    if col_nav2.button("🗣️ Go to Speaking Practice", use_container_width=True):
-        st.session_state['active_tab'] = "🗣️ Speaking Practice"
-        st.rerun()
-
-elif current_tab == "🗣️ Speaking Practice":
-    if col_nav1.button("🏆 Back to Leaderboard", use_container_width=True):
-        st.session_state['active_tab'] = "🏆 Leaderboard"
-        st.rerun()
-    if col_nav2.button("📊 Go to Student Reports", use_container_width=True):
-        st.session_state['active_tab'] = "📊 Student Reports"
-        st.rerun()
-st.markdown("</div>", unsafe_allow_html=True)
-st.divider()
-
 # Kéo dữ liệu một lần cho các trang
 df, error_msg = fetch_real_sheet_data()
 
 # ==========================================
 # TRANG 1: LEADERBOARD
 # ==========================================
-if current_tab == "🏆 Leaderboard":
+if menu == "🏆 Leaderboard":
     st.markdown("<h2 style='margin-top: 0;'>Class Leaderboard</h2>", unsafe_allow_html=True)
     st.markdown("<p style='color: #6B7280; font-size: 16px; margin-bottom: 24px;'>Check out the top students in our classes based on AI scores!</p>", unsafe_allow_html=True)
     
@@ -319,7 +254,7 @@ if current_tab == "🏆 Leaderboard":
 # ==========================================
 # TRANG 2: STUDENT REPORTS
 # ==========================================
-elif current_tab == "📊 Student Reports":
+elif menu == "📊 Student Reports":
     st.markdown("<h2 style='margin-top: 0;'>Student Reports</h2>", unsafe_allow_html=True)
     st.markdown("<p style='color: #6B7280; font-size: 16px; margin-bottom: 24px;'>Deep-dive analytics into individual performance.</p>", unsafe_allow_html=True)
     
@@ -370,7 +305,7 @@ elif current_tab == "📊 Student Reports":
 # ==========================================
 # TRANG 3: SPEAKING PRACTICE
 # ==========================================
-elif current_tab == "🗣️ Speaking Practice":
+elif menu == "🗣️ Speaking Practice":
     st.markdown("<h2 style='margin-top: 0;'>Speaking Practice</h2>", unsafe_allow_html=True)
     st.markdown("<p style='color: #6B7280; font-size: 16px; margin-bottom: 24px;'>Practice your IELTS Speaking with our AI and get instant feedback.</p>", unsafe_allow_html=True)
     
