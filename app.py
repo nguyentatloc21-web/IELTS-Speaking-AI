@@ -5,154 +5,93 @@ from datetime import datetime
 
 st.set_page_config(page_title="Mr. Tat Loc | AI Platform", page_icon="🎓", layout="wide")
 
-# ==========================================
-# KHỞI TẠO BỘ NHỚ TẠM (SESSION STATE)
-# ==========================================
-if 'speaking_logged_in' not in st.session_state:
-    st.session_state.speaking_logged_in = False
-    st.session_state.student_name = ""
-    st.session_state.class_code = ""
+# --- KHỞI TẠO STATE ĐIỀU HƯỚNG CHO NÚT BẤM ---
+if 'active_tab' not in st.session_state:
+    st.session_state.active_tab = "🏆 Leaderboard"
 
-# ==========================================
-# GIAO DIỆN CHUẨN SAAS (MODERN CLEAN UI)
-# ==========================================
+def navigate_to(tab_name):
+    st.session_state.active_tab = tab_name
+
 st.markdown("""
     <style>
-    /* Global Font & App Background */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-    html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
-    
-    /* Light gray background for the whole app to make white cards pop */
-    [data-testid="stAppViewContainer"] {
-        background-color: #F9FAFB;
-    }
+    /* Global Font & Aesthetics */
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+    html, body, [class*="css"] { font-family: 'Plus Jakarta Sans', sans-serif; }
     
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
 
-    /* Premium Brand Header */
+    /* Brand Header */
     .brand-header {
-        background: linear-gradient(135deg, #111827 0%, #1F2937 100%);
-        padding: 32px 24px;
+        background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+        padding: 30px 20px;
         border-radius: 16px;
+        color: white;
         text-align: center;
-        margin-bottom: 32px;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        margin-bottom: 30px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
     }
     .brand-header h1 {
-        margin: 0; 
-        font-size: 36px; 
-        font-weight: 800;
-        letter-spacing: -0.025em;
-        background: linear-gradient(to right, #60A5FA, #3B82F6);
-        -webkit-background-clip: text; 
-        -webkit-text-fill-color: transparent;
+        margin: 0; font-size: 38px; font-weight: 800;
+        background: -webkit-linear-gradient(#FACC15, #F59E0B);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
-    .brand-header p { 
-        margin: 8px 0 0 0; 
-        font-size: 16px; 
-        color: #9CA3AF; 
-        font-weight: 500;
-    }
+    .brand-header p { margin: 10px 0 0 0; font-size: 16px; color: #94A3B8; }
 
     /* Metric Cards */
-    .metric-container { 
-        display: flex; 
-        gap: 24px; 
-        margin-bottom: 32px; 
-        flex-wrap: wrap;
-    }
+    .metric-container { display: flex; gap: 20px; margin-bottom: 25px; }
     .metric-card {
-        background: #FFFFFF; 
-        border: 1px solid #F3F4F6; 
-        border-radius: 12px;
-        padding: 24px; 
-        text-align: left; 
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        background: white; border: 1px solid #E2E8F0; border-radius: 12px;
+        padding: 20px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.02);
         flex: 1;
-        min-width: 200px;
     }
-    .metric-card p { 
-        margin: 0 0 8px 0; 
-        font-size: 13px; 
-        color: #6B7280; 
-        font-weight: 600; 
-        text-transform: uppercase; 
-        letter-spacing: 0.05em;
-    }
-    .metric-card h3 { 
-        margin: 0; 
-        font-size: 36px; 
-        font-weight: 800; 
-        color: #111827; 
-        line-height: 1;
-    }
-
-    /* Highlighted Info/Login Box */
-    .highlight-box {
-        background-color: #FFFFFF;
-        border: 1px solid #E5E7EB;
-        border-left: 4px solid #4F46E5;
-        border-radius: 12px;
-        padding: 24px;
-        margin-bottom: 24px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    }
-    .highlight-box h3 {
-        margin-top: 0;
-        color: #111827;
-        font-size: 20px;
-        font-weight: 700;
-        margin-bottom: 8px;
-    }
-    .highlight-box p {
-        color: #6B7280;
-        font-size: 15px;
-        margin-bottom: 0;
-    }
+    .metric-card h3 { margin: 0; font-size: 32px; font-weight: 800; color: #0F172A; }
+    .metric-card p { margin: 5px 0 0 0; font-size: 14px; color: #64748B; font-weight: 600; text-transform: uppercase; }
 
     /* AI Report & Feedback Box */
     .ai-report-box {
-        background-color: #F9FAFB; 
-        border: 1px solid #E5E7EB;
+        background-color: #F8FAFC; 
+        border-left: 4px solid #3B82F6;
+        padding: 20px; 
         border-radius: 8px; 
-        padding: 24px; 
-        margin-top: 12px;
+        margin-top: 10px;
         font-size: 15px; 
         line-height: 1.6; 
-        color: #374151; 
+        color: #334155; 
     }
     
-    /* Customizing Streamlit Expanders */
-    [data-testid="stExpander"] {
-        background-color: #FFFFFF;
-        border: 1px solid #E5E7EB;
-        border-radius: 8px;
-        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    /* Highlighted Student Selection Box */
+    .student-selector-highlight {
+        background-color: #F0F9FF;
+        border: 3px solid #3B82F6;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 25px;
+        box-shadow: 0 8px 16px rgba(59, 130, 246, 0.15);
     }
-    
-    /* Headers inside the app */
-    h1, h2, h3, h4, h5 {
-        color: #111827;
+    .student-selector-highlight h3 {
+        margin-top: 0;
+        color: #0F172A;
+        font-size: 24px;
+        font-weight: 800;
     }
-    
-    /* Subtitles for better hierarchy */
-    .sub-text {
-        color: #6B7280; 
-        font-size: 16px; 
-        margin-bottom: 24px;
-        font-weight: 400;
+    .student-selector-highlight p {
+        color: #475569;
+        font-size: 16px;
+        margin-bottom: 15px;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# ==========================================
-# CÁC HÀM XỬ LÝ DỮ LIỆU
-# ==========================================
 def clean_student_name(name):
+    """Normalize and map student names to eliminate duplicates in stats."""
     if pd.isna(name): return name
+    
+    # Capitalize correctly and strip spaces
     clean_name = str(name).strip().title()
+    
+    # Dictionary to map unaccented or alternate names to official ones
     mapping = {
         "Nguyen Thi Nhu Quynh": "Nguyễn Thị Như Quỳnh",
         "Nhu Quynh": "Nguyễn Thị Như Quỳnh",
@@ -162,7 +101,7 @@ def clean_student_name(name):
     }
     return mapping.get(clean_name, clean_name)
 
-@st.cache_data(ttl=60) # Cập nhật mỗi 60 giây để tránh sập RAM
+@st.cache_data(ttl=5) # Refresh every 5 seconds
 def fetch_real_sheet_data():
     sheet_id = "1woji0ugdk7xfmpfZ6PKVU0dDvSwxtfDw-8rnmcidnDQ"
     csv_url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid=0"
@@ -179,8 +118,10 @@ def fetch_real_sheet_data():
             
         if 'Student' in df.columns:
             df = df.dropna(subset=['Student'])
+            # Clean and unify student names
             df['Student'] = df['Student'].apply(clean_student_name)
             
+        # Extract Column H (Index 7) for detailed feedback
         if len(df.columns) > 7:
             df['Feedback_Detail'] = df.iloc[:, 7]
         else:
@@ -201,22 +142,18 @@ def fetch_real_sheet_data():
             return None, err_msg
         return None, f"Connection Error: {str(e)}"
 
-# ==========================================
-# THANH ĐIỀU HƯỚNG BÊN TRÁI (SIDEBAR)
-# ==========================================
 with st.sidebar:
-    st.markdown("<h2 style='text-align: center; color: #111827; font-weight: 800;'>MENU</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: center; color: #0F172A; font-weight: 800;'>MENU</h2>", unsafe_allow_html=True)
     st.caption("Welcome back, Mr. Tat Loc")
     st.divider()
     
-    menu = st.radio(
-        "Choose a section:", 
-        ["🏆 Leaderboard", "📊 Student Reports", "🗣️ Speaking Practice"]
-    )
+    # Gắn key="active_tab" để đồng bộ với nút bấm ở màn hình chính
+    menu = st.radio("Choose a section:", [
+        "🏆 Leaderboard", 
+        "📊 Student Reports", 
+        "🗣️ Speaking Practice"
+    ], key="active_tab")
 
-# ==========================================
-# BANNER VÀ THANH ĐIỀU HƯỚNG TOÀN CỤC (HUB)
-# ==========================================
 st.markdown("""
 <div class="brand-header">
     <h1>MR. TAT LOC IELTS</h1>
@@ -224,16 +161,43 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Kéo dữ liệu một lần cho các trang
 df, error_msg = fetch_real_sheet_data()
 
-# ==========================================
-# TRANG 1: LEADERBOARD
-# ==========================================
+# --- GLOBAL QUICK NAVIGATION FOR MOBILE ---
+st.markdown("### 🚀 Quick Navigation")
+nav_col1, nav_col2 = st.columns(2)
+
 if menu == "🏆 Leaderboard":
-    st.markdown("<h2 style='margin-top: 0;'>Class Leaderboard</h2>", unsafe_allow_html=True)
-    st.markdown("<p class='sub-text'>Check out the top students in our classes based on AI scores!</p>", unsafe_allow_html=True)
+    with nav_col1:
+        st.button("📊 Student Reports ➔", use_container_width=True, on_click=navigate_to, args=("📊 Student Reports",))
+    with nav_col2:
+        st.button("🗣️ Speaking Practice ➔", type="primary", use_container_width=True, on_click=navigate_to, args=("🗣️ Speaking Practice",))
+        
+elif menu == "📊 Student Reports":
+    with nav_col1:
+        st.button("⬅️ Leaderboard", use_container_width=True, on_click=navigate_to, args=("🏆 Leaderboard",))
+    with nav_col2:
+        st.button("🗣️ Speaking Practice ➔", type="primary", use_container_width=True, on_click=navigate_to, args=("🗣️ Speaking Practice",))
+        
+elif menu == "🗣️ Speaking Practice":
+    with nav_col1:
+        st.button("⬅️ Leaderboard", use_container_width=True, on_click=navigate_to, args=("🏆 Leaderboard",))
+    with nav_col2:
+        st.button("⬅️ Student Reports", use_container_width=True, on_click=navigate_to, args=("📊 Student Reports",))
+
+st.divider()
+
+if menu == "🏆 Leaderboard":
+    st.title("🏆 Class Leaderboard")
+    st.markdown("Check out the top students in our classes!")
     
+    col1, col2 = st.columns([3, 1])
+    with col2:
+        auto_refresh = st.checkbox("🔄 Auto Update")
+        if auto_refresh:
+            time.sleep(5)
+            st.rerun()
+
     if error_msg:
         st.error(error_msg)
     elif df is not None and not df.empty:
@@ -243,13 +207,15 @@ if menu == "🏆 Leaderboard":
         
         st.markdown(f"""
         <div class="metric-container">
-            <div class="metric-card"><p>Total Students</p><h3>{total_students}</h3></div>
-            <div class="metric-card"><p>Tests Taken</p><h3>{total_tests}</h3></div>
-            <div class="metric-card"><p>Average Score</p><h3 style="color:#4F46E5;">{avg_band:.1f}</h3></div>
+            <div class="metric-card"><h3>{total_students}</h3><p>Students</p></div>
+            <div class="metric-card"><h3>{total_tests}</h3><p>Tests Taken</p></div>
+            <div class="metric-card"><h3 style="color:#27AE60;">{avg_band:.1f}</h3><p>Average Score</p></div>
         </div>
         """, unsafe_allow_html=True)
         
-        st.markdown("### 🥇 Top Students")
+        st.write("---")
+        st.subheader("🥇 Top Students")
+        
         try:
             lb_df = df.groupby('Student').agg(
                 Tests=('Band_Score', 'count'),
@@ -260,27 +226,26 @@ if menu == "🏆 Leaderboard":
             lb_df = lb_df.sort_values(by='Average_Score', ascending=False).reset_index(drop=True)
             lb_df.index += 1
             
-            lb_df.columns = ['Student Name', 'Tests Taken', 'Average Band Score']
+            lb_df.columns = ['Student', 'Tests Taken', 'Average Score']
             st.dataframe(lb_df, use_container_width=True)
         except Exception as e:
-            st.dataframe(df)
+            st.dataframe(df) # Fallback to raw data
+            
     else:
         st.info("No data found. Please do some tests first!")
 
-# ==========================================
-# TRANG 2: STUDENT REPORTS
-# ==========================================
 elif menu == "📊 Student Reports":
-    st.markdown("<h2 style='margin-top: 0;'>Student Reports</h2>", unsafe_allow_html=True)
-    st.markdown("<p class='sub-text'>Deep-dive analytics into individual performance.</p>", unsafe_allow_html=True)
+    st.title("📊 Student Reports")
+    st.markdown("View your test history and AI feedback here.")
     
     if error_msg:
         st.error(error_msg)
     elif df is not None and not df.empty and 'Student' in df.columns:
         student_list = df['Student'].dropna().unique().tolist()
         
+        # --- HIGHLIGHTED STUDENT SELECTOR ---
         st.markdown("""
-            <div class='highlight-box'>
+            <div class='student-selector-highlight'>
                 <h3>🔍 Find a Student</h3>
                 <p>Select a student's name below to see their test scores and detailed AI feedback.</p>
             </div>
@@ -288,7 +253,7 @@ elif menu == "📊 Student Reports":
         
         selected_student = st.selectbox("Select Student:", sorted(student_list), label_visibility="collapsed")
         
-        st.markdown(f"<h3 style='margin-top: 32px;'>🎓 Academic Profile: <span style='color: #4F46E5;'>{selected_student}</span></h3>", unsafe_allow_html=True)
+        st.subheader(f"🎓 Academic Profile: {selected_student}")
         
         student_data = df[df['Student'] == selected_student]
         if 'Timestamp' in student_data.columns:
@@ -298,118 +263,80 @@ elif menu == "📊 Student Reports":
             st.warning("No records found for this student.")
         else:
             for index, row in student_data.iterrows():
-                with st.container():
+                with st.container(border=True):
                     cols = st.columns([4, 1])
+                    
                     date_str = str(row.get('Timestamp', 'N/A'))
                     lesson_str = str(row.get('Lesson', 'N/A'))
                     topic_str = str(row.get('Question', 'N/A'))
                     band_str = str(row.get('Band_Score', 'N/A'))
+                    # Lấy feedback từ cột H đã gán thành 'Feedback_Detail'
                     feedback_str = str(row.get('Feedback_Detail', 'No detailed feedback available.'))
                     
                     with cols[0]:
                         st.markdown(f"**🕒 Date:** {date_str} &nbsp;|&nbsp; **Lesson:** {lesson_str}")
                         st.markdown(f"**📌 Topic:** *{topic_str}*")
                     with cols[1]:
-                        st.markdown(f"<h2 style='text-align: right; color: #4F46E5; margin:0;'>Band {band_str}</h2>", unsafe_allow_html=True)
+                        st.markdown(f"<h2 style='text-align: right; color: #3B82F6; margin:0;'>Band {band_str}</h2>", unsafe_allow_html=True)
                     
                     with st.expander("View Detailed AI Feedback", expanded=True):
                         st.markdown(f"<div class='ai-report-box'>\n\n{feedback_str}\n\n</div>", unsafe_allow_html=True)
-                    st.markdown("<br>", unsafe_allow_html=True)
     else:
         st.info("No student data available. Please check your Google Sheet.")
 
-# ==========================================
-# TRANG 3: SPEAKING PRACTICE
-# ==========================================
 elif menu == "🗣️ Speaking Practice":
-    st.markdown("<h2 style='margin-top: 0;'>Speaking Practice</h2>", unsafe_allow_html=True)
-    st.markdown("<p class='sub-text'>Practice your IELTS Speaking with our AI and get instant feedback.</p>", unsafe_allow_html=True)
+    st.title("🗣️ Speaking Practice")
+    st.markdown("Practice your IELTS Speaking with our AI and get instant feedback.")
     
-    # KIỂM TRA TRẠNG THÁI ĐĂNG NHẬP
-    if not st.session_state.speaking_logged_in:
+    # 10 Intensive Speaking Topics (Part 1, 2, and 3)
+    topics = {
+        "Part 1: Work or Study": "Let's talk about what you do. Do you work or are you a student?",
+        "Part 1: Hometown": "Tell me a little about where you live. What do you like most about your hometown?",
+        "Part 1: Hobbies & Free Time": "What do you usually do in your free time? Have your hobbies changed since you were a child?",
+        "Part 1: Food & Cooking": "What is your favorite food? Do you prefer eating at home or eating out?",
+        "Part 2: Describe a Person": "Describe a family member or a friend that you spend a lot of time with.\n\nYou should say:\n- Who this person is\n- What they look like\n- What their personality is\n- And explain why you like spending time with them.",
+        "Part 2: A Memorable Journey": "Describe a long journey you had and would like to take again.\n\nYou should say:\n- When/where you went\n- Who you went with\n- Why you went there\n- And explain why you would like to have it again.",
+        "Part 2: A Book You Enjoyed": "Describe a book that you enjoyed reading.\n\nYou should say:\n- What this book is about\n- Why you decided to read it\n- What you learned from it\n- And explain why you enjoyed reading it.",
+        "Part 2: A Useful Website": "Describe a useful website you often visit.\n\nYou should say:\n- What the website is\n- How you found it\n- What you do on this website\n- And explain why you think it is useful.",
+        "Part 3: Technology & Communication": "How has technology changed the way people communicate with each other? Do you think these changes are mostly positive or negative?",
+        "Part 3: Environment & Pollution": "What are the main environmental problems in your country? What can individuals do to help protect the environment?"
+    }
+    
+    selected_topic_key = st.selectbox("📚 Choose a Topic Category:", list(topics.keys()))
+    
+    st.info(f"**{selected_topic_key}**\n\n{topics[selected_topic_key]}")
+    
+    audio_data = st.audio_input("🎙️ Click to record your answer:")
+    
+    if audio_data:
+        with st.spinner("🤖 AI is analyzing your pronunciation, grammar, and fluency..."):
+            time.sleep(3) # Simulate loading time for demo
+            
+        st.success("✅ Analysis Complete!")
+        st.balloons()
+        
+        # Simulated Feedback
         st.markdown("""
-            <div class='highlight-box'>
-                <h3>🔒 Student Login Required</h3>
-                <p>Please enter your full name and class code to access the speaking simulator.</p>
-            </div>
+        <div class="ai-report-box">
+            <h4>🎯 OVERALL BAND: 7.0</h4>
+            <hr>
+            <h4>📝 DETAILED FEEDBACK:</h4>
+            <ul>
+                <li><b>Fluency & Coherence (7.0):</b> You spoke clearly and maintained a very good pace throughout your answer. Excellent use of linking phrases to connect your ideas logically.</li>
+                <li><b>Lexical Resource (7.5):</b> Appropriate and somewhat advanced vocabulary used. You deployed relevant topic-specific words accurately.</li>
+                <li><b>Grammatical Range (6.5):</b> Most sentences are well-structured. However, pay attention to the consistency of your past tense verbs when describing past events.</li>
+                <li><b>Pronunciation (7.0):</b> Very easy to understand with a natural rhythm and good chunking of phrases.</li>
+            </ul>
+            <br>
+            <h4>💡 HOW TO IMPROVE:</h4>
+            <b>1. Grammar Accuracy</b><br>
+            ❌ <i>Common error detected:</i> Missing articles (a/an/the) in complex sentences.<br>
+            ✅ <i>Advice:</i> Review the rules for definite and indefinite articles, especially before specific nouns.<br><br>
+            
+            <b>2. Vocabulary Upgrade</b><br>
+            Instead of repeating the word "good" or "nice", try using higher-level alternatives like <b>"outstanding"</b>, <b>"phenomenal"</b>, or <b>"captivating"</b> depending on the context.<br>
+        </div>
         """, unsafe_allow_html=True)
         
-        with st.form("login_form"):
-            st.markdown("#### Enter your details:")
-            name_input = st.text_input("Full Name (e.g. Nguyen Van A)")
-            class_input = st.text_input("Class Code (e.g. DIA2702)")
-            
-            submit_login = st.form_submit_button("Start Session", type="primary")
-            
-            if submit_login:
-                if name_input.strip() and class_input.strip():
-                    st.session_state.speaking_logged_in = True
-                    st.session_state.student_name = name_input.strip()
-                    st.session_state.class_code = class_input.strip()
-                    st.rerun()
-                else:
-                    st.warning("⚠️ Please fill in both your Name and Class Code to continue.")
-                    
-    else:
-        # GIAO DIỆN SAU KHI ĐĂNG NHẬP THÀNH CÔNG
-        st.success(f"👋 **Welcome, {st.session_state.student_name}** (Class: {st.session_state.class_code})!")
-        
-        if st.button("🚪 Logout / Change Student"):
-            st.session_state.speaking_logged_in = False
-            st.session_state.student_name = ""
-            st.session_state.class_code = ""
+        if st.button("🔄 Try Another Topic"):
             st.rerun()
-            
-        st.markdown("---")
-        
-        topics = {
-            "Part 1: Work or Study": "Let's talk about what you do. Do you work or are you a student?",
-            "Part 1: Hometown": "Tell me a little about where you live. What do you like most about your hometown?",
-            "Part 1: Hobbies & Free Time": "What do you usually do in your free time? Have your hobbies changed since you were a child?",
-            "Part 1: Food & Cooking": "What is your favorite food? Do you prefer eating at home or eating out?",
-            "Part 2: Describe a Person": "Describe a family member or a friend that you spend a lot of time with.\n\nYou should say:\n- Who this person is\n- What they look like\n- What their personality is\n- And explain why you like spending time with them.",
-            "Part 2: A Memorable Journey": "Describe a long journey you had and would like to take again.\n\nYou should say:\n- When/where you went\n- Who you went with\n- Why you went there\n- And explain why you would like to have it again.",
-            "Part 2: A Book You Enjoyed": "Describe a book that you enjoyed reading.\n\nYou should say:\n- What this book is about\n- Why you decided to read it\n- What you learned from it\n- And explain why you enjoyed reading it.",
-            "Part 2: A Useful Website": "Describe a useful website you often visit.\n\nYou should say:\n- What the website is\n- How you found it\n- What you do on this website\n- And explain why you think it is useful.",
-            "Part 3: Technology & Communication": "How has technology changed the way people communicate with each other? Do you think these changes are mostly positive or negative?",
-            "Part 3: Environment & Pollution": "What are the main environmental problems in your country? What can individuals do to help protect the environment?"
-        }
-        
-        st.markdown("### 📚 Choose a Topic Category")
-        selected_topic_key = st.selectbox("Select a topic to begin:", list(topics.keys()), label_visibility="collapsed")
-        
-        st.info(f"**{selected_topic_key}**\n\n{topics[selected_topic_key]}")
-        
-        st.markdown("### 🎙️ Record Your Answer")
-        audio_data = st.audio_input("Click to record your answer:")
-        
-        if audio_data:
-            with st.spinner("🤖 AI is analyzing your pronunciation, grammar, and fluency..."):
-                time.sleep(3)
-                
-            st.success("✅ Analysis Complete!")
-            
-            st.markdown("""
-            <div class="ai-report-box">
-                <h4 style="color: #4F46E5; margin-top: 0;">🎯 OVERALL BAND: 7.0</h4>
-                <hr style="border-top: 1px solid #E5E7EB;">
-                <h4>📝 DETAILED FEEDBACK:</h4>
-                <ul style="margin-bottom: 20px;">
-                    <li><b>Fluency & Coherence (7.0):</b> You spoke clearly and maintained a very good pace throughout your answer. Excellent use of linking phrases to connect your ideas logically.</li>
-                    <li><b>Lexical Resource (7.5):</b> Appropriate and somewhat advanced vocabulary used. You deployed relevant topic-specific words accurately.</li>
-                    <li><b>Grammatical Range (6.5):</b> Most sentences are well-structured. However, pay attention to the consistency of your past tense verbs when describing past events.</li>
-                    <li><b>Pronunciation (7.0):</b> Very easy to understand with a natural rhythm and good chunking of phrases.</li>
-                </ul>
-                
-                <h4>💡 HOW TO IMPROVE:</h4>
-                <b>1. Grammar Accuracy</b><br>
-                ❌ <i>Common error detected:</i> Missing articles (a/an/the) in complex sentences.<br>
-                ✅ <i>Advice:</i> Review the rules for definite and indefinite articles, especially before specific nouns.<br><br>
-                
-                <b>2. Vocabulary Upgrade</b><br>
-                Instead of repeating the word "good" or "nice", try using higher-level alternatives like <b>"outstanding"</b>, <b>"phenomenal"</b>, or <b>"captivating"</b> depending on the context.<br>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            if st.button("🔄 Try Another Topic"):
-                st.rerun()
